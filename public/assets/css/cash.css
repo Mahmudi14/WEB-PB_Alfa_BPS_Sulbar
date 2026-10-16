@@ -1,0 +1,1524 @@
+
+/* Umum */
+
+.cash-page,
+.cash-form-page {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+.cash-page *,
+.cash-form-page *,
+.cash-page *::before,
+.cash-form-page *::before,
+.cash-page *::after,
+.cash-form-page *::after {
+    box-sizing: border-box;
+}
+
+.cash-eyebrow {
+    color: #A7E4B4;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .11em;
+}
+
+.cash-eyebrow--green {
+    color: #318A53;
+}
+
+/* Header */
+
+.cash-hero,
+.cash-form-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+    min-height: 125px;
+    padding: 25px 29px;
+    border-radius: 18px;
+    background:
+        radial-gradient(
+            circle at 95% 10%,
+            rgba(104,180,73,.23),
+            transparent 42%
+        ),
+        linear-gradient(115deg,#092543,#15527C);
+    color: #FFFFFF;
+    overflow: hidden;
+}
+
+.cash-hero h1,
+.cash-form-hero h1 {
+    margin: 8px 0 5px;
+    color: #FFFFFF;
+    font-size: clamp(26px,4vw,41px);
+    font-weight: 900;
+    line-height: 1.12;
+    letter-spacing: -.045em;
+}
+
+.cash-hero h1 span,
+.cash-form-hero h1 span {
+    color: #FFA93E;
+}
+
+.cash-hero p {
+    margin: 0;
+    color: #CCDEEB;
+    font-size: 12px;
+}
+
+.cash-hero__decoration {
+    flex-shrink: 0;
+    color: rgba(255,255,255,.14);
+    font-size: 79px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+/* Ringkasan */
+
+.cash-summary {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 11px;
+    width: 100%;
+    min-width: 0;
+}
+
+.cash-summary__card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 19px;
+    border: 1px solid #DFE8F0;
+    border-radius: 13px;
+    background: white;
+}
+
+.cash-summary__card > span {
+    color: #617B91;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .05em;
+}
+
+.cash-summary__card > strong {
+    color: #173B5A;
+    font-size: clamp(17px,2.2vw,26px);
+    font-weight: 900;
+    letter-spacing: -.04em;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.cash-summary__card--balance {
+    background: #EAF4FC;
+    border-color: #CFE3F3;
+}
+
+.cash-summary__card--balance > strong {
+    color: #124C7C;
+}
+
+.cash-summary__card--balance > strong.is-negative {
+    color: #C54C4C;
+}
+
+.cash-summary__card--income {
+    background: #F0FAF2;
+    border-color: #CFEAD6;
+}
+
+.cash-summary__card--income > strong {
+    color: #23834B;
+}
+
+.cash-summary__card--expense {
+    background: #FFF5E8;
+    border-color: #F2DCBB;
+}
+
+.cash-summary__card--expense > strong {
+    color: #B76A13;
+}
+
+/* Filter */
+
+.cash-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+}
+
+.cash-filter {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+}
+
+.cash-filter label,
+.cash-filter > span {
+    flex: 0 0 auto;
+    color: #284E6D;
+    font-size: 12px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.site-main .cash-filter select {
+    display: block;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: 47px;
+    margin: 0;
+    padding: 10px 13px;
+    border: 1.5px solid #C9DBEA;
+    border-radius: 10px;
+    background: #FFFFFF;
+    color: #1769AA;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.site-main .cash-filter select:focus {
+    outline: none;
+    border-color: #1769AA;
+    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+}
+
+.cash-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    min-height: 47px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: #F39222;
+    color: #35230D;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.cash-add:hover {
+    background: #FFB34D;
+    color: #35230D;
+}
+
+.cash-add > span {
+    font-size: 20px;
+    line-height: 1;
+}
+
+/* Daftar */
+
+.cash-board {
+    width: 100%;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #DFE8F0;
+    border-radius: 17px;
+    background: #FFFFFF;
+}
+
+.cash-board__heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.cash-board__heading h2 {
+    margin: 5px 0 0;
+    color: #153B5E;
+    font-size: clamp(19px,3vw,25px);
+    font-weight: 850;
+}
+
+.cash-board__count {
+    flex-shrink: 0;
+    padding: 7px 10px;
+    border-radius: 30px;
+    background: #EDF5FB;
+    color: #386A8F;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.cash-table {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* Baris transaksi */
+
+.cash-row {
+    display: grid;
+    grid-template-columns:
+        38px
+        112px
+        minmax(0,1fr)
+        155px;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.cash-row--manage {
+    grid-template-columns:
+        38px
+        112px
+        minmax(0,1fr)
+        155px
+        76px;
+}
+
+.cash-row--head {
+    padding: 9px 11px;
+    border-bottom: 2px solid #DFE9F1;
+    color: #72879B;
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.cash-row--data {
+    padding: 10px 11px;
+    border: 1px solid #E2EAF1;
+    border-left: 3px solid #1769AA;
+    border-radius: 10px;
+    background: #FFFFFF;
+}
+
+.cash-row--data:hover {
+    background: #F8FBFE;
+}
+
+.cash-align-right {
+    text-align: right;
+}
+
+.cash-align-center {
+    text-align: center;
+}
+
+.cash-row__number {
+    color: #70869A;
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.cash-row__date {
+    color: #395B78;
+    font-size: 12px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Keterangan */
+
+.cash-row__description {
+    align-self: center;
+    min-width: 0;
+    color: #1D3A55;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+
+/* Nominal */
+
+.cash-row__amount {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    min-width: 0;
+    text-align: right;
+}
+
+.cash-row__amount strong {
+    color: #173B5A;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -.025em;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.cash-row__amount span {
+    color: #64748B;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.cash-row__amount--pemasukan strong,
+.cash-row__amount--pemasukan span {
+    color: #23834B;
+}
+
+.cash-row__amount--pengeluaran strong,
+.cash-row__amount--pengeluaran span {
+    color: #B76A13;
+}
+
+/* Aksi */
+
+.cash-row__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    min-width: 0;
+    padding-left: 7px;
+    border-left: 1px solid #DFE7EE;
+}
+
+.cash-row__actions form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.cash-action {
+    display: inline-grid;
+    place-items: center;
+    width: 33px;
+    height: 33px;
+    padding: 8px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cash-action svg {
+    display: block;
+    width: 17px;
+    height: 17px;
+}
+
+.cash-action--edit {
+    background: #E1F0FC;
+    color: #1769AA;
+}
+
+.cash-action--edit:hover {
+    background: #CBE5F7;
+}
+
+.cash-action--delete {
+    background: #FCE7E7;
+    color: #BF4545;
+}
+
+.cash-action--delete:hover {
+    background: #FAD2D2;
+}
+
+.cash-action:disabled {
+    opacity: .5;
+}
+
+/* Pagination */
+
+.cash-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 17px;
+    padding-top: 14px;
+    border-top: 1px solid #E3EBF2;
+}
+
+.cash-pagination a,
+.cash-pagination .is-disabled {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 11px;
+    border: 1px solid #D8E7F2;
+    border-radius: 8px;
+    background: #EDF5FB;
+    color: #1769AA;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.cash-pagination .is-disabled {
+    opacity: .4;
+}
+
+.cash-pagination__info {
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.cash-empty {
+    padding: 28px 15px;
+    border: 1px dashed #C9D9E6;
+    border-radius: 11px;
+    background: #F7FAFC;
+    color: #264864;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* Card form */
+
+.cash-form-card {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    padding: clamp(16px,2.8vw,28px);
+    border: 1px solid #DFE8F0;
+    border-radius: 17px;
+    background: #FFFFFF;
+}
+
+.cash-form-card__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 21px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #E4ECF2;
+}
+
+.cash-form-card__heading h2 {
+    margin: 5px 0 0;
+    color: #153B5E;
+    font-size: clamp(19px,3vw,25px);
+    font-weight: 850;
+}
+
+.cash-form-card__tag {
+    flex-shrink: 0;
+    padding: 6px 11px;
+    border-radius: 8px;
+    background: #EAF4FC;
+    color: #1769AA;
+    font-size: 10px;
+    font-weight: 850;
+}
+
+/* Form */
+
+.cash-form {
+    display: grid;
+    gap: 20px;
+    width: 100%;
+    min-width: 0;
+}
+
+.cash-form__grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        minmax(0,1.2fr)
+        minmax(0,1fr);
+    gap: 19px 15px;
+    min-width: 0;
+}
+
+.cash-field {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.cash-field > label,
+.cash-field > legend {
+    margin: 0;
+    padding: 0;
+    color: #264864;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.cash-field--description {
+    grid-column: 1 / -1;
+}
+
+.site-main .cash-field > input,
+.site-main .cash-field > textarea,
+.site-main .cash-money input {
+    display: block;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    border: 1.5px solid #CBD9E6;
+    border-radius: 9px;
+    background: #FFFFFF;
+    color: #173B5A;
+    font-size: 13px;
+    font-weight: 650;
+    outline: none;
+}
+
+.site-main .cash-field > input,
+.site-main .cash-money input {
+    height: 45px;
+    min-height: 45px;
+    padding: 10px 12px;
+}
+
+.site-main .cash-field > textarea {
+    min-height: 79px;
+    padding: 11px 12px;
+    resize: vertical;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.site-main .cash-field input:focus,
+.site-main .cash-field textarea:focus {
+    border-color: #1769AA;
+    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+}
+
+.site-main .cash-field input::placeholder,
+.site-main .cash-field textarea::placeholder {
+    color: #9AAAB8;
+    font-weight: 400;
+}
+
+/* Kategori */
+
+.cash-type {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+    min-width: 0;
+}
+
+.cash-type label {
+    position: relative;
+    display: block;
+    min-width: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.cash-type input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.cash-type label span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 45px;
+    padding: 8px;
+    border: 1.5px solid #D7E3ED;
+    border-radius: 9px;
+    background: #FFFFFF;
+    color: #48657D;
+    font-size: 12px;
+    font-weight: 750;
+    text-align: center;
+}
+
+.cash-type input[value="pemasukan"]:checked + span {
+    border-color: #7BCB91;
+    background: #EAF8EF;
+    color: #217C43;
+}
+
+.cash-type input[value="pengeluaran"]:checked + span {
+    border-color: #F1C98B;
+    background: #FFF3E3;
+    color: #A65B08;
+}
+
+.cash-type input:focus-visible + span {
+    outline: 3px solid rgba(23,105,170,.2);
+    outline-offset: 2px;
+}
+
+/* Nominal */
+
+.cash-money {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.cash-money > span {
+    position: absolute;
+    left: 13px;
+    z-index: 1;
+    color: #1769AA;
+    font-size: 12px;
+    font-weight: 850;
+    pointer-events: none;
+}
+
+.site-main .cash-money input {
+    padding-left: 42px;
+}
+
+.cash-money input::-webkit-inner-spin-button,
+.cash-money input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+.cash-money input[type="number"] {
+    appearance: textfield;
+}
+
+/* Validasi */
+
+.cash-alert {
+    padding: 11px 13px;
+    border: 1px solid #F0C5C5;
+    border-radius: 9px;
+    background: #FFF0F0;
+    color: #A94040;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.cash-alert strong {
+    display: block;
+}
+
+.cash-alert ul {
+    margin: 5px 0 0;
+    padding-left: 18px;
+}
+
+/* Tombol form */
+
+.cash-form__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 11px;
+    padding-top: 16px;
+    border-top: 1px solid #E4ECF2;
+}
+
+.cash-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 9px;
+    background: #1769AA;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.cash-submit:hover {
+    background: #125487;
+}
+
+.cash-submit:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.cash-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 10px 16px;
+    color: #64748B;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+/* Tablet */
+
+@media (max-width: 750px) {
+
+    .cash-summary {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+    .cash-summary__card--balance {
+        grid-column: 1 / -1;
+    }
+
+    .cash-row {
+        grid-template-columns:
+            27px 83px minmax(0,1fr) 110px;
+        gap: 7px;
+    }
+
+    .cash-row--manage {
+        grid-template-columns:
+            27px 83px minmax(0,1fr) 110px 65px;
+    }
+
+    .cash-row__amount strong {
+        font-size: 12px;
+    }
+
+    .cash-row__actions {
+        gap: 4px;
+        padding-left: 4px;
+    }
+
+    .cash-action {
+        width: 29px;
+        height: 30px;
+        padding: 7px;
+    }
+
+    .cash-form__grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        grid-template-areas:
+            "date amount"
+            "type type"
+            "description description";
+        gap: 17px 12px;
+    }
+
+    .cash-field--date {
+        grid-area: date;
+    }
+
+    .cash-field--type {
+        grid-area: type;
+    }
+
+    .cash-field--amount {
+        grid-area: amount;
+    }
+
+    .cash-field--description {
+        grid-area: description;
+    }
+}
+
+/* HP */
+
+@media (max-width: 600px) {
+
+    .cash-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .cash-add {
+        order: -1;
+        width: 100%;
+        min-height: 46px;
+    }
+
+    .cash-filter {
+        display: grid;
+        grid-template-columns: minmax(0,1fr);
+        gap: 7px;
+        width: 100%;
+        flex: none;
+    }
+
+    .cash-filter > span {
+        display: none;
+    }
+
+    .site-main .cash-filter select {
+        width: 100%;
+        min-height: 47px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .cash-page,
+    .cash-form-page {
+        gap: 14px;
+    }
+
+    .cash-hero,
+    .cash-form-hero {
+        min-height: 105px;
+        padding: 20px 17px;
+        border-radius: 15px;
+    }
+
+    .cash-hero h1,
+    .cash-form-hero h1 {
+        font-size: clamp(25px,7.5vw,33px);
+    }
+
+    .cash-hero p {
+        font-size: 11px;
+    }
+
+    .cash-hero__decoration {
+        display: none;
+    }
+
+    .cash-summary {
+        gap: 8px;
+    }
+
+    .cash-summary__card {
+        gap: 6px;
+        padding: 13px 11px;
+        border-radius: 10px;
+    }
+
+    .cash-summary__card > span {
+        font-size: 9px;
+    }
+
+    .cash-summary__card > strong {
+        font-size: clamp(15px,4vw,20px);
+    }
+
+    .cash-board {
+        padding: 11px 8px;
+        border-radius: 14px;
+    }
+
+    .cash-board__heading {
+        gap: 6px;
+    }
+
+    .cash-board__heading h2 {
+        font-size: 19px;
+    }
+
+    .cash-board__count {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+    .cash-row {
+        grid-template-columns:
+            18px
+            61px
+            minmax(0,1fr)
+            minmax(82px,max-content);
+        gap: 4px;
+    }
+
+    .cash-row--manage {
+        grid-template-columns:
+            18px
+            61px
+            minmax(0,1fr)
+            minmax(82px,max-content)
+            53px;
+    }
+
+    .cash-row--head {
+        padding: 8px 5px;
+        font-size: 9px;
+    }
+
+    .cash-row--data {
+        padding: 9px 5px;
+        border-left-width: 2px;
+        border-radius: 8px;
+    }
+
+    .cash-row__number,
+    .cash-row__date {
+        font-size: 9px;
+    }
+
+    .cash-row__description {
+        font-size: 10px;
+        line-height: 1.3;
+    }
+
+    .cash-row__amount {
+        gap: 3px;
+    }
+
+    .cash-row__amount strong {
+        font-size: 10px;
+        letter-spacing: -.03em;
+    }
+
+    .cash-row__amount span {
+        font-size: 9px;
+    }
+
+    .cash-row__actions {
+        gap: 3px;
+        padding-left: 3px;
+    }
+
+    .cash-action {
+        width: 24px;
+        height: 27px;
+        padding: 5px;
+        border-radius: 6px;
+    }
+
+    .cash-action svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .cash-form-card {
+        padding: 16px 12px;
+        border-radius: 14px;
+    }
+
+    .cash-form-card__heading {
+        margin-bottom: 17px;
+        padding-bottom: 12px;
+    }
+
+    .cash-form-card__heading h2 {
+        font-size: 19px;
+    }
+
+    .cash-form-card__tag {
+        padding: 6px 8px;
+        font-size: 9px;
+    }
+
+    .cash-form {
+        gap: 17px;
+    }
+
+    .cash-form__grid {
+        gap: 16px 10px;
+    }
+
+    .cash-field > label,
+    .cash-field > legend {
+        font-size: 11px;
+    }
+
+    .site-main .cash-field > input,
+    .site-main .cash-money input {
+        height: 43px;
+        min-height: 43px;
+        font-size: 12px;
+    }
+
+    .site-main .cash-field > textarea {
+        min-height: 75px;
+        font-size: 12px;
+    }
+
+    .cash-type label span {
+        min-height: 43px;
+        padding: 8px;
+        font-size: 11px;
+    }
+
+    .cash-form__actions {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) 82px;
+        gap: 8px;
+    }
+
+    .cash-submit,
+    .cash-cancel {
+        width: 100%;
+        min-height: 44px;
+        padding: 9px 7px;
+        font-size: 11px;
+    }
+
+    .cash-pagination a,
+    .cash-pagination .is-disabled {
+        padding: 8px;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 350px) {
+
+    .cash-row {
+        grid-template-columns:
+            17px 55px minmax(0,1fr) 78px;
+        gap: 3px;
+    }
+
+    .cash-row--manage {
+        grid-template-columns:
+            17px 55px minmax(0,1fr) 78px 51px;
+    }
+
+    .cash-row__amount strong {
+        font-size: 9px;
+    }
+
+    .cash-form__grid {
+        grid-template-columns: minmax(0,1fr);
+        grid-template-areas:
+            "date"
+            "type"
+            "amount"
+            "description";
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cash-page *,
+    .cash-form-page * {
+        transition: none !important;
+    }
+}
+
+/* =========================================================
+   PB ALFA - CASH LAYOUT FIX
+   Perbaikan form, nominal, jenis transaksi dan responsivitas
+========================================================= */
+
+/* =========================================================
+   1. LAYOUT FORM
+========================================================= */
+
+.cash-form {
+    display: grid;
+    gap: 18px;
+    width: 100%;
+    min-width: 0;
+}
+
+.cash-form__grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+        "date amount"
+        "type type"
+        "description description";
+    align-items: start;
+    gap: 17px 16px;
+    width: 100%;
+    min-width: 0;
+}
+
+.cash-field--date {
+    grid-area: date;
+}
+
+.cash-field--amount {
+    grid-area: amount;
+}
+
+.cash-field--type {
+    grid-area: type;
+    min-width: 0;
+}
+
+.cash-field--description {
+    grid-area: description;
+    min-width: 0;
+}
+
+.cash-field > label,
+.cash-field > legend {
+    font-size: 12px;
+    font-weight: 800;
+    color: #264864;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   2. NOMINAL - PREFIX RP TIDAK MENIMPA ANGKA
+========================================================= */
+
+.cash-money {
+    position: relative;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    align-items: stretch;
+    width: 100%;
+    height: 45px;
+    min-height: 45px;
+    min-width: 0;
+    overflow: hidden;
+    border: 1.5px solid #CBD9E6;
+    border-radius: 9px;
+    background: #FFFFFF;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+/* Rp merupakan kolom tersendiri */
+
+.cash-money > span {
+    position: static;
+    left: auto;
+    z-index: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    border-right: 1px solid #D8E6F0;
+    background: #EDF5FB;
+
+    color: #1769AA;
+    font-size: 13px;
+    font-weight: 850;
+    line-height: 1;
+
+    pointer-events: none;
+}
+
+/* Input nominal */
+
+.site-main .cash-money input {
+    display: block;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+
+    margin: 0;
+    padding: 0 12px;
+
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    box-shadow: none;
+
+    background: transparent;
+    color: #173B5A;
+
+    font-size: 14px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+    text-align: left;
+}
+
+/* Fokus input nominal */
+
+.cash-money:focus-within {
+    border-color: #1769AA;
+    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+}
+
+.site-main .cash-money input:focus {
+    border: 0;
+    outline: none;
+    box-shadow: none;
+}
+
+/* Hilangkan tombol spinner angka */
+
+.cash-money input::-webkit-inner-spin-button,
+.cash-money input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.cash-money input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* =========================================================
+   3. JENIS TRANSAKSI
+========================================================= */
+
+.cash-field--type legend {
+    display: block;
+    width: 100%;
+    margin-bottom: 9px;
+    padding: 0;
+}
+
+.cash-type {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    width: 100%;
+    max-width: 440px;
+    min-width: 0;
+}
+
+.cash-type label {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.cash-type input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.cash-type label span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 45px;
+    padding: 9px 12px;
+
+    border: 1.5px solid #D7E3ED;
+    border-radius: 9px;
+    background: #FFFFFF;
+
+    color: #48657D;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+
+    transition:
+        border-color .2s,
+        background-color .2s;
+}
+
+/* Pemasukan aktif */
+
+.cash-type input[value="pemasukan"]:checked + span {
+    border-color: #7BCB91;
+    background: #EAF8EF;
+    color: #217C43;
+}
+
+/* Pengeluaran aktif */
+
+.cash-type input[value="pengeluaran"]:checked + span {
+    border-color: #F1C98B;
+    background: #FFF3E3;
+    color: #A65B08;
+}
+
+.cash-type input:focus-visible + span {
+    outline: 3px solid rgba(23,105,170,.2);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   4. KETERANGAN
+========================================================= */
+
+.site-main .cash-field--description textarea {
+    width: 100%;
+    min-height: 78px;
+    margin: 0;
+    padding: 11px 12px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   5. NOMINAL PADA HALAMAN INDEX
+========================================================= */
+
+.cash-row__amount {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    text-align: right;
+}
+
+.cash-row__amount strong {
+    display: block;
+    max-width: 100%;
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.cash-row__amount span {
+    display: block;
+    margin: 0;
+    padding: 0;
+    line-height: 1.25;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+/* Keterangan tetap di tengah baris */
+
+.cash-row__description {
+    align-self: center;
+}
+
+/* =========================================================
+   6. RESPONSIVE TABLET
+========================================================= */
+
+@media (max-width: 750px) {
+    .cash-form__grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+        grid-template-areas:
+            "date amount"
+            "type type"
+            "description description";
+        gap: 16px 12px;
+    }
+}
+
+/* =========================================================
+   7. RESPONSIVE HP
+========================================================= */
+
+@media (max-width: 600px) {
+    .cash-form__grid {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "date"
+            "amount"
+            "type"
+            "description";
+        gap: 16px;
+    }
+
+    .cash-type {
+        max-width: none;
+        gap: 8px;
+    }
+
+    .cash-money {
+        height: 45px;
+        min-height: 45px;
+    }
+
+    .cash-form__actions {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr) 82px;
+        gap: 9px;
+    }
+
+    .cash-submit,
+    .cash-cancel {
+        width: 100%;
+        min-height: 44px;
+    }
+}
+
+/* =========================================================
+   8. HP KECIL
+========================================================= */
+
+@media (max-width: 350px) {
+    .cash-form__grid {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "date"
+            "amount"
+            "type"
+            "description";
+    }
+
+    .cash-money {
+        grid-template-columns: 43px minmax(0, 1fr);
+    }
+
+    .cash-type label span {
+        padding: 8px 5px;
+        font-size: 11px;
+    }
+}
+
+/* =========================================================
+   FILTER KAS - PERBAIKAN ICON DROPDOWN
+========================================================= */
+
+.site-main .cash-filter select {
+    /* Ukuran */
+    height: 47px;
+    min-height: 47px;
+    box-sizing: border-box;
+
+    /* Teks dan ruang untuk ikon */
+    padding: 0 44px 0 14px;
+    line-height: normal;
+
+    /* Hilangkan ikon bawaan browser */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Ikon panah custom */
+    background-color: #FFFFFF;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%231769AA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px 16px;
+
+    /* Tampilan */
+    border: 1.5px solid #C9DBEA;
+    border-radius: 10px;
+    color: #1769AA;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.site-main .cash-filter select:focus {
+    outline: none;
+    border-color: #1769AA;
+    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+}
