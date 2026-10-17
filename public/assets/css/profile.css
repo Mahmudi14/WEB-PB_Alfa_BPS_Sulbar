@@ -1,0 +1,346 @@
+
+/* Umum */
+
+.profile-page {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+.profile-page *,
+.profile-page *::before,
+.profile-page *::after {
+    box-sizing: border-box;
+}
+
+/* Header */
+
+.profile-hero {
+    width: 100%;
+    min-width: 0;
+    padding: 25px 29px;
+    border-radius: 18px;
+    background:
+        radial-gradient(
+            circle at 95% 10%,
+            rgba(104,180,73,.23),
+            transparent 42%
+        ),
+        linear-gradient(115deg,#092543,#15527C);
+    color: #FFFFFF;
+}
+
+.profile-eyebrow {
+    color: #A7E4B4;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .11em;
+}
+
+.profile-hero h1 {
+    margin: 8px 0 5px;
+    color: #FFFFFF;
+    font-size: clamp(26px,4vw,41px);
+    font-weight: 900;
+    line-height: 1.12;
+    letter-spacing: -.045em;
+}
+
+.profile-hero h1 span {
+    color: #FFA93E;
+}
+
+.profile-hero p {
+    margin: 0;
+    color: #CCDEEB;
+    font-size: 12px;
+}
+
+/* Card */
+
+.profile-card {
+    width: 100%;
+    min-width: 0;
+    padding: clamp(16px,2.5vw,25px);
+    border: 1px solid #DFE8F0;
+    border-radius: 16px;
+    background: #FFFFFF;
+}
+
+.profile-card__heading {
+    margin-bottom: 17px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #E4ECF2;
+}
+
+.profile-card__heading h2 {
+    margin: 0;
+    color: #153B5E;
+    font-size: 19px;
+    font-weight: 850;
+}
+
+/* Identitas */
+
+.profile-identity {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+}
+
+.profile-avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+    border-radius: 13px;
+    background: #EAF4FC;
+    color: #1769AA;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.profile-identity__info {
+    display: grid;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-identity__info strong {
+    color: #173B5A;
+    font-size: 15px;
+    font-weight: 850;
+    overflow-wrap: anywhere;
+}
+
+.profile-identity__info span {
+    color: #71879A;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.profile-role {
+    flex: 0 0 auto;
+    padding: 7px 11px;
+    border-radius: 20px;
+    background: #EAF8EF;
+    color: #217C43;
+    font-size: 10px;
+    font-weight: 850;
+}
+
+/* Form */
+
+.profile-form {
+    display: grid;
+    gap: 19px;
+    min-width: 0;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 16px;
+    min-width: 0;
+}
+
+.profile-field {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+
+.profile-field label {
+    color: #264864;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.site-main .profile-field input {
+    display: block;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: 45px;
+    min-height: 45px;
+    margin: 0;
+    padding: 10px 12px;
+    border: 1.5px solid #CBD9E6;
+    border-radius: 9px;
+    background: #FFFFFF;
+    color: #173B5A;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    outline: none;
+}
+
+.site-main .profile-field input:focus {
+    border-color: #1769AA;
+    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+}
+
+.site-main .profile-field input[readonly] {
+    background: #F2F6F9;
+    color: #71879A;
+    cursor: not-allowed;
+}
+
+.profile-error {
+    color: #B64B4B;
+    font-size: 11px;
+}
+
+.profile-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 15px;
+    border-top: 1px solid #E4ECF2;
+}
+
+.profile-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 9px;
+    background: #1769AA;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.profile-button:hover {
+    background: #125487;
+}
+
+.profile-button:disabled {
+    opacity: .55;
+}
+
+/* Informasi keamanan */
+
+.profile-warning {
+    padding: 14px 16px;
+    border: 1px solid #F0D9B6;
+    border-radius: 10px;
+    background: #FFF8EB;
+    color: #94601D;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+/* Password sementara */
+
+.profile-credential {
+    display: grid;
+    gap: 13px;
+}
+
+.profile-credential h2 {
+    margin: 0;
+    color: #153B5E;
+    font-size: 19px;
+}
+
+.profile-credential p,
+.profile-credential small {
+    margin: 0;
+    color: #64748B;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.profile-credential label {
+    color: #284E6D;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.site-main .profile-credential input {
+    width: 100%;
+    height: 45px;
+    padding: 10px 12px;
+    border: 1.5px solid #CBD9E6;
+    border-radius: 9px;
+    background: #F8FAFC;
+    color: #173B5A;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/* HP */
+
+@media (max-width: 600px) {
+    .profile-page {
+        gap: 13px;
+    }
+
+    .profile-hero {
+        padding: 20px 17px;
+        border-radius: 15px;
+    }
+
+    .profile-hero h1 {
+        font-size: clamp(25px,7.5vw,33px);
+    }
+
+    .profile-hero p {
+        font-size: 11px;
+    }
+
+    .profile-card {
+        padding: 15px 12px;
+        border-radius: 14px;
+    }
+
+    .profile-grid {
+        grid-template-columns: minmax(0,1fr);
+        gap: 14px;
+    }
+
+    .profile-avatar {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
+
+    .profile-identity {
+        gap: 9px;
+    }
+
+    .profile-identity__info strong {
+        font-size: 12px;
+    }
+
+    .profile-identity__info span {
+        font-size: 10px;
+    }
+
+    .profile-role {
+        padding: 6px 8px;
+        font-size: 9px;
+    }
+
+    .site-main .profile-field input {
+        height: 43px;
+        min-height: 43px;
+    }
+
+    .profile-actions .profile-button {
+        width: 100%;
+        min-height: 44px;
+    }
+}

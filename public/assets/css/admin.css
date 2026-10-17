@@ -1164,3 +1164,129 @@
         transform: none !important;
     }
 }
+
+
+/* Kontrol pengguna */
+
+.adm-user-controls {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 9px;
+    min-width: 0;
+}
+
+.adm-user-reset-form {
+    display: flex;
+    align-items: flex-end;
+    margin: 0;
+}
+
+.adm-user-reset-form .adm-button {
+    min-height: 43px;
+}
+
+/* Password sementara */
+
+.adm-reset-result {
+    display: grid;
+    gap: 11px;
+    padding: 20px;
+    border: 1px solid #B6E2C4;
+    border-radius: 13px;
+    background: #F0FAF2;
+}
+
+.adm-reset-result h2 {
+    margin: 0;
+    color: #217C43;
+    font-size: 18px;
+    font-weight: 850;
+}
+
+.adm-reset-result p {
+    margin: 0;
+    color: #395B78;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.adm-reset-result label {
+    color: #264864;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.site-main .adm-reset-result input {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    min-width: 0;
+    height: 45px;
+    padding: 10px 12px;
+    border: 1.5px solid #B6D5C1;
+    border-radius: 9px;
+    background: #FFFFFF;
+    color: #173B5A;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.adm-reset-result small {
+    color: #587868;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+    .adm-user-row {
+        grid-template-columns: minmax(0,1fr);
+    }
+
+    .adm-user-controls {
+        justify-content: flex-start;
+        padding-top: 11px;
+        border-top: 1px solid #E8EDF2;
+    }
+}
+
+/* HP */
+
+@media (max-width: 560px) {
+    .adm-user-controls {
+        display: grid;
+        grid-template-columns: minmax(0,1fr);
+        gap: 10px;
+    }
+
+    .adm-user-controls .adm-role-form {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) auto;
+        align-items: end;
+        gap: 8px;
+        width: 100%;
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    .adm-user-controls .adm-role-form__field {
+        width: 100%;
+    }
+
+    .adm-user-reset-form,
+    .adm-user-reset-form .adm-button {
+        width: 100%;
+    }
+
+    .adm-reset-result {
+        padding: 14px 12px;
+    }
+
+    .adm-reset-result h2 {
+        font-size: 16px;
+    }
+}

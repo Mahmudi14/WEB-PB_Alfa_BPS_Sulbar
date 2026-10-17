@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             \App\Http\Middleware\EnsureActiveAccount::class,
+            \App\Http\Middleware\EnsurePasswordSecurity::class,
         ]);
 
         $middleware->redirectGuestsTo('/login');

@@ -4,40 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\Player;
 use App\Models\User;
+use App\Services\PlayerRankingService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use App\Services\PlayerRankingService;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\ValidationException;
 
 class PlayerController extends Controller
 {
-    // DAFTAR PEMAIN PUBLIK
-
-
+    // Daftar pemain
 
     public function index(PlayerRankingService $rankingService)
     {
-        // Semua data ranking dimuat sekali.
-        // Pencarian dan pagination dilakukan di browser.
         $players = $rankingService->all();
 
         return view('players.index', compact('players'));
     }
 
-
-
-    // FORM TAMBAH
+    // Form tambah
 
     public function create()
     {
         return view('players.create');
     }
 
-    // SIMPAN PEMAIN
+    // Simpan pemain
 
     public function store(Request $request)
     {
@@ -63,26 +56,35 @@ class PlayerController extends Controller
             ],
         ]);
 
+        $credentials = null;
+
         try {
-            DB::transaction(function () use ($data) {
+            DB::transaction(function () use ($data, &$credentials) {
                 $userId = null;
 
-                // Buat akun HANYA jika email diisi.
+                // Akun hanya dibuat jika email diisi
+
                 if (!empty($data['email'])) {
-                    $password = $this->initialPassword();
+                    $temporaryPassword = Str::random(20);
 
                     $user = User::create([
                         'name' => $data['name'],
                         'email' => $data['email'],
-                        'password' => Hash::make($password),
+                        'password' => $temporaryPassword,
                         'role' => 'pemain',
                         'is_active' => true,
+                        'must_change_password' => true,
                     ]);
 
                     $userId = $user->id;
+
+                    $credentials = [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'password' => $temporaryPassword,
+                    ];
                 }
 
-                // Data pemain selalu dibuat.
                 Player::create([
                     'name' => $data['name'],
                     'email' => $data['email'] ?? null,
@@ -91,8 +93,15 @@ class PlayerController extends Controller
                     'user_id' => $userId,
                 ]);
             }, 3);
-        } catch (QueryException $e) {
-            $this->handleDuplicateEmail($e);
+
+        } catch (QueryException $exception) {
+            $this->handleDuplicateEmail($exception);
+        }
+
+        if ($credentials) {
+            return redirect()
+                ->route('players.credentials')
+                ->with('new_player_credentials', $credentials);
         }
 
         return redirect()
@@ -100,12 +109,10 @@ class PlayerController extends Controller
             ->with('success', 'Pemain berhasil ditambahkan.');
     }
 
-    // FORM EDIT
+    // Form edit
 
-    public function edit(
-        Request $request,
-        Player $player
-    ) {
+    public function edit(Request $request, Player $player)
+    {
         $player->load('user');
 
         $this->ensureCanModify($request, $player);
@@ -113,12 +120,10 @@ class PlayerController extends Controller
         return view('players.edit', compact('player'));
     }
 
-    // UPDATE PEMAIN
+    // Update pemain
 
-    public function update(
-        Request $request,
-        Player $player
-    ) {
+    public function update(Request $request, Player $player)
+    {
         $player->load('user');
 
         $this->ensureCanModify($request, $player);
@@ -147,40 +152,52 @@ class PlayerController extends Controller
             ],
         ]);
 
+        $credentials = null;
+
         try {
-            DB::transaction(function () use ($player, $data) {
+            DB::transaction(function () use (
+                $player,
+                $data,
+                &$credentials
+            ) {
                 $user = $player->user;
                 $email = $data['email'] ?? null;
 
                 if ($user) {
 
-                    // Pemain sudah pernah memiliki akun.
-                    // Update nama akun agar sinkron.
+                    // Sinkron nama akun
+
                     $user->name = $data['name'];
 
                     if ($email !== null) {
                         $user->email = $email;
                         $user->is_active = true;
                     } else {
-                        // Email dihapus, akun tidak
-                        // dapat dipakai login lagi.
                         $user->is_active = false;
                     }
 
                     $user->save();
+
                 } elseif ($email !== null) {
 
-                    // Pemain sebelumnya tanpa akun.
-                    // Email baru diisi: buat akun.
+                    // Buat akun pemain baru
+
+                    $temporaryPassword = Str::random(20);
+
                     $user = User::create([
                         'name' => $data['name'],
                         'email' => $email,
-                        'password' => Hash::make(
-                            $this->initialPassword()
-                        ),
+                        'password' => $temporaryPassword,
                         'role' => 'pemain',
                         'is_active' => true,
+                        'must_change_password' => true,
                     ]);
+
+                    $credentials = [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'password' => $temporaryPassword,
+                    ];
                 }
 
                 $player->update([
@@ -191,8 +208,15 @@ class PlayerController extends Controller
                     'user_id' => $user?->id,
                 ]);
             }, 3);
-        } catch (QueryException $e) {
-            $this->handleDuplicateEmail($e);
+
+        } catch (QueryException $exception) {
+            $this->handleDuplicateEmail($exception);
+        }
+
+        if ($credentials) {
+            return redirect()
+                ->route('players.credentials')
+                ->with('new_player_credentials', $credentials);
         }
 
         return redirect()
@@ -200,12 +224,26 @@ class PlayerController extends Controller
             ->with('success', 'Data pemain berhasil diperbarui.');
     }
 
-    // SOFT DELETE
+    // Tampilkan password baru sekali
 
-    public function destroy(
-        Request $request,
-        Player $player
-    ) {
+    public function credentials(Request $request)
+    {
+        $credentials = $request->session()
+            ->pull('new_player_credentials');
+
+        if (!$credentials) {
+            return redirect()->route('players.index');
+        }
+
+        return response()
+            ->view('players.credentials', compact('credentials'))
+            ->header('Cache-Control', 'private, no-store, max-age=0');
+    }
+
+    // Nonaktifkan pemain
+
+    public function destroy(Request $request, Player $player)
+    {
         $player->load('user');
 
         $this->ensureCanModify($request, $player);
@@ -219,7 +257,6 @@ class PlayerController extends Controller
         DB::transaction(function () use ($player) {
             $player->delete();
 
-            // Pemain tanpa akun tetap bisa dihapus.
             if ($player->user) {
                 $player->user->update([
                     'is_active' => false,
@@ -232,7 +269,7 @@ class PlayerController extends Controller
             ->with('success', 'Pemain berhasil dinonaktifkan.');
     }
 
-    // FUNGSI PENDUKUNG
+    // Normalisasi input
 
     private function normalizeInput(Request $request): void
     {
@@ -246,16 +283,7 @@ class PlayerController extends Controller
         ]);
     }
 
-    private function initialPassword(): string
-    {
-        $password = config('pb_alfa.player_initial_password');
-
-        if (!is_string($password) || $password === '') {
-            abort(500, 'Password awal belum dikonfigurasi.');
-        }
-
-        return $password;
-    }
+    // Hak akses edit
 
     private function ensureCanModify(
         Request $request,
@@ -263,8 +291,6 @@ class PlayerController extends Controller
     ): void {
         abort_unless($request->user()->canManage(), 403);
 
-        // Pengelola tidak boleh mengubah akun
-        // Admin atau Pengelola lainnya.
         if (!$request->user()->isAdmin()) {
             abort_if(
                 in_array(
@@ -277,14 +303,16 @@ class PlayerController extends Controller
         }
     }
 
+    // Email duplikat
+
     private function handleDuplicateEmail(
         QueryException $exception
     ): void {
         if (
-            (string) $exception->getCode() === '23000' &&
-            (int) ($exception->errorInfo[1] ?? 0) === 1062
+            (string) $exception->getCode() === '23000'
+            && (int) ($exception->errorInfo[1] ?? 0) === 1062
         ) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'email' => 'Email sudah digunakan.',
             ]);
         }

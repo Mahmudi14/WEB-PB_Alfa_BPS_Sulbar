@@ -49,9 +49,9 @@ class GalleryController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                if (GalleryImage::count() >= 5) {
+                if (GalleryImage::count() >= 6) {
                     throw ValidationException::withMessages([
-                        'image' => 'Maksimal 5 foto. Hapus foto lama terlebih dahulu.',
+                        'image' => 'Maksimal 6 foto. Hapus foto lama terlebih dahulu.',
                     ]);
                 }
 

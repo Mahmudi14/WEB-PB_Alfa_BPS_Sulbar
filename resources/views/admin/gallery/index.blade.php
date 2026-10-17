@@ -41,7 +41,7 @@
             </div>
 
             <span class="adm-count">
-                {{ $images->count() }} / 5 Foto
+                {{ $images->count() }} / 6 Foto
             </span>
         </div>
 
@@ -58,7 +58,7 @@
 
         {{-- Tambah foto --}}
 
-        @if($images->count() < 5)
+        @if($images->count() < 6)
 
             <form
                 method="POST"
@@ -125,7 +125,7 @@
         @else
 
             <div class="adm-gallery-limit">
-                Galeri sudah berisi 5 foto. Hapus satu foto
+                Galeri sudah berisi 6 foto. Hapus satu foto
                 untuk menambahkan foto baru.
             </div>
 

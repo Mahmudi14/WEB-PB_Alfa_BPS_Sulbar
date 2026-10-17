@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\InactivePlayerController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\GalleryController;
+use App\Http\Controllers\ProfileController;
 
 use App\Models\GalleryImage;
 use App\Services\PlayerRankingService;
@@ -29,19 +30,18 @@ Route::get('/', function (
 ) {
     $topPlayers = $rankingService->all()
         ->filter(
-            fn ($player) => $player->rank_position <= 3
+            fn($player) => $player->rank_position <= 3
         );
 
     $galleryImages = GalleryImage::query()
         ->latest('id')
-        ->limit(5)
+        ->limit(6)
         ->get();
 
     return view('pages.home', compact(
         'topPlayers',
         'galleryImages'
     ));
-
 })->name('home');
 
 
@@ -85,7 +85,6 @@ Route::middleware('guest')->group(function () {
     ])
         ->middleware('throttle:15,1')
         ->name('login.store');
-
 });
 
 
@@ -102,6 +101,30 @@ Route::middleware('auth')->group(function () {
         LoginController::class,
         'destroy'
     ])->name('logout');
+
+    // Profil Saya
+
+    Route::get('/profil', [
+        ProfileController::class,
+        'index',
+    ])->name('profile.index');
+
+    Route::patch('/profil/nama', [
+        ProfileController::class,
+        'updateName',
+    ])->name('profile.name.update');
+
+    Route::get('/profil/ganti-password', [
+        ProfileController::class,
+        'passwordForm',
+    ])->name('profile.password.form');
+
+    Route::put('/profil/password', [
+        ProfileController::class,
+        'updatePassword',
+    ])
+        ->middleware('throttle:5,1')
+        ->name('profile.password.update');
 
 
     /*
@@ -123,9 +146,6 @@ Route::middleware('auth')->group(function () {
                 MatchController::class,
                 'store'
             ])->name('matches.store');
-
-            
-
         });
 
 
@@ -215,8 +235,13 @@ Route::middleware('auth')->group(function () {
             ])
                 ->whereNumber('transaction')
                 ->name('cash.destroy');
-
         });
+    // Informasi akun pemain baru
+
+    Route::get('/pemain/akun-baru', [
+        PlayerController::class,
+        'credentials',
+    ])->name('players.credentials');
 
 
     /*
@@ -247,6 +272,16 @@ Route::middleware('auth')->group(function () {
             ])
                 ->whereNumber('user')
                 ->name('admin.users.update');
+
+            // Reset password pemain dan pengelola
+
+            Route::post('/admin/pengguna/{user}/reset-password', [
+                RoleController::class,
+                'resetPassword',
+            ])
+                ->whereNumber('user')
+                ->middleware('throttle:10,1')
+                ->name('admin.users.reset-password');
 
 
             // PEMAIN NONAKTIF
@@ -305,7 +340,5 @@ Route::middleware('auth')->group(function () {
             ])
                 ->whereNumber('image')
                 ->name('admin.gallery.destroy');
-
         });
-
 });

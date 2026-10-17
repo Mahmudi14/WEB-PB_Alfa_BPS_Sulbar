@@ -1,28 +1,22 @@
 @php
-    $type = old('type', 'ganda');
-    $selected = $selected ?? [];
+$type = old('type', 'ganda');
+$selected = $selected ?? [];
 @endphp
 
-<form
-    id="match-form"
-    class="match-form"
-    method="POST"
-    action="{{ route('matches.store') }}"
-    data-single-submit
->
+<form id="match-form" class="match-form" method="POST" action="{{ route('matches.store') }}" data-single-submit>
     @csrf
 
     {{-- Validasi --}}
 
     @if($errors->any())
-        <div class="match-alert" role="alert">
-            <strong>Periksa kembali data pertandingan.</strong>
-            <ul>
-                @foreach($errors->all() as $message)
-                    <li>{{ $message }}</li>
-                @endforeach
-            </ul>
-        </div>
+    <div class="match-alert" role="alert">
+        <strong>Periksa kembali data pertandingan.</strong>
+        <ul>
+            @foreach($errors->all() as $message)
+            <li>{{ $message }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
 
     <div id="match-client-error" class="match-alert" role="alert" hidden></div>
@@ -34,13 +28,8 @@
         <div class="match-field">
             <label for="played_on">Tanggal Pertandingan</label>
 
-            <input
-                id="played_on"
-                type="date"
-                name="played_on"
-                value="{{ old('played_on', now()->toDateString()) }}"
-                required
-            >
+            <input id="played_on" type="date" name="played_on" value="{{ old('played_on', now()->toDateString()) }}"
+                required>
         </div>
 
         <div class="match-field">
@@ -48,23 +37,12 @@
 
             <div class="match-choice match-choice--type">
                 <label>
-                    <input
-                        type="radio"
-                        name="type"
-                        value="ganda"
-                        @checked($type === 'ganda')
-                        required
-                    >
+                    <input type="radio" name="type" value="ganda" @checked($type==='ganda' ) required>
                     <span>Ganda</span>
                 </label>
 
                 <label>
-                    <input
-                        type="radio"
-                        name="type"
-                        value="tunggal"
-                        @checked($type === 'tunggal')
-                    >
+                    <input type="radio" name="type" value="tunggal" @checked($type==='tunggal' )>
                     <span>Tunggal</span>
                 </label>
             </div>
@@ -83,114 +61,82 @@
 
             @foreach(['a' => 'Tim A', 'b' => 'Tim B'] as $team => $teamName)
 
-                <div class="match-team-column">
+            <div class="match-team-column">
 
-                    <div class="match-team-column__heading
+                <div class="match-team-column__heading
                         {{ $team === 'b' ? 'match-team-column__heading--b' : '' }}">
-                        {{ $teamName }}
-                    </div>
+                    {{ $teamName }}
+                </div>
 
-                    @foreach([1, 2] as $number)
+                @foreach([1, 2] as $number)
 
-                        @php
-                            $slot = $team . $number;
-                            $value = (string) old(
-                                $slot,
-                                $selected[$slot] ?? ''
-                            );
+                @php
+                $slot = $team . $number;
+                $value = (string) old(
+                $slot,
+                $selected[$slot] ?? ''
+                );
 
-                            if ($type === 'tunggal' && $number === 2) {
-                                $value = '';
-                            }
+                if ($type === 'tunggal' && $number === 2) {
+                $value = '';
+                }
 
-                            $pickedPlayer = $players->first(
-                                fn ($player) => (string) $player->id === $value
-                            );
+                $pickedPlayer = $players->first(
+                fn ($player) => (string) $player->id === $value
+                );
 
-                            $pickedName = $value === 'guest'
-                                ? 'Pemain Luar'
-                                : ($pickedPlayer?->name ?? 'Pemain ' . $number);
-                        @endphp
+                $pickedName = $value === 'guest'
+                ? 'Pemain Luar'
+                : ($pickedPlayer?->name ?? 'Pemain ' . $number);
+                @endphp
 
-                        <div
-                            class="match-picker"
-                            data-slot="{{ $slot }}"
-                            data-placeholder="Pemain {{ $number }}"
-                            @if($number === 2 && $type === 'tunggal') hidden @endif
-                        >
-                            <input
-                                type="hidden"
-                                name="{{ $slot }}"
-                                value="{{ $value }}"
-                            >
+                <div class="match-picker" data-slot="{{ $slot }}" data-placeholder="Pemain {{ $number }}"
+                    @if($number===2 && $type==='tunggal' ) hidden @endif>
+                    <input type="hidden" name="{{ $slot }}" value="{{ $value }}">
 
-                            <button
-                                type="button"
-                                class="match-picker__trigger"
-                                aria-expanded="false"
-                                aria-label="{{ $teamName }} pemain {{ $number }}"
-                            >
-                                <span class="match-picker__label">
-                                    {{ $pickedName }}
-                                </span>
+                    <button type="button" class="match-picker__trigger" aria-expanded="false"
+                        aria-label="{{ $teamName }} pemain {{ $number }}">
+                        <span class="match-picker__label">
+                            {{ $pickedName }}
+                        </span>
 
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    aria-hidden="true"
-                                >
-                                    <path d="m6 9 6 6 6-6"/>
-                                </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+
+                    <div class="match-picker__menu" hidden>
+
+                        <input type="search" class="match-picker__search" placeholder="Cari pemain..."
+                            autocomplete="off" aria-label="Cari {{ $teamName }} pemain {{ $number }}">
+
+                        <div class="match-picker__options">
+
+                            <button type="button" class="match-picker__option match-picker__option--guest"
+                                data-id="guest" data-name="Pemain Luar">
+                                Pemain Luar
                             </button>
 
-                            <div class="match-picker__menu" hidden>
+                            @foreach($players as $player)
+                            <button type="button" class="match-picker__option" data-id="{{ $player->id }}"
+                                data-name="{{ $player->name }}">
+                                {{ $player->name }}
+                            </button>
+                            @endforeach
 
-                                <input
-                                    type="search"
-                                    class="match-picker__search"
-                                    placeholder="Cari pemain..."
-                                    autocomplete="off"
-                                    aria-label="Cari {{ $teamName }} pemain {{ $number }}"
-                                >
-
-                                <div class="match-picker__options">
-
-                                    <button
-                                        type="button"
-                                        class="match-picker__option match-picker__option--guest"
-                                        data-id="guest"
-                                        data-name="Pemain Luar"
-                                    >
-                                        Pemain Luar
-                                    </button>
-
-                                    @foreach($players as $player)
-                                        <button
-                                            type="button"
-                                            class="match-picker__option"
-                                            data-id="{{ $player->id }}"
-                                            data-name="{{ $player->name }}"
-                                        >
-                                            {{ $player->name }}
-                                        </button>
-                                    @endforeach
-
-                                </div>
-
-                                <p class="match-picker__empty" hidden>
-                                    Pemain tidak ditemukan.
-                                </p>
-
-                            </div>
                         </div>
 
-                    @endforeach
+                        <p class="match-picker__empty" hidden>
+                            Pemain tidak ditemukan.
+                        </p>
 
+                    </div>
                 </div>
+
+                @endforeach
+
+            </div>
 
             @endforeach
 
@@ -212,33 +158,13 @@
 
                 <div class="match-scoreboard__inputs">
 
-                    <input
-                        type="number"
-                        name="set1_a"
-                        min="0"
-                        max="99"
-                        step="1"
-                        inputmode="numeric"
-                        aria-label="Set 1 Tim A"
-                        placeholder="A"
-                        value="{{ old('set1_a') }}"
-                        required
-                    >
+                    <input type="number" name="set1_a" min="0" max="99" step="1" inputmode="numeric"
+                        aria-label="Set 1 Tim A" placeholder="A" value="{{ old('set1_a') }}" required>
 
                     <span>:</span>
 
-                    <input
-                        type="number"
-                        name="set1_b"
-                        min="0"
-                        max="99"
-                        step="1"
-                        inputmode="numeric"
-                        aria-label="Set 1 Tim B"
-                        placeholder="B"
-                        value="{{ old('set1_b') }}"
-                        required
-                    >
+                    <input type="number" name="set1_b" min="0" max="99" step="1" inputmode="numeric"
+                        aria-label="Set 1 Tim B" placeholder="B" value="{{ old('set1_b') }}" required>
 
                 </div>
 
@@ -248,17 +174,8 @@
             <div class="match-scoreboard__cock">
                 <label for="shuttlecock_count">KOK</label>
 
-                <input
-                    id="shuttlecock_count"
-                    type="number"
-                    name="shuttlecock_count"
-                    min="0"
-                    max="65535"
-                    step="1"
-                    inputmode="numeric"
-                    value="{{ old('shuttlecock_count', 0) }}"
-                    required
-                >
+                <input id="shuttlecock_count" type="number" name="shuttlecock_count" min="0" max="65535" step="1"
+                    inputmode="numeric" value="{{ old('shuttlecock_count', 0) }}" required>
             </div>
 
             <div class="match-scoreboard__set">
@@ -266,33 +183,13 @@
 
                 <div class="match-scoreboard__inputs">
 
-                    <input
-                        type="number"
-                        name="set2_a"
-                        min="0"
-                        max="99"
-                        step="1"
-                        inputmode="numeric"
-                        aria-label="Set 2 Tim A"
-                        placeholder="A"
-                        value="{{ old('set2_a') }}"
-                        required
-                    >
+                    <input type="number" name="set2_a" min="0" max="99" step="1" inputmode="numeric"
+                        aria-label="Set 2 Tim A" placeholder="A" value="{{ old('set2_a') }}" required>
 
                     <span>:</span>
 
-                    <input
-                        type="number"
-                        name="set2_b"
-                        min="0"
-                        max="99"
-                        step="1"
-                        inputmode="numeric"
-                        aria-label="Set 2 Tim B"
-                        placeholder="B"
-                        value="{{ old('set2_b') }}"
-                        required
-                    >
+                    <input type="number" name="set2_b" min="0" max="99" step="1" inputmode="numeric"
+                        aria-label="Set 2 Tim B" placeholder="B" value="{{ old('set2_b') }}" required>
 
                 </div>
 
@@ -326,7 +223,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('match-form');
     if (!form) return;
 
@@ -569,12 +466,17 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         event.stopPropagation();
 
-        error.textContent = message;
-        error.hidden = false;
-        error.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
+        if (window.PBAlfaDialog) {
+    error.hidden = true;
+
+    window.PBAlfaDialog.error(
+        message,
+        'Pertandingan Belum Disimpan'
+    );
+} else {
+    error.textContent = message;
+    error.hidden = false;
+}
     });
 
     updateType();

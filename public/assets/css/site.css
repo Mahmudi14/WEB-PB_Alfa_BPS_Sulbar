@@ -1039,3 +1039,218 @@ body::-webkit-scrollbar {
     display: none;
     width: 0;
 }
+
+
+/* Popup Global PB Alfa */
+
+.pb-dialog {
+    position: fixed;
+    inset: 0;
+    width: min(440px, calc(100% - 32px));
+    max-width: none;
+    max-height: min(85vh, 600px);
+    max-height: min(85dvh, 600px);
+    margin: auto;
+    padding: 0;
+    overflow-y: auto;
+    border: 1px solid #E0E8F0;
+    border-radius: 20px;
+    background: #FFFFFF;
+    color: #173B5A;
+    box-shadow: 0 24px 70px rgba(7, 32, 57, .22);
+}
+
+.pb-dialog:not([open]) {
+    display: none;
+}
+
+.pb-dialog::backdrop {
+    background: rgba(8, 26, 46, .62);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.pb-dialog__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 28px 25px 24px;
+    text-align: center;
+}
+
+.pb-dialog__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 55px;
+    height: 55px;
+    border: 1px solid #F3D0D0;
+    border-radius: 16px;
+    background: #FFF0F0;
+    color: #BA4141;
+}
+
+.pb-dialog__icon span {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.pb-dialog__heading {
+    display: grid;
+    gap: 7px;
+    width: 100%;
+    min-width: 0;
+}
+
+.pb-dialog__heading h2 {
+    margin: 0;
+    color: #163B5A;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -.035em;
+}
+
+.pb-dialog__heading p {
+    margin: 0;
+    color: #64748B;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* Daftar error */
+
+.pb-dialog__content ul {
+    display: grid;
+    gap: 7px;
+    width: 100%;
+    max-height: 180px;
+    margin: 0;
+    padding: 12px 14px 12px 29px;
+    overflow-y: auto;
+    border: 1px solid #F4D5D5;
+    border-radius: 10px;
+    background: #FFF8F8;
+    color: #A94040;
+    font-size: 11px;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.pb-dialog__content li {
+    overflow-wrap: anywhere;
+}
+
+/* Tombol */
+
+.pb-dialog__actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 7px;
+}
+
+.pb-dialog__actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.pb-dialog__cancel {
+    background: #EDF2F6;
+    color: #4F6478;
+}
+
+.pb-dialog__cancel:hover {
+    background: #DFE7EE;
+}
+
+.pb-dialog__ok {
+    background: #1769AA;
+    color: #FFFFFF;
+}
+
+.pb-dialog__ok:hover {
+    background: #125487;
+}
+
+/* Mode konfirmasi */
+
+.pb-dialog[data-mode="confirm"] .pb-dialog__icon {
+    border-color: #F3D7B1;
+    background: #FFF3E3;
+    color: #AD701F;
+}
+
+.pb-dialog[data-destructive="true"] .pb-dialog__ok {
+    background: #BA4141;
+}
+
+.pb-dialog[data-destructive="true"] .pb-dialog__ok:hover {
+    background: #9C3030;
+}
+
+/* Mode error */
+
+.pb-dialog[data-mode="error"] .pb-dialog__actions {
+    max-width: 230px;
+}
+
+/* HP */
+
+@media (max-width: 480px) {
+    .pb-dialog {
+        width: calc(100% - 28px);
+        border-radius: 16px;
+    }
+
+    .pb-dialog__content {
+        gap: 12px;
+        padding: 23px 17px 18px;
+    }
+
+    .pb-dialog__icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 13px;
+    }
+
+    .pb-dialog__icon span {
+        font-size: 27px;
+    }
+
+    .pb-dialog__heading h2 {
+        font-size: 18px;
+    }
+
+    .pb-dialog__heading p {
+        font-size: 11px;
+    }
+
+    .pb-dialog__actions button {
+        min-height: 43px;
+        padding: 9px 10px;
+        font-size: 11px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pb-dialog,
+    .pb-dialog * {
+        transition: none !important;
+    }
+}

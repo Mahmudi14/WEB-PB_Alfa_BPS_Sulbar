@@ -323,7 +323,7 @@
                 </a>
             @endforeach
 
-            @for($i = $galleryImages->count(); $i < 5; $i++)
+            @for($i = $galleryImages->count(); $i < 6; $i++)
                 <div class="nova-gallery__tile nova-gallery__tile--empty">
                     <svg viewBox="0 0 80 110" aria-hidden="true">
                         <use href="#nova-shuttle"></use>

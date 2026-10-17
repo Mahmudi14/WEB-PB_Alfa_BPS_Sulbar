@@ -56,6 +56,17 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
+        $request->session()->put(
+            'pb_alfa_password_version',
+            (int) $request->user()->password_version
+        );
+
+        if ($request->user()->must_change_password) {
+            $request->session()->forget('url.intended');
+
+            return redirect()->route('profile.password.form');
+        }
+
         return redirect()->intended(route('home'));
     }
 
