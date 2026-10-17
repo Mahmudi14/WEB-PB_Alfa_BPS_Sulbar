@@ -3,7 +3,7 @@
 @section('title', 'Pertandingan - PB Alfa')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=4">
+<link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=6">
 @endpush
 
 @section('content')
