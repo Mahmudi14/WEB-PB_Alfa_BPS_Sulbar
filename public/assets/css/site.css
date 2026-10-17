@@ -1026,3 +1026,16 @@ input[type="checkbox"] {
     color: var(--muted);
     font-size: 12px;
 }
+/* Sembunyikan scrollbar */
+
+html,
+body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+}
