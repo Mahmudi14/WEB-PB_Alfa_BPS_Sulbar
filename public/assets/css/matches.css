@@ -1443,3 +1443,218 @@ input::-webkit-calendar-picker-indicator {
         scroll-behavior: auto !important;
     }
 }
+
+
+/* Perbaikan layout pertandingan */
+
+.match-page .match-row {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+}
+
+.match-page .match-row.match-row--manage {
+    grid-template-columns: minmax(0, 1fr) 72px;
+}
+
+.match-page .match-row__teams {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        62px
+        minmax(0, 1fr);
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+
+.match-page .match-side,
+.match-page .match-center {
+    display: grid;
+    grid-template-rows: minmax(44px, 1fr) 38px;
+    gap: 6px;
+    min-width: 0;
+}
+
+.match-page .match-team {
+    width: 100%;
+    min-width: 0;
+}
+
+.match-page .match-side--b .match-team,
+.match-page .match-side--b .match-set {
+    align-items: flex-end;
+    text-align: right;
+}
+
+/* Skor setiap set */
+
+.match-page .match-set {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 3px;
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 5px 9px;
+    border: 1px solid #E4EAF1;
+    border-radius: 7px;
+    background: #F8FAFC;
+}
+
+.match-page .match-set small {
+    color: #7C90A3;
+    font-size: 8px;
+    font-weight: 850;
+    line-height: 1;
+}
+
+.match-page .match-set strong {
+    color: #173B5A;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.2;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* VS dan jumlah kok */
+
+.match-page .match-center {
+    width: 100%;
+}
+
+.match-page .match-row__vs {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    font-size: 11px;
+}
+
+.match-page .match-cock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 5px 3px;
+    border: 1px solid #F3D7B1;
+    border-radius: 7px;
+    background: #FFF3E3;
+}
+
+.match-page .match-cock small {
+    color: #A66C24;
+    font-size: 9px;
+    font-weight: 850;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.match-page .match-cock strong {
+    color: #A65B08;
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Tablet */
+
+@media (max-width: 750px) {
+    .match-page .match-row.match-row--manage {
+        grid-template-columns: minmax(0, 1fr) 34px;
+        gap: 6px;
+    }
+
+    .match-page .match-row__teams {
+        grid-template-columns:
+            minmax(0, 1fr)
+            54px
+            minmax(0, 1fr);
+        gap: 6px;
+    }
+
+    .match-page .match-delete-form {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .match-page .match-delete {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+    }
+
+    .match-page .match-delete span {
+        display: none;
+    }
+}
+
+/* HP */
+
+@media (max-width: 480px) {
+    .match-page .match-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 5px;
+        padding: 7px;
+    }
+
+    .match-page .match-row.match-row--manage {
+        grid-template-columns: minmax(0, 1fr) 30px;
+        gap: 5px;
+    }
+
+    .match-page .match-row__teams {
+        grid-template-columns:
+            minmax(0, 1fr)
+            50px
+            minmax(0, 1fr);
+        gap: 5px;
+    }
+
+    .match-page .match-side,
+    .match-page .match-center {
+        grid-template-rows: minmax(42px, 1fr) 36px;
+        gap: 5px;
+    }
+
+    .match-page .match-team {
+        min-height: 42px;
+        padding: 6px 5px;
+    }
+
+    .match-page .match-set,
+    .match-page .match-cock {
+        min-height: 36px;
+        padding: 4px 3px;
+    }
+
+    .match-page .match-set small,
+    .match-page .match-cock small {
+        font-size: 8px;
+    }
+
+    .match-page .match-set strong {
+        font-size: 12px;
+    }
+
+    .match-page .match-cock strong {
+        font-size: 15px;
+    }
+
+    .match-page .match-row__vs {
+        font-size: 10px;
+    }
+
+    .match-page .match-delete {
+        width: 30px;
+        height: 32px;
+    }
+}
