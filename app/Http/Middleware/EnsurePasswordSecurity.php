@@ -56,7 +56,8 @@ class EnsurePasswordSecurity
         // Wajib ganti password sementara
 
         if (
-            $user->must_change_password
+            $user->role === 'pengelola'
+            && $user->must_change_password
             && !$request->routeIs(
                 'profile.password.form',
                 'profile.password.update',

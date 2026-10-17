@@ -5,12 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class RoleController extends Controller
 {
-    // Daftar akun pemain
+    // Daftar pengguna
 
     public function index()
     {
@@ -25,10 +24,13 @@ class RoleController extends Controller
 
         return response()
             ->view('admin.users', compact('users'))
-            ->header('Cache-Control', 'private, no-store, max-age=0');
+            ->header(
+                'Cache-Control',
+                'private, no-store, max-age=0'
+            );
     }
 
-    // Ubah role
+    // Ubah role pemain / pengelola
 
     public function update(Request $request, User $user)
     {
@@ -44,9 +46,22 @@ class RoleController extends Controller
             404
         );
 
-        $user->update([
-            'role' => $data['role'],
-        ]);
+        $oldRole = $user->role;
+        $newRole = $data['role'];
+
+        $user->role = $newRole;
+
+        // Baru diangkat menjadi Pengelola
+        if ($oldRole !== 'pengelola' && $newRole === 'pengelola') {
+            $user->must_change_password = true;
+        }
+
+        // Dikembalikan menjadi Pemain
+        if ($newRole === 'pemain') {
+            $user->must_change_password = false;
+        }
+
+        $user->save();
 
         return back()->with(
             'success',
@@ -54,33 +69,52 @@ class RoleController extends Controller
         );
     }
 
-    // Reset password
+    // Reset ke password default
 
     public function resetPassword(Request $request, User $user)
     {
         abort_unless(
             $this->canManageUser($user)
-            && $user->id !== $request->user()->id,
+                && $user->id !== $request->user()->id,
             404
         );
 
-        $temporaryPassword = Str::random(20);
+        $defaultPassword = config(
+            'pb_alfa.player_initial_password'
+        );
 
-        $user->password = $temporaryPassword;
-        $user->must_change_password = true;
-        $user->password_version = $user->password_version + 1;
+        if (
+            !is_string($defaultPassword)
+            || trim($defaultPassword) === ''
+        ) {
+            abort(
+                500,
+                'Password default belum dikonfigurasi.'
+            );
+        }
+
+        $user->password = $defaultPassword;
+
+        // Hanya Pengelola yang wajib ganti password
+        $user->must_change_password =
+            $user->role === 'pengelola';
+
+        // Putuskan sesi lama setelah reset
+        $user->password_version =
+            $user->password_version + 1;
+
         $user->save();
+
+        $message = $user->role === 'pengelola'
+            ? 'Password berhasil direset ke password default. Pengelola wajib mengganti password setelah login.'
+            : 'Password berhasil direset ke password default. Pemain dapat langsung login.';
 
         return redirect()
             ->route('admin.users')
-            ->with('reset_credentials', [
-                'name' => $user->name,
-                'email' => $user->email,
-                'password' => $temporaryPassword,
-            ]);
+            ->with('success', $message);
     }
 
-    // Validasi akun
+    // Pastikan akun merupakan pemain terdaftar
 
     private function canManageUser(User $user): bool
     {
@@ -91,7 +125,7 @@ class RoleController extends Controller
                 true
             )
             && $user->player()
-                ->whereNotNull('email')
-                ->exists();
+            ->whereNotNull('email')
+            ->exists();
     }
 }

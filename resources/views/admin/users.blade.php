@@ -8,9 +8,6 @@
 
 @section('content')
 
-@php
-    $resetCredentials = session()->pull('reset_credentials');
-@endphp
 
 <div class="adm-page">
 
@@ -30,41 +27,6 @@
         </span>
     </header>
 
-    {{-- Password sementara --}}
-
-    @if($resetCredentials)
-        <section class="adm-reset-result" role="status">
-
-            <h2>Password Berhasil Direset</h2>
-
-            <p>
-                Akun:
-                <strong>{{ $resetCredentials['name'] }}</strong>
-                ({{ $resetCredentials['email'] }})
-            </p>
-
-            <label for="temporary-password">
-                Password Sementara
-            </label>
-
-            <input
-                id="temporary-password"
-                type="text"
-                value="{{ $resetCredentials['password'] }}"
-                readonly
-                autocomplete="off"
-                spellcheck="false"
-                onclick="this.select()"
-            >
-
-            <small>
-                Salin password sekarang. Password ini hanya
-                ditampilkan satu kali dan wajib diganti
-                oleh pengguna saat login.
-            </small>
-
-        </section>
-    @endif
 
     {{-- Daftar --}}
 

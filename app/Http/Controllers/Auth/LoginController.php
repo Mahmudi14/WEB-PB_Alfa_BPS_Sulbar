@@ -61,7 +61,10 @@ class LoginController extends Controller
             (int) $request->user()->password_version
         );
 
-        if ($request->user()->must_change_password) {
+        if (
+            $request->user()->role === 'pengelola'
+            && $request->user()->must_change_password
+        ) {
             $request->session()->forget('url.intended');
 
             return redirect()->route('profile.password.form');

@@ -53,7 +53,10 @@ class ProfileController extends Controller
 
     public function passwordForm(Request $request)
     {
-        if (!$request->user()->must_change_password) {
+        if (
+            $request->user()->role !== 'pengelola'
+            || !$request->user()->must_change_password
+        ) {
             return redirect()->route('profile.index');
         }
 

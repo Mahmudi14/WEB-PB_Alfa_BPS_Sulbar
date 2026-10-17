@@ -56,34 +56,26 @@ class PlayerController extends Controller
             ],
         ]);
 
-        $credentials = null;
-
         try {
-            DB::transaction(function () use ($data, &$credentials) {
+            DB::transaction(function () use ($data) {
                 $userId = null;
 
-                // Akun hanya dibuat jika email diisi
+                // Akun login dibuat jika email diisi
 
                 if (!empty($data['email'])) {
-                    $temporaryPassword = Str::random(20);
-
                     $user = User::create([
                         'name' => $data['name'],
                         'email' => $data['email'],
-                        'password' => $temporaryPassword,
+                        'password' => $this->defaultPassword(),
                         'role' => 'pemain',
                         'is_active' => true,
-                        'must_change_password' => true,
+                        'must_change_password' => false,
                     ]);
 
                     $userId = $user->id;
-
-                    $credentials = [
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'password' => $temporaryPassword,
-                    ];
                 }
+
+                // Profil pemain selalu dibuat
 
                 Player::create([
                     'name' => $data['name'],
@@ -98,15 +90,14 @@ class PlayerController extends Controller
             $this->handleDuplicateEmail($exception);
         }
 
-        if ($credentials) {
-            return redirect()
-                ->route('players.credentials')
-                ->with('new_player_credentials', $credentials);
-        }
-
         return redirect()
             ->route('players.index')
-            ->with('success', 'Pemain berhasil ditambahkan.');
+            ->with(
+                'success',
+                !empty($data['email'])
+                    ? 'Pemain dan akun login berhasil dibuat. Password menggunakan password default.'
+                    : 'Pemain berhasil ditambahkan.'
+            );
     }
 
     // Form edit
@@ -152,20 +143,21 @@ class PlayerController extends Controller
             ],
         ]);
 
-        $credentials = null;
+        $createdAccount = false;
 
         try {
             DB::transaction(function () use (
                 $player,
                 $data,
-                &$credentials
+                &$createdAccount
             ) {
                 $user = $player->user;
                 $email = $data['email'] ?? null;
 
                 if ($user) {
 
-                    // Sinkron nama akun
+                    // Akun lama tetap menggunakan
+                    // password yang sudah dimiliki
 
                     $user->name = $data['name'];
 
@@ -180,24 +172,18 @@ class PlayerController extends Controller
 
                 } elseif ($email !== null) {
 
-                    // Buat akun pemain baru
-
-                    $temporaryPassword = Str::random(20);
+                    // Pemain lama baru diberi akun login
 
                     $user = User::create([
                         'name' => $data['name'],
                         'email' => $email,
-                        'password' => $temporaryPassword,
+                        'password' => $this->defaultPassword(),
                         'role' => 'pemain',
                         'is_active' => true,
-                        'must_change_password' => true,
+                        'must_change_password' => false,
                     ]);
 
-                    $credentials = [
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'password' => $temporaryPassword,
-                    ];
+                    $createdAccount = true;
                 }
 
                 $player->update([
@@ -213,31 +199,14 @@ class PlayerController extends Controller
             $this->handleDuplicateEmail($exception);
         }
 
-        if ($credentials) {
-            return redirect()
-                ->route('players.credentials')
-                ->with('new_player_credentials', $credentials);
-        }
-
         return redirect()
             ->route('players.index')
-            ->with('success', 'Data pemain berhasil diperbarui.');
-    }
-
-    // Tampilkan password baru sekali
-
-    public function credentials(Request $request)
-    {
-        $credentials = $request->session()
-            ->pull('new_player_credentials');
-
-        if (!$credentials) {
-            return redirect()->route('players.index');
-        }
-
-        return response()
-            ->view('players.credentials', compact('credentials'))
-            ->header('Cache-Control', 'private, no-store, max-age=0');
+            ->with(
+                'success',
+                $createdAccount
+                    ? 'Data pemain dan akun login berhasil diperbarui. Password menggunakan password default.'
+                    : 'Data pemain berhasil diperbarui.'
+            );
     }
 
     // Nonaktifkan pemain
@@ -269,7 +238,7 @@ class PlayerController extends Controller
             ->with('success', 'Pemain berhasil dinonaktifkan.');
     }
 
-    // Normalisasi input
+    // Normalisasi
 
     private function normalizeInput(Request $request): void
     {
@@ -281,6 +250,25 @@ class PlayerController extends Controller
             'name' => trim((string) $request->input('name', '')),
             'email' => $email === '' ? null : $email,
         ]);
+    }
+
+    // Password default dari konfigurasi
+
+    private function defaultPassword(): string
+    {
+        $password = config('pb_alfa.player_initial_password');
+
+        if (
+            !is_string($password)
+            || trim($password) === ''
+        ) {
+            abort(
+                500,
+                'Password default belum dikonfigurasi.'
+            );
+        }
+
+        return $password;
     }
 
     // Hak akses edit
