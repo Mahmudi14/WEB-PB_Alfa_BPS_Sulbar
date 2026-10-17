@@ -27,7 +27,7 @@
             <h1>RANKING <span>PEMAIN.</span></h1>
 
             <p>
-                Menang +3 · Seri +1 · Kalah -2
+                Menang +30 · Seri +10 · Kalah -30
             </p>
         </div>
 
