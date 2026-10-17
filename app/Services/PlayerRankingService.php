@@ -12,6 +12,7 @@ class PlayerRankingService
         $stats = DB::table('match_participants as mp')
             ->join('matches as m', 'm.id', '=', 'mp.match_id')
             ->whereNull('m.deleted_at')
+            ->whereNotNull('mp.player_id')
             ->select('mp.player_id')
             ->selectRaw('COUNT(*) AS played_count')
             ->selectRaw("
@@ -27,10 +28,8 @@ class PlayerRankingService
             ")
             ->selectRaw("
                 SUM(
-                    CASE
-                        WHEN m.result = 'seri'
-                        THEN 1 ELSE 0
-                    END
+                    CASE WHEN m.result = 'seri'
+                    THEN 1 ELSE 0 END
                 ) AS draws
             ")
             ->selectRaw("
@@ -63,9 +62,9 @@ class PlayerRankingService
             ->selectRaw("
                 (
                     players.initial_score
-                    + COALESCE(stats.wins, 0) * 3
-                    + COALESCE(stats.draws, 0)
-                    - COALESCE(stats.losses, 0) * 2
+                    + COALESCE(stats.wins, 0) * 30
+                    + COALESCE(stats.draws, 0) * 10
+                    - COALESCE(stats.losses, 0) * 30
                 ) AS total_score
             ")
             ->orderByDesc('total_score')

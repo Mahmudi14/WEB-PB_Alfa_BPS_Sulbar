@@ -1,7 +1,5 @@
-
 @php
     $type = old('type', 'ganda');
-    $result = old('result', '');
     $selected = $selected ?? [];
 @endphp
 
@@ -19,7 +17,6 @@
     @if($errors->any())
         <div class="match-alert" role="alert">
             <strong>Periksa kembali data pertandingan.</strong>
-
             <ul>
                 @foreach($errors->all() as $message)
                     <li>{{ $message }}</li>
@@ -28,14 +25,9 @@
         </div>
     @endif
 
-    <div
-        id="match-client-error"
-        class="match-alert"
-        role="alert"
-        hidden
-    ></div>
+    <div id="match-client-error" class="match-alert" role="alert" hidden></div>
 
-    {{-- Informasi pertandingan --}}
+    {{-- Informasi --}}
 
     <div class="match-form__fields">
 
@@ -55,7 +47,6 @@
             <span class="match-field__label">Jenis Pertandingan</span>
 
             <div class="match-choice match-choice--type">
-
                 <label>
                     <input
                         type="radio"
@@ -76,32 +67,14 @@
                     >
                     <span>Tunggal</span>
                 </label>
-
             </div>
-        </div>
-
-        <div class="match-field">
-            <label for="shuttlecock_count">Jumlah Kok</label>
-
-            <input
-                id="shuttlecock_count"
-                type="number"
-                name="shuttlecock_count"
-                min="0"
-                max="65535"
-                step="1"
-                inputmode="numeric"
-                value="{{ old('shuttlecock_count', 0) }}"
-                required
-            >
         </div>
 
     </div>
 
     {{-- Pemain --}}
 
-    <div class="match-section">
-
+    <section class="match-section">
         <div class="match-section__heading">
             <h3>Pilih Pemain</h3>
         </div>
@@ -121,7 +94,6 @@
 
                         @php
                             $slot = $team . $number;
-
                             $value = (string) old(
                                 $slot,
                                 $selected[$slot] ?? ''
@@ -131,9 +103,13 @@
                                 $value = '';
                             }
 
-                            $selectedPlayer = $players->first(
-                                fn ($candidate) => (string) $candidate->id === $value
+                            $pickedPlayer = $players->first(
+                                fn ($player) => (string) $player->id === $value
                             );
+
+                            $pickedName = $value === 'guest'
+                                ? 'Pemain Luar'
+                                : ($pickedPlayer?->name ?? 'Pemain ' . $number);
                         @endphp
 
                         <div
@@ -142,7 +118,6 @@
                             data-placeholder="Pemain {{ $number }}"
                             @if($number === 2 && $type === 'tunggal') hidden @endif
                         >
-
                             <input
                                 type="hidden"
                                 name="{{ $slot }}"
@@ -152,11 +127,11 @@
                             <button
                                 type="button"
                                 class="match-picker__trigger"
-                                aria-label="Pilih {{ $teamName }} pemain {{ $number }}"
                                 aria-expanded="false"
+                                aria-label="{{ $teamName }} pemain {{ $number }}"
                             >
                                 <span class="match-picker__label">
-                                    {{ $selectedPlayer?->name ?? 'Pemain ' . $number }}
+                                    {{ $pickedName }}
                                 </span>
 
                                 <svg
@@ -177,32 +152,40 @@
                                 <input
                                     type="search"
                                     class="match-picker__search"
-                                    placeholder="Cari nama pemain..."
-                                    aria-label="Cari pemain {{ $teamName }}"
+                                    placeholder="Cari pemain..."
                                     autocomplete="off"
+                                    aria-label="Cari {{ $teamName }} pemain {{ $number }}"
                                 >
 
                                 <div class="match-picker__options">
 
-                                    @foreach($players as $candidate)
+                                    <button
+                                        type="button"
+                                        class="match-picker__option match-picker__option--guest"
+                                        data-id="guest"
+                                        data-name="Pemain Luar"
+                                    >
+                                        Pemain Luar
+                                    </button>
+
+                                    @foreach($players as $player)
                                         <button
                                             type="button"
                                             class="match-picker__option"
-                                            data-id="{{ $candidate->id }}"
-                                            data-name="{{ $candidate->name }}"
+                                            data-id="{{ $player->id }}"
+                                            data-name="{{ $player->name }}"
                                         >
-                                            {{ $candidate->name }}
+                                            {{ $player->name }}
                                         </button>
                                     @endforeach
 
                                 </div>
 
                                 <p class="match-picker__empty" hidden>
-                                    Pemain tidak ditemukan
+                                    Pemain tidak ditemukan.
                                 </p>
 
                             </div>
-
                         </div>
 
                     @endforeach
@@ -212,53 +195,118 @@
             @endforeach
 
         </div>
+    </section>
 
-    </div>
+    {{-- Skor dan kok --}}
 
-    {{-- Hasil --}}
-
-    <div class="match-section">
+    <section class="match-section">
 
         <div class="match-section__heading">
-            <h3>Hasil Pertandingan</h3>
+            <h3>Skor Pertandingan</h3>
         </div>
 
-        <div class="match-choice match-choice--result">
+        <div class="match-scoreboard">
 
-            <label>
+            <div class="match-scoreboard__set">
+                <label>SET 1</label>
+
+                <div class="match-scoreboard__inputs">
+
+                    <input
+                        type="number"
+                        name="set1_a"
+                        min="0"
+                        max="99"
+                        step="1"
+                        inputmode="numeric"
+                        aria-label="Set 1 Tim A"
+                        placeholder="A"
+                        value="{{ old('set1_a') }}"
+                        required
+                    >
+
+                    <span>:</span>
+
+                    <input
+                        type="number"
+                        name="set1_b"
+                        min="0"
+                        max="99"
+                        step="1"
+                        inputmode="numeric"
+                        aria-label="Set 1 Tim B"
+                        placeholder="B"
+                        value="{{ old('set1_b') }}"
+                        required
+                    >
+
+                </div>
+
+                <small>Tim A : Tim B</small>
+            </div>
+
+            <div class="match-scoreboard__cock">
+                <label for="shuttlecock_count">KOK</label>
+
                 <input
-                    type="radio"
-                    name="result"
-                    value="a"
-                    @checked($result === 'a')
+                    id="shuttlecock_count"
+                    type="number"
+                    name="shuttlecock_count"
+                    min="0"
+                    max="65535"
+                    step="1"
+                    inputmode="numeric"
+                    value="{{ old('shuttlecock_count', 0) }}"
                     required
                 >
-                <span>Tim A</span>
-            </label>
+            </div>
 
-            <label>
-                <input
-                    type="radio"
-                    name="result"
-                    value="seri"
-                    @checked($result === 'seri')
-                >
-                <span>Seri</span>
-            </label>
+            <div class="match-scoreboard__set">
+                <label>SET 2</label>
 
-            <label>
-                <input
-                    type="radio"
-                    name="result"
-                    value="b"
-                    @checked($result === 'b')
-                >
-                <span>Tim B</span>
-            </label>
+                <div class="match-scoreboard__inputs">
+
+                    <input
+                        type="number"
+                        name="set2_a"
+                        min="0"
+                        max="99"
+                        step="1"
+                        inputmode="numeric"
+                        aria-label="Set 2 Tim A"
+                        placeholder="A"
+                        value="{{ old('set2_a') }}"
+                        required
+                    >
+
+                    <span>:</span>
+
+                    <input
+                        type="number"
+                        name="set2_b"
+                        min="0"
+                        max="99"
+                        step="1"
+                        inputmode="numeric"
+                        aria-label="Set 2 Tim B"
+                        placeholder="B"
+                        value="{{ old('set2_b') }}"
+                        required
+                    >
+
+                </div>
+
+                <small>Tim A : Tim B</small>
+            </div>
 
         </div>
 
-    </div>
+        <div class="match-result-preview" aria-live="polite">
+            <span>Hasil Pertandingan</span>
+            <strong id="match-result-text">Isi skor kedua set</strong>
+        </div>
+
+    </section>
 
     {{-- Tombol --}}
 
@@ -268,10 +316,7 @@
             Simpan Pertandingan
         </button>
 
-        <a
-            href="{{ route('matches.index') }}"
-            class="match-cancel"
-        >
+        <a href="{{ route('matches.index') }}" class="match-cancel">
             Batal
         </a>
 
@@ -290,6 +335,7 @@ document.addEventListener('DOMContentLoaded', function () {
     );
 
     const error = document.getElementById('match-client-error');
+    const resultText = document.getElementById('match-result-text');
 
     const normalize = value => String(value)
         .normalize('NFKC')
@@ -305,7 +351,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function closeAll() {
         pickers.forEach(picker => {
             picker.querySelector('.match-picker__menu').hidden = true;
-
             picker.querySelector('.match-picker__trigger')
                 .setAttribute('aria-expanded', 'false');
         });
@@ -328,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const active = pickers.filter(picker => !picker.hidden);
 
         active.forEach(picker => {
-            const query = normalize(
+            const keyword = normalize(
                 picker.querySelector('.match-picker__search').value
             );
 
@@ -338,25 +383,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     .map(other => other.querySelector(
                         'input[type="hidden"]'
                     ).value)
-                    .filter(Boolean)
+                    .filter(value => value && value !== 'guest')
             );
 
             let available = 0;
 
             picker.querySelectorAll('.match-picker__option')
                 .forEach(option => {
+                    const taken = option.dataset.id !== 'guest'
+                        && used.has(option.dataset.id);
+
                     const matches = normalize(
                         option.dataset.name
-                    ).includes(query);
-
-                    const taken = used.has(option.dataset.id);
+                    ).includes(keyword);
 
                     option.hidden = !matches || taken;
                     option.disabled = taken;
 
-                    if (matches && !taken) {
-                        available++;
-                    }
+                    if (matches && !taken) available++;
                 });
 
             picker.querySelector('.match-picker__empty').hidden =
@@ -368,9 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const singles = currentType() === 'tunggal';
 
         pickers.forEach(picker => {
-            if (!picker.dataset.slot.endsWith('2')) {
-                return;
-            }
+            if (!picker.dataset.slot.endsWith('2')) return;
 
             picker.hidden = singles;
 
@@ -388,21 +430,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     pickers.forEach(picker => {
-        const trigger = picker.querySelector(
-            '.match-picker__trigger'
-        );
-
-        const menu = picker.querySelector(
-            '.match-picker__menu'
-        );
-
-        const search = picker.querySelector(
-            '.match-picker__search'
-        );
-
-        const selected = picker.querySelector(
-            'input[type="hidden"]'
-        );
+        const trigger = picker.querySelector('.match-picker__trigger');
+        const menu = picker.querySelector('.match-picker__menu');
+        const search = picker.querySelector('.match-picker__search');
+        const selected = picker.querySelector('input[type="hidden"]');
 
         updateLabel(picker);
 
@@ -443,17 +474,57 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     document.addEventListener('click', function (event) {
-        if (!event.target.closest('.match-picker')) {
-            closeAll();
-        }
+        if (!event.target.closest('.match-picker')) closeAll();
     });
 
     document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            closeAll();
-        }
+        if (event.key === 'Escape') closeAll();
     });
 
+    // Hasil otomatis
+    function updateResult() {
+        const fields = ['set1_a', 'set1_b', 'set2_a', 'set2_b'];
+
+        if (fields.some(name => {
+            const input = form.elements.namedItem(name);
+            return input.value === '' || !input.validity.valid;
+        })) {
+            resultText.textContent = 'Isi skor kedua set';
+            return;
+        }
+
+        const values = Object.fromEntries(
+            fields.map(name => [
+                name,
+                Number(form.elements.namedItem(name).value)
+            ])
+        );
+
+        if (
+            values.set1_a === values.set1_b
+            || values.set2_a === values.set2_b
+        ) {
+            resultText.textContent = 'Skor satu set tidak boleh seri';
+            return;
+        }
+
+        const winsA =
+            Number(values.set1_a > values.set1_b)
+            + Number(values.set2_a > values.set2_b);
+
+        resultText.textContent = winsA === 2
+            ? 'Tim A menang 2–0'
+            : winsA === 0
+                ? 'Tim B menang 2–0'
+                : 'Seri 1–1';
+    }
+
+    form.querySelectorAll('.match-scoreboard input')
+        .forEach(input => {
+            input.addEventListener('input', updateResult);
+        });
+
+    // Validasi pemain
     form.addEventListener('submit', function (event) {
         const slots = currentType() === 'ganda'
             ? ['a1', 'a2', 'b1', 'b2']
@@ -463,12 +534,31 @@ document.addEventListener('DOMContentLoaded', function () {
             form.elements.namedItem(slot)?.value || ''
         );
 
+        const realIds = values.filter(value => value !== 'guest');
+
         let message = '';
 
         if (values.some(value => !value)) {
             message = 'Pilih semua pemain terlebih dahulu.';
-        } else if (new Set(values).size !== values.length) {
-            message = 'Pemain tidak boleh dipilih lebih dari sekali.';
+        } else if (new Set(realIds).size !== realIds.length) {
+            message = 'Pemain yang sama tidak boleh dipilih dua kali.';
+        }
+
+        const s1a = form.elements.namedItem('set1_a').value;
+        const s1b = form.elements.namedItem('set1_b').value;
+        const s2a = form.elements.namedItem('set2_a').value;
+        const s2b = form.elements.namedItem('set2_b').value;
+
+        if (
+            !message
+            && s1a !== '' && s1b !== ''
+            && s2a !== '' && s2b !== ''
+            && (
+                Number(s1a) === Number(s1b)
+                || Number(s2a) === Number(s2b)
+            )
+        ) {
+            message = 'Skor dalam satu set tidak boleh seri.';
         }
 
         if (!message) {
@@ -481,7 +571,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         error.textContent = message;
         error.hidden = false;
-
         error.scrollIntoView({
             behavior: 'smooth',
             block: 'center'
@@ -489,6 +578,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     updateType();
+    updateResult();
 });
 </script>
 @endpush

@@ -1,10 +1,9 @@
-
 @extends('layouts.app')
 
 @section('title', 'Pertandingan - PB Alfa')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=3">
+<link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=4">
 @endpush
 
 @section('content')
@@ -73,10 +72,7 @@
         </form>
 
         @if($canCreate)
-            <a
-                href="{{ route('matches.create') }}"
-                class="match-add"
-            >
+            <a href="{{ route('matches.create') }}" class="match-add">
                 <span aria-hidden="true">+</span>
                 Tambah Pertandingan
             </a>
@@ -93,6 +89,7 @@
                 <span class="match-eyebrow match-eyebrow--green">
                     OFFICIAL MATCH RECORDS
                 </span>
+
                 <h2>Daftar Pertandingan</h2>
             </div>
 
@@ -111,13 +108,13 @@
                     $teamA = $match->participants
                         ->where('team', 'a')
                         ->sortBy('slot')
-                        ->map(fn ($item) => $item->player?->name ?? '-')
+                        ->map(fn ($item) => $item->display_name)
                         ->implode(' / ');
 
                     $teamB = $match->participants
                         ->where('team', 'b')
                         ->sortBy('slot')
-                        ->map(fn ($item) => $item->player?->name ?? '-')
+                        ->map(fn ($item) => $item->display_name)
                         ->implode(' / ');
 
                     $isDraw = $match->result === 'seri';
@@ -131,6 +128,16 @@
                     $nameClassB = mb_strlen($teamB) > 28
                         ? 'match-team--very-long'
                         : (mb_strlen($teamB) > 17 ? 'match-team--long' : '');
+
+                    $set1 = $match->set1_a !== null
+                        && $match->set1_b !== null
+                        ? $match->set1_a . ' : ' . $match->set1_b
+                        : '— : —';
+
+                    $set2 = $match->set2_a !== null
+                        && $match->set2_b !== null
+                        ? $match->set2_a . ' : ' . $match->set2_b
+                        : '— : —';
                 @endphp
 
                 {{-- Tanggal --}}
@@ -170,44 +177,78 @@
 
                     <div class="match-row__teams">
 
-                        <div class="match-team
-                            {{ $isDraw ? 'is-draw' : ($winnerA ? 'is-winner' : 'is-loser') }}
-                            {{ $nameClassA }}">
+                        {{-- Tim A dan Set 1 --}}
 
-                            <span class="match-team__label">TIM A</span>
-                            <strong>{{ $teamA }}</strong>
+                        <div class="match-side match-side--a">
 
-                            <span class="match-sr-only">
-                                {{ $isDraw ? 'Seri' : ($winnerA ? 'Menang' : 'Kalah') }}
-                            </span>
+                            <div class="match-team
+                                {{ $isDraw ? 'is-draw' : ($winnerA ? 'is-winner' : 'is-loser') }}
+                                {{ $nameClassA }}">
+
+                                <span class="match-team__label">
+                                    TIM A
+                                </span>
+
+                                <strong>{{ $teamA }}</strong>
+
+                                <span class="match-sr-only">
+                                    {{ $isDraw ? 'Seri' : ($winnerA ? 'Menang' : 'Kalah') }}
+                                </span>
+
+                            </div>
+
+                            <div class="match-set">
+                                <small>SET 1</small>
+                                <strong>{{ $set1 }}</strong>
+                            </div>
 
                         </div>
 
-                        <span class="match-row__vs">VS</span>
+                        {{-- VS dan Kok --}}
 
-                        <div class="match-team
-                            {{ $isDraw ? 'is-draw' : ($winnerB ? 'is-winner' : 'is-loser') }}
-                            {{ $nameClassB }}">
+                        <div class="match-center">
 
-                            <span class="match-team__label">TIM B</span>
-                            <strong>{{ $teamB }}</strong>
-
-                            <span class="match-sr-only">
-                                {{ $isDraw ? 'Seri' : ($winnerB ? 'Menang' : 'Kalah') }}
+                            <span class="match-row__vs">
+                                VS
                             </span>
+
+                            <div
+                                class="match-cock"
+                                aria-label="Jumlah kok {{ $match->shuttlecock_count }}"
+                            >
+                                <small>KOK</small>
+                                <strong>{{ $match->shuttlecock_count }}</strong>
+                            </div>
 
                         </div>
 
-                    </div>
+                        {{-- Tim B dan Set 2 --}}
 
-                    {{-- Kok --}}
+                        <div class="match-side match-side--b">
 
-                    <div
-                        class="match-cock"
-                        aria-label="Jumlah kok {{ $match->shuttlecock_count }}"
-                    >
-                        <small>KOK</small>
-                        <strong>{{ $match->shuttlecock_count }}</strong>
+                            <div class="match-team
+                                {{ $isDraw ? 'is-draw' : ($winnerB ? 'is-winner' : 'is-loser') }}
+                                {{ $nameClassB }}">
+
+                                <span class="match-team__label">
+                                    TIM B
+                                </span>
+
+                                <strong>{{ $teamB }}</strong>
+
+                                <span class="match-sr-only">
+                                    {{ $isDraw ? 'Seri' : ($winnerB ? 'Menang' : 'Kalah') }}
+                                </span>
+
+                            </div>
+
+                            <div class="match-set">
+                                <small>SET 2</small>
+                                <strong>{{ $set2 }}</strong>
+                            </div>
+
+                        </div>
+
                     </div>
 
                     {{-- Hapus --}}
@@ -256,7 +297,9 @@
                 <div class="match-empty">
 
                     @if($tanggal)
-                        <strong>Tidak ada pertandingan pada tanggal ini.</strong>
+                        <strong>
+                            Tidak ada pertandingan pada tanggal ini.
+                        </strong>
 
                         <a href="{{ route('matches.index') }}">
                             Lihat Semua Pertandingan →
@@ -274,8 +317,11 @@
         {{-- Pagination --}}
 
         @if($matches->hasPages())
-            <nav class="match-pagination"
-                 aria-label="Navigasi halaman pertandingan">
+
+            <nav
+                class="match-pagination"
+                aria-label="Navigasi halaman pertandingan"
+            >
 
                 @if($matches->onFirstPage())
                     <span class="is-disabled">← Sebelumnya</span>
@@ -299,6 +345,7 @@
                 @endif
 
             </nav>
+
         @endif
 
     </section>

@@ -10,6 +10,7 @@ class MatchParticipant extends Model
     protected $fillable = [
         'match_id',
         'player_id',
+        'guest_name',
         'team',
         'slot',
     ];
@@ -26,5 +27,12 @@ class MatchParticipant extends Model
     {
         return $this->belongsTo(Player::class)
             ->withTrashed();
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->player?->name
+            ?? $this->guest_name
+            ?? 'Pemain Luar';
     }
 }

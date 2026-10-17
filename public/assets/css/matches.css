@@ -1,4 +1,3 @@
-
 /* Umum */
 
 .match-page,
@@ -281,9 +280,9 @@ input::-webkit-calendar-picker-indicator {
 
 .match-row {
     display: grid;
-    grid-template-columns: minmax(0,1fr) 52px;
+    grid-template-columns: minmax(0,1fr);
     align-items: center;
-    gap: 7px;
+    gap: 8px;
     min-width: 0;
     padding: 7px 9px;
     border: 1px solid #E2EAF1;
@@ -293,7 +292,7 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .match-row--manage {
-    grid-template-columns: minmax(0,1fr) 52px 72px;
+    grid-template-columns: minmax(0,1fr) 72px;
 }
 
 .match-row:hover {
@@ -302,8 +301,21 @@ input::-webkit-calendar-picker-indicator {
 
 .match-row__teams {
     display: grid;
-    grid-template-columns: minmax(0,1fr) 17px minmax(0,1fr);
-    align-items: center;
+    grid-template-columns:
+        minmax(0,1fr)
+        44px
+        minmax(0,1fr);
+    align-items: stretch;
+    gap: 7px;
+    min-width: 0;
+}
+
+/* Sisi tim */
+
+.match-side,
+.match-center {
+    display: grid;
+    grid-template-rows: minmax(44px,1fr) auto;
     gap: 5px;
     min-width: 0;
 }
@@ -314,12 +326,14 @@ input::-webkit-calendar-picker-indicator {
     justify-content: center;
     gap: 3px;
     min-width: 0;
+    min-height: 44px;
     padding: 6px 7px;
     border: 1px solid transparent;
     border-radius: 7px;
 }
 
-.match-team:nth-child(3) {
+.match-side--b .match-team,
+.match-side--b .match-set {
     align-items: flex-end;
     text-align: right;
 }
@@ -349,9 +363,11 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .match-row__vs {
+    display: grid;
+    place-items: center;
+    align-self: stretch;
     color: #A2B0BD;
-    text-align: center;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 900;
     font-style: italic;
 }
@@ -385,6 +401,39 @@ input::-webkit-calendar-picker-indicator {
     color: #596B7E;
 }
 
+/* Skor set */
+
+.match-set {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+    min-height: 38px;
+    padding: 5px 9px;
+    border: 1px solid #E4EAF1;
+    border-radius: 7px;
+    background: #F8FAFC;
+}
+
+.match-set small {
+    color: #7C90A3;
+    font-size: 8px;
+    font-weight: 850;
+    line-height: 1;
+}
+
+.match-set strong {
+    color: #173B5A;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -.035em;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
 /* Kok */
 
 .match-cock {
@@ -394,6 +443,7 @@ input::-webkit-calendar-picker-indicator {
     align-items: center;
     gap: 2px;
     width: 100%;
+    min-height: 38px;
     padding: 5px 3px;
     border: 1px solid #F3D7B1;
     border-radius: 7px;
@@ -419,6 +469,8 @@ input::-webkit-calendar-picker-indicator {
 
 .match-delete-form {
     display: flex;
+    justify-content: center;
+    align-items: center;
     min-width: 0;
     margin: 0;
 }
@@ -557,10 +609,7 @@ input::-webkit-calendar-picker-indicator {
 
 .match-form__fields {
     display: grid;
-    grid-template-columns:
-        minmax(0,1.2fr)
-        minmax(0,1.1fr)
-        minmax(0,.7fr);
+    grid-template-columns: repeat(2,minmax(0,1fr));
     align-items: start;
     gap: 15px;
 }
@@ -617,10 +666,6 @@ input::-webkit-calendar-picker-indicator {
     grid-template-columns: repeat(2,minmax(0,1fr));
 }
 
-.match-choice--result {
-    grid-template-columns: repeat(3,minmax(0,1fr));
-}
-
 .match-choice label {
     position: relative;
     display: block;
@@ -657,24 +702,6 @@ input::-webkit-calendar-picker-indicator {
     border-color: #1769AA;
     background: #EAF4FC;
     color: #1769AA;
-}
-
-.match-choice input[value="a"]:checked + span {
-    border-color: #7BCB91;
-    background: #EAF8EF;
-    color: #217C43;
-}
-
-.match-choice input[value="b"]:checked + span {
-    border-color: #7BCB91;
-    background: #EAF8EF;
-    color: #217C43;
-}
-
-.match-choice input[value="seri"]:checked + span {
-    border-color: #CBD5E1;
-    background: #F1F4F7;
-    color: #596B7E;
 }
 
 .match-choice input:focus-visible + span {
@@ -851,12 +878,157 @@ input::-webkit-calendar-picker-indicator {
     background: #EDF5FB;
 }
 
+.match-picker__option--guest {
+    margin-bottom: 5px;
+    border-bottom: 1px solid #E4ECF2;
+    border-radius: 6px;
+    background: #FFF4E4;
+    color: #A66C24;
+    font-weight: 850;
+}
+
+.match-picker__option--guest:hover {
+    background: #FFEBCD;
+}
+
 .match-picker__empty {
     margin: 0;
     padding: 12px 5px;
     color: #8193A5;
     text-align: center;
     font-size: 12px;
+}
+
+/* Skor form */
+
+.match-scoreboard {
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        70px
+        minmax(0,1fr);
+    align-items: stretch;
+    gap: 12px;
+    min-width: 0;
+}
+
+.match-scoreboard__set,
+.match-scoreboard__cock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid #DFE8F0;
+    border-radius: 11px;
+    background: #F8FAFC;
+}
+
+.match-scoreboard__set > label,
+.match-scoreboard__cock > label {
+    color: #264864;
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: .04em;
+}
+
+.match-scoreboard__inputs {
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        12px
+        minmax(0,1fr);
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    min-width: 0;
+}
+
+.match-scoreboard__inputs > span {
+    color: #7A91A6;
+    font-size: 17px;
+    font-weight: 900;
+    text-align: center;
+}
+
+.site-main .match-scoreboard input {
+    display: block;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: 44px;
+    min-height: 44px;
+    margin: 0;
+    padding: 5px;
+    border: 1.5px solid #CBD9E6;
+    border-radius: 9px;
+    background: white;
+    color: #173B5A;
+    font-size: 17px;
+    font-weight: 900;
+    text-align: center;
+    outline: none;
+    font-variant-numeric: tabular-nums;
+    appearance: textfield;
+}
+
+.site-main .match-scoreboard input:focus {
+    border-color: #1769AA;
+    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+}
+
+.match-scoreboard input::-webkit-inner-spin-button,
+.match-scoreboard input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+.match-scoreboard__set > small {
+    color: #8193A5;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.match-scoreboard__cock {
+    justify-content: flex-start;
+    border-color: #F3D7B1;
+    background: #FFF3E3;
+}
+
+.match-scoreboard__cock > label {
+    color: #A66C24;
+}
+
+.site-main .match-scoreboard__cock input {
+    margin-top: 0;
+    color: #A65B08;
+}
+
+/* Hasil otomatis */
+
+.match-result-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 7px 12px;
+    padding: 12px 15px;
+    border: 1px solid #D9E7F1;
+    border-radius: 9px;
+    background: #EDF5FB;
+}
+
+.match-result-preview > span {
+    color: #58768F;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.match-result-preview > strong {
+    color: #1769AA;
+    font-size: 13px;
+    font-weight: 850;
 }
 
 /* Validasi */
@@ -929,13 +1101,12 @@ input::-webkit-calendar-picker-indicator {
 /* Tablet */
 
 @media (max-width: 750px) {
-    .match-row {
-        grid-template-columns: minmax(0,1fr) 47px;
-        gap: 6px;
-    }
-
-    .match-row--manage {
-        grid-template-columns: minmax(0,1fr) 47px 64px;
+    .match-row__teams {
+        grid-template-columns:
+            minmax(0,1fr)
+            38px
+            minmax(0,1fr);
+        gap: 5px;
     }
 
     .match-team {
@@ -954,12 +1125,8 @@ input::-webkit-calendar-picker-indicator {
         font-size: 9px;
     }
 
-    .match-form__fields {
-        grid-template-columns:
-            minmax(0,1.1fr)
-            minmax(0,1fr)
-            minmax(0,.75fr);
-        gap: 10px;
+    .match-scoreboard {
+        gap: 8px;
     }
 }
 
@@ -983,14 +1150,15 @@ input::-webkit-calendar-picker-indicator {
         flex: none;
     }
 
+    .match-row--manage {
+        grid-template-columns: minmax(0,1fr) 33px;
+        gap: 5px;
+    }
+
     .match-delete {
         width: 33px;
         min-height: 33px;
         padding: 0;
-    }
-
-    .match-delete-form {
-        justify-content: center;
     }
 
     .match-delete span {
@@ -1000,15 +1168,6 @@ input::-webkit-calendar-picker-indicator {
     .match-delete svg {
         width: 16px;
         height: 16px;
-    }
-
-    .match-form__fields {
-        grid-template-columns: repeat(2,minmax(0,1fr));
-        gap: 12px;
-    }
-
-    .match-form__fields > .match-field:first-child {
-        grid-column: 1 / -1;
     }
 }
 
@@ -1075,27 +1234,29 @@ input::-webkit-calendar-picker-indicator {
     }
 
     .match-row {
-        grid-template-columns: minmax(0,1fr) 42px;
         gap: 4px;
         padding: 6px;
         border-radius: 8px;
     }
 
-    .match-row--manage {
-        grid-template-columns: minmax(0,1fr) 42px 33px;
-    }
-
     .match-row__teams {
         grid-template-columns:
             minmax(0,1fr)
-            12px
+            33px
             minmax(0,1fr);
-        gap: 2px;
+        gap: 4px;
+    }
+
+    .match-side,
+    .match-center {
+        grid-template-rows: minmax(42px,1fr) auto;
+        gap: 4px;
     }
 
     .match-team {
+        min-height: 42px;
         gap: 2px;
-        padding: 5px 3px;
+        padding: 5px 4px;
         border-radius: 6px;
     }
 
@@ -1116,20 +1277,28 @@ input::-webkit-calendar-picker-indicator {
     }
 
     .match-row__vs {
-        font-size: 8px;
+        font-size: 9px;
     }
 
+    .match-set,
     .match-cock {
-        padding: 4px 2px;
+        min-height: 35px;
+        padding: 4px;
         border-radius: 6px;
     }
 
+    .match-set small,
     .match-cock small {
         font-size: 7px;
     }
 
+    .match-set strong {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
     .match-cock strong {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .match-form-card {
@@ -1150,6 +1319,11 @@ input::-webkit-calendar-picker-indicator {
 
     .match-form {
         gap: 17px;
+    }
+
+    .match-form__fields {
+        grid-template-columns: minmax(0,1fr);
+        gap: 12px;
     }
 
     .match-field > label,
@@ -1195,6 +1369,50 @@ input::-webkit-calendar-picker-indicator {
     .match-picker__trigger svg {
         width: 13px;
         height: 13px;
+    }
+
+    .match-scoreboard {
+        grid-template-columns:
+            minmax(0,1fr)
+            49px
+            minmax(0,1fr);
+        gap: 5px;
+    }
+
+    .match-scoreboard__set,
+    .match-scoreboard__cock {
+        gap: 7px;
+        padding: 9px 6px;
+        border-radius: 8px;
+    }
+
+    .match-scoreboard__set > label,
+    .match-scoreboard__cock > label {
+        font-size: 9px;
+    }
+
+    .match-scoreboard__inputs {
+        grid-template-columns:
+            minmax(0,1fr)
+            8px
+            minmax(0,1fr);
+        gap: 3px;
+    }
+
+    .match-scoreboard__inputs > span {
+        font-size: 13px;
+    }
+
+    .site-main .match-scoreboard input {
+        height: 38px;
+        min-height: 38px;
+        padding: 3px;
+        border-radius: 7px;
+        font-size: 12px;
+    }
+
+    .match-scoreboard__set > small {
+        font-size: 8px;
     }
 
     .match-form__actions {

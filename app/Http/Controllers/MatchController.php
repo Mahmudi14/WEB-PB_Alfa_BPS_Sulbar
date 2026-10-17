@@ -11,23 +11,16 @@ use Illuminate\Validation\ValidationException;
 
 class MatchController extends Controller
 {
-
     public function index(Request $request)
     {
         $data = $request->validate([
-            'tanggal' => [
-                'nullable',
-                'date_format:Y-m-d',
-            ],
+            'tanggal' => ['nullable', 'date_format:Y-m-d'],
         ]);
 
         $tanggal = $data['tanggal'] ?? null;
 
         $matches = BadmintonMatch::query()
-            ->with([
-                'participants.player',
-                'creator',
-            ])
+            ->with(['participants.player', 'creator'])
             ->when($tanggal, function ($query) use ($tanggal) {
                 $query->whereDate('played_on', $tanggal);
             })
@@ -42,13 +35,14 @@ class MatchController extends Controller
         ));
     }
 
-
     public function create(Request $request)
     {
         $this->ensureCanCreate($request);
 
         return view('matches.create', [
-            'players' => $this->availablePlayers(),
+            'players' => Player::query()
+                ->orderBy('name')
+                ->get(['id', 'name']),
             'selected' => [
                 'a1' => '',
                 'a2' => '',
@@ -65,12 +59,15 @@ class MatchController extends Controller
         $data = $this->validatedMatch($request);
 
         DB::transaction(function () use ($data, $request) {
-
             $match = BadmintonMatch::create([
                 'played_on' => $data['played_on'],
                 'type' => $data['type'],
                 'result' => $data['result'],
                 'shuttlecock_count' => $data['shuttlecock_count'],
+                'set1_a' => $data['set1_a'],
+                'set1_b' => $data['set1_b'],
+                'set2_a' => $data['set2_a'],
+                'set2_b' => $data['set2_b'],
                 'created_by' => $request->user()->id,
             ]);
 
@@ -84,75 +81,10 @@ class MatchController extends Controller
             ->with('success', 'Pertandingan berhasil ditambahkan.');
     }
 
-    public function edit(
-        Request $request,
-        BadmintonMatch $match
-    ) {
+    public function destroy(Request $request, BadmintonMatch $match)
+    {
         abort_unless(
-            $match->editableBy($request->user()),
-            403
-        );
-
-        $match->load('participants');
-
-        $selected = [
-            'a1' => '',
-            'a2' => '',
-            'b1' => '',
-            'b2' => '',
-        ];
-
-        foreach ($match->participants as $participant) {
-            $key = $participant->team . $participant->slot;
-
-            $selected[$key] = (string) $participant->player_id;
-        }
-
-        return view('matches.edit', [
-            'match' => $match,
-            'players' => $this->availablePlayers($match),
-            'selected' => $selected,
-        ]);
-    }
-
-    public function update(
-        Request $request,
-        BadmintonMatch $match
-    ) {
-        abort_unless(
-            $match->editableBy($request->user()),
-            403
-        );
-
-        $data = $this->validatedMatch($request, $match);
-
-        DB::transaction(function () use ($match, $data) {
-
-            $match->update([
-                'played_on' => $data['played_on'],
-                'type' => $data['type'],
-                'result' => $data['result'],
-                'shuttlecock_count' => $data['shuttlecock_count'],
-            ]);
-
-            $match->participants()->delete();
-
-            $match->participants()->createMany(
-                $this->participantData($data)
-            );
-        }, 3);
-
-        return redirect()
-            ->route('matches.index')
-            ->with('success', 'Pertandingan berhasil diperbarui.');
-    }
-
-    public function destroy(
-        Request $request,
-        BadmintonMatch $match
-    ) {
-        abort_unless(
-            $request->user()->canManage(),
+            $request->user()?->canManage(),
             403
         );
 
@@ -180,10 +112,8 @@ class MatchController extends Controller
         );
     }
 
-    private function validatedMatch(
-        Request $request,
-        ?BadmintonMatch $match = null
-    ): array {
+    private function validatedMatch(Request $request): array
+    {
         $data = $request->validate([
             'played_on' => [
                 'required',
@@ -193,89 +123,97 @@ class MatchController extends Controller
                 'required',
                 Rule::in(['tunggal', 'ganda']),
             ],
-            'result' => [
-                'required',
-                Rule::in(['a', 'b', 'seri']),
-            ],
             'shuttlecock_count' => [
                 'required',
                 'integer',
                 'between:0,65535',
             ],
-            'a1' => [
-                'required',
-                'integer',
-                Rule::exists('players', 'id'),
-            ],
-            'b1' => [
-                'required',
-                'integer',
-                Rule::exists('players', 'id'),
-            ],
+            'set1_a' => ['required', 'integer', 'between:0,99'],
+            'set1_b' => ['required', 'integer', 'between:0,99'],
+            'set2_a' => ['required', 'integer', 'between:0,99'],
+            'set2_b' => ['required', 'integer', 'between:0,99'],
+            'a1' => ['required', 'string'],
+            'b1' => ['required', 'string'],
             'a2' => [
-                Rule::requiredIf(
-                    $request->input('type') === 'ganda'
-                ),
+                Rule::requiredIf($request->input('type') === 'ganda'),
                 'nullable',
-                'integer',
-                Rule::exists('players', 'id'),
+                'string',
             ],
             'b2' => [
-                Rule::requiredIf(
-                    $request->input('type') === 'ganda'
-                ),
+                Rule::requiredIf($request->input('type') === 'ganda'),
                 'nullable',
-                'integer',
-                Rule::exists('players', 'id'),
+                'string',
             ],
         ]);
 
-        $fields = $data['type'] === 'ganda'
+        // Validasi skor
+        if (
+            $data['set1_a'] === $data['set1_b']
+            || $data['set2_a'] === $data['set2_b']
+        ) {
+            throw ValidationException::withMessages([
+                'set1_a' => 'Skor dalam satu set tidak boleh seri.',
+            ]);
+        }
+
+        // Hasil otomatis
+        $winsA = 0;
+
+        if ($data['set1_a'] > $data['set1_b']) {
+            $winsA++;
+        }
+
+        if ($data['set2_a'] > $data['set2_b']) {
+            $winsA++;
+        }
+
+        $data['result'] = match ($winsA) {
+            2 => 'a',
+            0 => 'b',
+            default => 'seri',
+        };
+
+        // Peserta
+        $slots = $data['type'] === 'ganda'
             ? ['a1', 'a2', 'b1', 'b2']
             : ['a1', 'b1'];
 
-        $ids = array_map(
-            fn($field) => (int) $data[$field],
-            $fields
-        );
+        $realIds = [];
 
-        if (count(array_unique($ids)) !== count($ids)) {
+        foreach ($slots as $slot) {
+            $value = (string) $data[$slot];
+
+            if ($value === 'guest') {
+                continue;
+            }
+
+            if (!preg_match('/^[1-9][0-9]*$/D', $value)) {
+                throw ValidationException::withMessages([
+                    $slot => 'Pilihan pemain tidak valid.',
+                ]);
+            }
+
+            $realIds[] = (int) $value;
+        }
+
+        if (count($realIds) !== count(array_unique($realIds))) {
             throw ValidationException::withMessages([
                 'a1' => 'Pemain yang sama tidak boleh dipilih dua kali.',
             ]);
         }
 
-        // Peserta nonaktif hanya diizinkan jika
-        // memang sudah menjadi peserta pertandingan
-        // yang sedang diedit.
-        $existingIds = $match
-            ? $match->participants()
-            ->pluck('player_id')
-            ->map(fn($id) => (int) $id)
-            ->all()
-            : [];
+        $found = Player::query()
+            ->whereIn('id', $realIds)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
 
-        $players = Player::withTrashed()
-            ->whereIn('id', $ids)
-            ->get()
-            ->keyBy('id');
-
-        foreach ($ids as $id) {
-            $player = $players->get($id);
-
-            if (
-                !$player ||
-                ($player->trashed()
-                    && !in_array($id, $existingIds, true))
-            ) {
-                throw ValidationException::withMessages([
-                    'a1' => 'Pilih pemain yang masih aktif.',
-                ]);
-            }
+        if (count($found) !== count($realIds)) {
+            throw ValidationException::withMessages([
+                'a1' => 'Pilih pemain yang masih aktif.',
+            ]);
         }
 
-        // Untuk tunggal, input pemain kedua
-        // tidak dipakai meskipun dikirim dari browser.
         if ($data['type'] === 'tunggal') {
             $data['a2'] = null;
             $data['b2'] = null;
@@ -286,54 +224,24 @@ class MatchController extends Controller
 
     private function participantData(array $data): array
     {
-        $participants = [
-            [
-                'player_id' => $data['a1'],
-                'team' => 'a',
-                'slot' => 1,
-            ],
-            [
-                'player_id' => $data['b1'],
-                'team' => 'b',
-                'slot' => 1,
-            ],
-        ];
+        $slots = $data['type'] === 'ganda'
+            ? ['a1', 'a2', 'b1', 'b2']
+            : ['a1', 'b1'];
 
-        if ($data['type'] === 'ganda') {
-            $participants[] = [
-                'player_id' => $data['a2'],
-                'team' => 'a',
-                'slot' => 2,
-            ];
+        $participants = [];
+
+        foreach ($slots as $slot) {
+            $value = (string) $data[$slot];
+            $guest = $value === 'guest';
 
             $participants[] = [
-                'player_id' => $data['b2'],
-                'team' => 'b',
-                'slot' => 2,
+                'player_id' => $guest ? null : (int) $value,
+                'guest_name' => $guest ? 'Pemain Luar' : null,
+                'team' => substr($slot, 0, 1),
+                'slot' => (int) substr($slot, 1),
             ];
         }
 
         return $participants;
-    }
-
-    private function availablePlayers(
-        ?BadmintonMatch $match = null
-    ) {
-        $existingIds = $match
-            ? $match->participants()
-            ->pluck('player_id')
-            ->all()
-            : [];
-
-        return Player::withTrashed()
-            ->where(function ($query) use ($existingIds) {
-                $query->whereNull('deleted_at');
-
-                if (!empty($existingIds)) {
-                    $query->orWhereIn('id', $existingIds);
-                }
-            })
-            ->orderBy('name')
-            ->get(['id', 'name', 'deleted_at']);
     }
 }
