@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/home-v3.css') }}?v=4">
 
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('assets/css/password-toggle.css') }}?v=1">
 </head>
 
 <body>
@@ -222,6 +223,7 @@
 
 
     <script src="{{ asset('assets/js/site.js') }}?v=8" defer></script>
+    <script src="{{ asset('assets/js/password-toggle.js') }}?v=1" defer></script>
 
     @stack('scripts')
 
