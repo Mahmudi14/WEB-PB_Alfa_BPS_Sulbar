@@ -74,22 +74,42 @@ class PlayerRankingService
             ->orderBy('players.id')
             ->get();
 
-        $previous = null;
-        $currentRank = 0;
+        // Posisi ranking masing-masing kategori
+        $positions = [
+            'L' => 0,
+            'P' => 0,
+        ];
 
-        foreach ($players as $index => $player) {
+        $currentRanks = [
+            'L' => 0,
+            'P' => 0,
+        ];
+
+        $previousKeys = [
+            'L' => null,
+            'P' => null,
+        ];
+
+        foreach ($players as $player) {
+
+            $gender = $player->gender;
+
+            // Penomoran rank berbeda antara putra dan putri
+            $positions[$gender]++;
+
             $key = [
                 (int) $player->total_score,
                 (int) $player->wins,
                 (int) $player->losses,
             ];
 
-            if ($previous !== $key) {
-                $currentRank = $index + 1;
+            // Pemain dengan hasil identik berbagi peringkat
+            if ($previousKeys[$gender] !== $key) {
+                $currentRanks[$gender] = $positions[$gender];
             }
 
-            $player->rank_position = $currentRank;
-            $previous = $key;
+            $player->rank_position = $currentRanks[$gender];
+            $previousKeys[$gender] = $key;
         }
 
         return $players;

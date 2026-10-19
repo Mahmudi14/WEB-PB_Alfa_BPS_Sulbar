@@ -85,7 +85,6 @@ class PlayerController extends Controller
                     'user_id' => $userId,
                 ]);
             }, 3);
-
         } catch (QueryException $exception) {
             $this->handleDuplicateEmail($exception);
         }
@@ -169,7 +168,6 @@ class PlayerController extends Controller
                     }
 
                     $user->save();
-
                 } elseif ($email !== null) {
 
                     // Pemain lama baru diberi akun login
@@ -194,7 +192,6 @@ class PlayerController extends Controller
                     'user_id' => $user?->id,
                 ]);
             }, 3);
-
         } catch (QueryException $exception) {
             $this->handleDuplicateEmail($exception);
         }
@@ -273,23 +270,32 @@ class PlayerController extends Controller
 
     // Hak akses edit
 
+
     private function ensureCanModify(
         Request $request,
         Player $player
     ): void {
-        abort_unless($request->user()->canManage(), 403);
 
-        if (!$request->user()->isAdmin()) {
-            abort_if(
-                in_array(
-                    $player->user?->role,
-                    ['admin', 'pengelola'],
-                    true
-                ),
-                403
-            );
+        $user = $request->user();
+
+        // Hanya Admin dan Pengelola
+        abort_unless($user->canManage(), 403);
+
+        // Admin memiliki akses penuh
+        if ($user->isAdmin()) {
+            return;
         }
+
+        // Pengelola boleh mengedit pemain biasa,
+        // dirinya sendiri, dan sesama Pengelola.
+        // Namun tidak boleh mengedit akun Admin.
+        abort_if(
+            $player->user?->role === 'admin',
+            403,
+            'Data Admin hanya dapat diubah oleh Admin.'
+        );
     }
+
 
     // Email duplikat
 
