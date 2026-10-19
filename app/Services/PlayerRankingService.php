@@ -68,11 +68,12 @@ class PlayerRankingService
                 ) AS total_score
             ")
             ->orderByDesc('total_score')
-            ->orderByDesc('wins')
-            ->orderBy('losses')
-            ->orderBy('players.name')
-            ->orderBy('players.id')
-            ->get();
+->orderByDesc('wins')
+->orderByDesc('draws')
+->orderBy('losses')
+->orderBy('players.name')
+->orderBy('players.id')
+->get();
 
         // Posisi ranking masing-masing kategori
         $positions = [
