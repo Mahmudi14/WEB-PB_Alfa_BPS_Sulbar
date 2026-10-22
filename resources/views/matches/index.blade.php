@@ -3,29 +3,43 @@
 @section('title', 'Pertandingan - PB Alfa')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=6">
+<link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=7">
 @endpush
 
 @section('content')
 
 @php
-    $viewer = auth()->user();
-    $canManage = $viewer?->canManage() ?? false;
-    $canCreate = $viewer && in_array(
-        $viewer->role,
-        ['admin', 'pengelola', 'pemain'],
-        true
-    );
-    $lastDate = null;
+$viewer = auth()->user();
+
+$canCreate = $viewer
+&& $viewer->is_active
+&& (
+$viewer->canManage()
+|| (
+$viewer->role === 'pemain'
+&& $viewer->player !== null
+)
+);
+
+$lastDate = null;
 @endphp
 
 <div class="match-page">
 
+    {{-- Header --}}
     <header class="match-hero">
         <div>
-            <span class="match-eyebrow">PB ALFA / MATCH HISTORY</span>
-            <h1>RIWAYAT <span>PERTANDINGAN.</span></h1>
-            <p>Catatan pertandingan PB Alfa BPS Sulawesi Barat.</p>
+            <span class="match-eyebrow">
+                PB ALFA / MATCH HISTORY
+            </span>
+
+            <h1>
+                RIWAYAT <span>PERTANDINGAN.</span>
+            </h1>
+
+            <p>
+                Catatan pertandingan PB Alfa BPS Sulawesi Barat.
+            </p>
         </div>
 
         <span class="match-hero__decoration" aria-hidden="true">
@@ -33,35 +47,22 @@
         </span>
     </header>
 
-    {{-- Filter --}}
-
+    {{-- Filter dan Tambah --}}
     <div class="match-toolbar">
 
-        <form
-            method="GET"
-            action="{{ route('matches.index') }}"
-            class="match-filter"
-        >
-            <label for="match-date">Filter berdasarkan tanggal</label>
+        <form method="GET" action="{{ route('matches.index') }}" class="match-filter">
+            <label for="match-date">
+                Filter berdasarkan tanggal
+            </label>
 
             <div class="match-filter__controls">
-
-                <input
-                    id="match-date"
-                    type="date"
-                    name="tanggal"
-                    value="{{ $tanggal ?? '' }}"
-                >
+                <input id="match-date" type="date" name="tanggal" value="{{ $tanggal ?? '' }}">
 
                 @if($tanggal)
-                    <a
-                        href="{{ route('matches.index') }}"
-                        class="match-filter__reset"
-                    >
-                        Lihat Semua
-                    </a>
+                <a href="{{ route('matches.index') }}" class="match-filter__reset">
+                    Lihat Semua
+                </a>
                 @endif
-
             </div>
 
             <noscript>
@@ -72,16 +73,15 @@
         </form>
 
         @if($canCreate)
-            <a href="{{ route('matches.create') }}" class="match-add">
-                <span aria-hidden="true">+</span>
-                Tambah Pertandingan
-            </a>
+        <a href="{{ route('matches.create') }}" class="match-add">
+            <span aria-hidden="true">+</span>
+            Tambah Pertandingan
+        </a>
         @endif
 
     </div>
 
-    {{-- Daftar --}}
-
+    {{-- Daftar Pertandingan --}}
     <section class="match-board">
 
         <div class="match-board__heading">
@@ -102,249 +102,271 @@
 
             @forelse($matches as $match)
 
-                @php
-                    $dateKey = $match->played_on->toDateString();
+            @php
+            $dateKey = $match->played_on->toDateString();
 
-                    $teamA = $match->participants
-                        ->where('team', 'a')
-                        ->sortBy('slot')
-                        ->map(fn ($item) => $item->display_name)
-                        ->implode(' / ');
+            // Nama pemain
+            $teamA = $match->participants
+            ->where('team', 'a')
+            ->sortBy('slot')
+            ->map(fn ($item) => $item->display_name)
+            ->implode(' / ');
 
-                    $teamB = $match->participants
-                        ->where('team', 'b')
-                        ->sortBy('slot')
-                        ->map(fn ($item) => $item->display_name)
-                        ->implode(' / ');
+            $teamB = $match->participants
+            ->where('team', 'b')
+            ->sortBy('slot')
+            ->map(fn ($item) => $item->display_name)
+            ->implode(' / ');
 
-                    $isDraw = $match->result === 'seri';
-                    $winnerA = $match->result === 'a';
-                    $winnerB = $match->result === 'b';
+            // Kelengkapan skor
+            $hasScores = $match->set1_a !== null
+            && $match->set1_b !== null
+            && $match->set2_a !== null
+            && $match->set2_b !== null;
 
-                    $nameClassA = mb_strlen($teamA) > 28
-                        ? 'match-team--very-long'
-                        : (mb_strlen($teamA) > 17 ? 'match-team--long' : '');
+            // Status pertandingan
+            $isPending = !$hasScores
+            || $match->result === null;
 
-                    $nameClassB = mb_strlen($teamB) > 28
-                        ? 'match-team--very-long'
-                        : (mb_strlen($teamB) > 17 ? 'match-team--long' : '');
+            $isDraw = !$isPending
+            && $match->result === 'seri';
 
-                    $set1 = $match->set1_a !== null
-                        && $match->set1_b !== null
-                        ? $match->set1_a . ' : ' . $match->set1_b
-                        : '— : —';
+            $winnerA = !$isPending
+            && $match->result === 'a';
 
-                    $set2 = $match->set2_a !== null
-                        && $match->set2_b !== null
-                        ? $match->set2_a . ' : ' . $match->set2_b
-                        : '— : —';
-                @endphp
+            $winnerB = !$isPending
+            && $match->result === 'b';
 
-                {{-- Tanggal --}}
+            // Warna setiap tim
+            $statusA = $isPending
+            ? 'is-pending'
+            : ($isDraw
+            ? 'is-draw'
+            : ($winnerA ? 'is-winner' : 'is-loser'));
 
-                @if($lastDate !== $dateKey)
-                    <h3 class="match-divider">
+            $statusB = $isPending
+            ? 'is-pending'
+            : ($isDraw
+            ? 'is-draw'
+            : ($winnerB ? 'is-winner' : 'is-loser'));
 
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true"
-                        >
-                            <rect x="3" y="5" width="18" height="16" rx="2"/>
-                            <path d="M7 3v4M17 3v4M3 10h18"/>
-                        </svg>
+            // Keterangan aksesibilitas
+            $statusTextA = $isPending
+            ? 'Belum ada hasil'
+            : ($isDraw
+            ? 'Seri'
+            : ($winnerA ? 'Menang' : 'Kalah'));
 
-                        <span>
-                            {{ $match->played_on
-                                ->locale('id')
-                                ->translatedFormat('l, d F Y') }}
-                        </span>
+            $statusTextB = $isPending
+            ? 'Belum ada hasil'
+            : ($isDraw
+            ? 'Seri'
+            : ($winnerB ? 'Menang' : 'Kalah'));
 
-                    </h3>
+            // Ukuran teks pemain
+            $nameClassA = mb_strlen($teamA) > 28
+            ? 'match-team--very-long'
+            : (mb_strlen($teamA) > 17
+            ? 'match-team--long'
+            : '');
 
-                    @php
-                        $lastDate = $dateKey;
-                    @endphp
-                @endif
+            $nameClassB = mb_strlen($teamB) > 28
+            ? 'match-team--very-long'
+            : (mb_strlen($teamB) > 17
+            ? 'match-team--long'
+            : '');
 
-                {{-- Pertandingan --}}
+            // Skor
+            $set1 = $match->set1_a !== null
+            && $match->set1_b !== null
+            ? $match->set1_a . ' : ' . $match->set1_b
+            : '— : —';
 
-                <article class="match-row {{ $canManage ? 'match-row--manage' : '' }}">
+            $set2 = $match->set2_a !== null
+            && $match->set2_b !== null
+            ? $match->set2_a . ' : ' . $match->set2_b
+            : '— : —';
 
-                    <div class="match-row__teams">
+            // Hak membuka halaman edit
+            $canOpenEditor = $viewer
+            && $viewer->is_active
+            && (
+            $viewer->canManage()
+            || (
+            $viewer->role === 'pemain'
+            && $viewer->player !== null
+            && (int) $match->created_by
+            === (int) $viewer->id
+            )
+            );
+            @endphp
 
-                        {{-- Tim A dan Set 1 --}}
+            {{-- Pemisah tanggal --}}
+            @if($lastDate !== $dateKey)
 
-                        <div class="match-side match-side--a">
+            <h3 class="match-divider">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M7 3v4M17 3v4M3 10h18" />
+                </svg>
 
-                            <div class="match-team
-                                {{ $isDraw ? 'is-draw' : ($winnerA ? 'is-winner' : 'is-loser') }}
+                <span>
+                    {{ $match->played_on
+                    ->locale('id')
+                    ->translatedFormat('l, d F Y') }}
+                </span>
+            </h3>
+
+            @php
+            $lastDate = $dateKey;
+            @endphp
+            @endif
+
+            {{-- Kartu pertandingan --}}
+            <article class="match-row
+                    {{ $canOpenEditor ? 'match-row--manage' : '' }}
+                    {{ $isPending ? 'match-row--pending' : '' }}">
+
+                <div class="match-row__teams">
+
+                    {{-- Tim A --}}
+                    <div class="match-side match-side--a">
+
+                        <div class="match-team
+                                {{ $statusA }}
                                 {{ $nameClassA }}">
 
-                                <span class="match-team__label">
-                                    TIM A
-                                </span>
-
-                                <strong>{{ $teamA }}</strong>
-
-                                <span class="match-sr-only">
-                                    {{ $isDraw ? 'Seri' : ($winnerA ? 'Menang' : 'Kalah') }}
-                                </span>
-
-                            </div>
-
-                            <div class="match-set">
-                                <small>SET 1</small>
-                                <strong>{{ $set1 }}</strong>
-                            </div>
-
-                        </div>
-
-                        {{-- VS dan Kok --}}
-
-                        <div class="match-center">
-
-                            <span class="match-row__vs">
-                                VS
+                            <span class="match-team__label">
+                                TIM A
                             </span>
 
-                            <div
-                                class="match-cock"
-                                aria-label="Jumlah kok {{ $match->shuttlecock_count }}"
-                            >
-                                <small>KOK</small>
-                                <strong>{{ $match->shuttlecock_count }}</strong>
-                            </div>
+                            <strong>{{ $teamA }}</strong>
 
+                            <span class="match-sr-only">
+                                {{ $statusTextA }}
+                            </span>
                         </div>
 
-                        {{-- Tim B dan Set 2 --}}
-
-                        <div class="match-side match-side--b">
-
-                            <div class="match-team
-                                {{ $isDraw ? 'is-draw' : ($winnerB ? 'is-winner' : 'is-loser') }}
-                                {{ $nameClassB }}">
-
-                                <span class="match-team__label">
-                                    TIM B
-                                </span>
-
-                                <strong>{{ $teamB }}</strong>
-
-                                <span class="match-sr-only">
-                                    {{ $isDraw ? 'Seri' : ($winnerB ? 'Menang' : 'Kalah') }}
-                                </span>
-
-                            </div>
-
-                            <div class="match-set">
-                                <small>SET 2</small>
-                                <strong>{{ $set2 }}</strong>
-                            </div>
-
+                        <div class="match-set">
+                            <small>SET 1</small>
+                            <strong>{{ $set1 }}</strong>
                         </div>
 
                     </div>
 
-                    {{-- Hapus --}}
+                    {{-- VS dan Kok --}}
+                    <div class="match-center">
 
-                    @if($canManage)
-                        <form
-                            method="POST"
-                            action="{{ route('matches.destroy', $match) }}"
-                            class="match-delete-form"
-                            data-single-submit
-                            data-confirm="Hapus pertandingan ini?"
-                        >
-                            @csrf
-                            @method('DELETE')
+                        <span class="match-row__vs">
+                            VS
+                        </span>
 
-                            <button
-                                type="submit"
-                                class="match-delete"
-                                title="Hapus pertandingan"
-                                aria-label="Hapus pertandingan {{ $teamA }} melawan {{ $teamB }}"
-                            >
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    aria-hidden="true"
-                                >
-                                    <path d="M3 6h18"/>
-                                    <path d="M8 6V4h8v2"/>
-                                    <path d="M5 6l1 15h12l1-15"/>
-                                    <path d="M10 10v7M14 10v7"/>
-                                </svg>
+                        <div class="match-cock" aria-label="Jumlah kok {{ $match->shuttlecock_count }}">
+                            <small>KOK</small>
+                            <strong>
+                                {{ $match->shuttlecock_count }}
+                            </strong>
+                        </div>
 
-                                <span>Hapus</span>
-                            </button>
-                        </form>
-                    @endif
+                    </div>
 
-                </article>
+                    {{-- Tim B --}}
+                    <div class="match-side match-side--b">
+
+                        <div class="match-team
+                                {{ $statusB }}
+                                {{ $nameClassB }}">
+
+                            <span class="match-team__label">
+                                TIM B
+                            </span>
+
+                            <strong>{{ $teamB }}</strong>
+
+                            <span class="match-sr-only">
+                                {{ $statusTextB }}
+                            </span>
+                        </div>
+
+                        <div class="match-set">
+                            <small>SET 2</small>
+                            <strong>{{ $set2 }}</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {{-- Tombol Edit --}}
+                @if($canOpenEditor)
+
+                <a href="{{ route('matches.edit', $match) }}" class="match-edit" title="Buka halaman edit pertandingan"
+                    aria-label="Edit pertandingan {{ $teamA }} melawan {{ $teamB }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z" />
+                    </svg>
+
+                    <span>Edit</span>
+                </a>
+
+                @endif
+
+            </article>
 
             @empty
 
-                <div class="match-empty">
+            <div class="match-empty">
 
-                    @if($tanggal)
-                        <strong>
-                            Tidak ada pertandingan pada tanggal ini.
-                        </strong>
+                @if($tanggal)
+                <strong>
+                    Tidak ada pertandingan pada tanggal ini.
+                </strong>
 
-                        <a href="{{ route('matches.index') }}">
-                            Lihat Semua Pertandingan →
-                        </a>
-                    @else
-                        <strong>Belum ada pertandingan.</strong>
-                    @endif
+                <a href="{{ route('matches.index') }}">
+                    Lihat Semua Pertandingan →
+                </a>
+                @else
+                <strong>Belum ada pertandingan.</strong>
+                @endif
 
-                </div>
+            </div>
 
             @endforelse
 
         </div>
 
         {{-- Pagination --}}
-
         @if($matches->hasPages())
 
-            <nav
-                class="match-pagination"
-                aria-label="Navigasi halaman pertandingan"
-            >
+        <nav class="match-pagination" aria-label="Navigasi halaman pertandingan">
+            @if($matches->onFirstPage())
+            <span class="is-disabled">
+                ← Sebelumnya
+            </span>
+            @else
+            <a href="{{ $matches->previousPageUrl() }}">
+                ← Sebelumnya
+            </a>
+            @endif
 
-                @if($matches->onFirstPage())
-                    <span class="is-disabled">← Sebelumnya</span>
-                @else
-                    <a href="{{ $matches->previousPageUrl() }}">
-                        ← Sebelumnya
-                    </a>
-                @endif
+            <span class="match-pagination__info">
+                {{ $matches->currentPage() }}
+                / {{ $matches->lastPage() }}
+            </span>
 
-                <span class="match-pagination__info">
-                    {{ $matches->currentPage() }}
-                    / {{ $matches->lastPage() }}
-                </span>
-
-                @if($matches->hasMorePages())
-                    <a href="{{ $matches->nextPageUrl() }}">
-                        Berikutnya →
-                    </a>
-                @else
-                    <span class="is-disabled">Berikutnya →</span>
-                @endif
-
-            </nav>
+            @if($matches->hasMorePages())
+            <a href="{{ $matches->nextPageUrl() }}">
+                Berikutnya →
+            </a>
+            @else
+            <span class="is-disabled">
+                Berikutnya →
+            </span>
+            @endif
+        </nav>
 
         @endif
 
@@ -356,7 +378,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('match-date');
 
     if (input) {

@@ -1,0 +1,334 @@
+/* PB ALFA — Halaman login premium
+   Semua gaya dibatasi pada .pb-login agar tidak mengganggu halaman lain. */
+
+.pb-login {
+    --login-navy: #071c39;
+    --login-ink: #102943;
+    --login-blue: #12639c;
+    --login-gold: #f3b945;
+    --login-muted: #6b7c91;
+    display: grid;
+    grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+    width: min(100%, 1080px);
+    min-height: 635px;
+    margin: 20px auto 28px;
+    overflow: hidden;
+    border: 1px solid rgba(11, 42, 78, .09);
+    border-radius: 28px;
+    background: #fff;
+    box-shadow: 0 32px 80px rgba(7, 28, 57, .11), 0 5px 16px rgba(7, 28, 57, .04);
+}
+
+.pb-login *, .pb-login *::before, .pb-login *::after { box-sizing: border-box; }
+
+/* Sisi branding */
+.pb-login__story {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 38px 43px 30px;
+    overflow: hidden;
+    background: linear-gradient(148deg, #123e6b 0%, #071e40 58%, #06152d 100%);
+    color: #fff;
+}
+
+.pb-login__story::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image: radial-gradient(rgba(255,255,255,.13) .75px, transparent .75px);
+    background-size: 19px 19px;
+    opacity: .19;
+}
+
+.pb-login__glow { position: absolute; z-index: -1; border-radius: 50%; pointer-events: none; }
+.pb-login__glow--one {
+    width: 360px; height: 360px; top: -190px; right: -170px;
+    background: radial-gradient(circle, rgba(37, 157, 218, .45), transparent 68%);
+}
+.pb-login__glow--two {
+    width: 360px; height: 360px; bottom: -190px; left: -160px;
+    background: radial-gradient(circle, rgba(243,185,69,.14), transparent 68%);
+}
+
+.pb-login__brand {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: fit-content;
+    color: #fff;
+    text-decoration: none;
+}
+.pb-login__brand:hover { color: #fff; }
+.pb-login__brand-icon, .pb-login__mobile-logo {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 62px;
+    height: 62px;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 19px;
+    background: rgba(255,255,255,.10);
+    color: var(--login-gold);
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: -.04em;
+}
+.pb-login__brand-icon img, .pb-login__mobile-logo img {
+    display: block;
+    width: 88%;
+    height: 88%;
+    object-fit: contain;
+}
+.pb-login__brand-label, .pb-login__mobile-brand > span:last-child { display: grid; gap: 2px; }
+.pb-login__brand-label strong { font-size: 20px; line-height: 1.08; letter-spacing: .04em; }
+.pb-login__brand-label small { font-size: 9px; font-weight: 800; letter-spacing: .14em; opacity: .74; }
+
+.pb-login__court {
+    position: absolute;
+    z-index: -1;
+    width: 285px;
+    height: 445px;
+    top: 145px;
+    right: -104px;
+    transform: rotate(-24deg);
+    border: 2px solid rgba(166, 214, 241, .16);
+    opacity: .7;
+    pointer-events: none;
+}
+.pb-login__court::before, .pb-login__court::after, .pb-login__court-line {
+    content: '';
+    position: absolute;
+    display: block;
+    background: rgba(166,214,241,.17);
+}
+.pb-login__court::before { width: 2px; height: 100%; left: 50%; top: 0; }
+.pb-login__court::after { height: 2px; width: 100%; top: 50%; left: 0; }
+.pb-login__court-line { height: 2px; width: 100%; left: 0; }
+.pb-login__court-line--top { top: 20%; }
+.pb-login__court-line--middle { top: 72%; }
+.pb-login__court-line--bottom { top: 80%; }
+
+.pb-login__story-content { position: relative; margin: auto 0; padding: 66px 0 42px; }
+.pb-login__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .21em;
+    color: #d0e9fc;
+}
+.pb-login__eyebrow span {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--login-gold);
+    box-shadow: 0 0 0 5px rgba(243,185,69,.12);
+}
+.pb-login__story-content h2 {
+    max-width: 470px;
+    margin: 23px 0 18px;
+    font-size: clamp(34px, 3.6vw, 52px);
+    font-weight: 900;
+    line-height: 1.11;
+    letter-spacing: -.06em;
+    color: #fff;
+}
+.pb-login__story-content h2 em { font-style: normal; color: var(--login-gold); }
+.pb-login__story-content p {
+    max-width: 360px;
+    margin: 0;
+    color: #b9d1e5;
+    font-size: 14px;
+    line-height: 1.9;
+}
+.pb-login__features { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 30px; }
+.pb-login__features span {
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 9px;
+    background: rgba(255,255,255,.065);
+    color: #e2f0fa;
+    font-size: 10px;
+    font-weight: 750;
+}
+.pb-login__story-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.pb-login__story-footer span { color: #a3bfdb; font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.pb-login__story-footer i { width: 3px; height: 3px; border-radius: 50%; background: var(--login-gold); }
+
+/* Sisi form */
+.pb-login__panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: 55px clamp(29px, 4.4vw, 66px) 27px;
+    background: linear-gradient(180deg, #fff 0%, #fcfdff 100%);
+}
+.pb-login__mobile-brand { display: none; }
+.pb-login__form-container { width: 100%; max-width: 385px; margin: auto; }
+.pb-login__form-kicker {
+    color: #b5842e;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .19em;
+}
+.pb-login__form-container h1 {
+    margin: 13px 0 11px;
+    color: var(--login-ink);
+    font-size: clamp(29px, 2.85vw, 40px);
+    font-weight: 900;
+    line-height: 1.18;
+    letter-spacing: -.055em;
+}
+.pb-login__period { color: #dc9d35; }
+.pb-login__intro { margin: 0 0 31px; color: var(--login-muted); font-size: 13px; line-height: 1.8; }
+.pb-login__form { display: grid; gap: 19px; }
+.pb-login__field { display: grid; gap: 9px; }
+.pb-login__field label { color: #263e55; font-size: 12px; font-weight: 800; }
+.pb-login__input-wrap { position: relative; width: 100%; }
+.pb-login__input-icon {
+    position: absolute;
+    z-index: 2;
+    top: 50%; left: 16px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #8393a4;
+}
+.pb-login__input-wrap .pb-password { display: block; width: 100%; }
+.site-main .pb-login .pb-login__input-wrap > input,
+.site-main .pb-login .pb-login__input-wrap .pb-password > input {
+    display: block;
+    width: 100%;
+    height: 52px;
+    margin: 0;
+    padding: 12px 53px 12px 50px;
+    border: 1px solid #dbe4ec;
+    border-radius: 12px;
+    outline: none;
+    background: #f7f9fc;
+    color: #172f48;
+    font: inherit;
+    font-size: 13px;
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.site-main .pb-login__input-wrap input::placeholder { color: #99a7b6; }
+.site-main .pb-login__input-wrap input:hover { border-color: #a7bdd0; }
+.site-main .pb-login__input-wrap input:focus {
+    border-color: #4089bd;
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(18,99,156,.10);
+}
+.site-main .pb-login__input-wrap input[aria-invalid="true"] { border-color: #d36162; }
+.pb-login__input-wrap:focus-within .pb-login__input-icon { color: var(--login-blue); }
+.pb-login__input-wrap .pb-password__toggle { right: 6px; }
+
+.pb-login__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 8px;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(105deg, #0e3b69, #11659d);
+    box-shadow: 0 10px 20px rgba(11,80,135,.17);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.pb-login__submit:hover { transform: translateY(-1px); box-shadow: 0 13px 24px rgba(11,80,135,.24); filter: brightness(1.07); }
+.pb-login__submit:focus-visible { outline: 3px solid #e5b04a; outline-offset: 3px; }
+.pb-login__submit:disabled { cursor: wait; transform: none; opacity: .8; box-shadow: none; }
+
+.pb-login__error {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    margin: 0 0 21px;
+    border: 1px solid #f3c9ca;
+    border-radius: 11px;
+    background: #fff2f2;
+    color: #ac353b;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.5;
+}
+.pb-login__error svg { flex-shrink: 0; margin-top: 1px; }
+.pb-login__notice { display: flex; gap: 10px; margin-top: 24px; color: #7a8b9c; font-size: 11px; line-height: 1.6; }
+.pb-login__notice svg { flex-shrink: 0; margin-top: 1px; color: #7797b2; }
+.pb-login__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin-top: 31px;
+    color: #296b9c;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+}
+.pb-login__back:hover { color: #0c3d6a; text-decoration: underline; }
+.pb-login__panel-foot { margin: 38px 0 0; color: #a4b0bd; font-size: 10px; text-align: center; }
+
+@media (max-width: 860px) {
+    .pb-login { grid-template-columns: 1fr; max-width: 520px; min-height: 0; margin-top: 18px; }
+    .pb-login__story { display: none; }
+    .pb-login__panel { padding: 36px 35px 30px; }
+    .pb-login__mobile-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 45px; }
+    .pb-login__mobile-logo { width: 51px; height: 51px; border: none; border-radius: 14px; background: #0b2d54; font-size: 16px; }
+    .pb-login__mobile-brand strong { color: var(--login-ink); font-size: 16px; font-weight: 900; letter-spacing: .04em; line-height: 1; }
+    .pb-login__mobile-brand small { color: #637c94; font-size: 9px; font-weight: 800; letter-spacing: .11em; }
+    .pb-login__form-container { max-width: 100%; }
+}
+@media (max-width: 480px) {
+    .pb-login { margin: 4px auto 18px; border-radius: 19px; box-shadow: 0 12px 32px rgba(7,28,57,.08); }
+    .pb-login__panel { padding: 27px 22px 25px; }
+    .pb-login__mobile-brand { margin-bottom: 33px; }
+    .pb-login__form-container h1 { font-size: 30px; }
+    .pb-login__intro { margin-bottom: 24px; }
+    .pb-login__panel-foot { margin-top: 37px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pb-login__submit, .pb-login__input-wrap input { transition: none; }
+    .pb-login__submit:hover { transform: none; }
+}
+/* Penyesuaian Login Tanpa Logo Ganda */
+
+.pb-login__story-content {
+    position: relative;
+    margin: auto 0;
+    padding: 40px 0;
+}
+
+/* Memastikan ikon tidak bertabrakan dengan teks */
+
+.site-main .pb-login .pb-login__input-wrap > input,
+.site-main .pb-login .pb-login__input-wrap .pb-password > input {
+    padding-left: 50px;
+    padding-right: 53px;
+}
+
+/* Tampilan Mobile */
+
+@media (max-width: 860px) {
+    .pb-login__panel {
+        padding: 36px 35px 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pb-login__panel {
+        padding: 27px 22px 25px;
+    }
+}

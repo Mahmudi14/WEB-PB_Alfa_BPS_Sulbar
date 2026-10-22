@@ -18,6 +18,10 @@ class BadmintonMatch extends Model
         'type',
         'result',
         'shuttlecock_count',
+        'set1_a',
+        'set1_b',
+        'set2_a',
+        'set2_b',
         'created_by',
     ];
 
@@ -26,6 +30,10 @@ class BadmintonMatch extends Model
         return [
             'played_on' => 'date',
             'shuttlecock_count' => 'integer',
+            'set1_a' => 'integer',
+            'set1_b' => 'integer',
+            'set2_a' => 'integer',
+            'set2_b' => 'integer',
         ];
     }
 
@@ -51,15 +59,30 @@ class BadmintonMatch extends Model
             return false;
         }
 
-        if ($user->canManage()) {
+        // Admin tidak memiliki batas waktu.
+        if ($user->isAdmin()) {
             return true;
         }
 
+        // Pengguna lainnya maksimal 24 jam.
+        if (
+            !$this->created_at ||
+            now()->greaterThanOrEqualTo(
+                $this->created_at->copy()->addHours(24)
+            )
+        ) {
+            return false;
+        }
+
+        // Pengelola dapat mengedit semua pertandingan
+        // selama masih dalam batas 24 jam.
+        if ($user->role === 'pengelola') {
+            return true;
+        }
+
+        // Pemain hanya pertandingan yang dibuat sendiri.
         return $user->role === 'pemain'
             && $user->player !== null
-            && $this->created_by === $user->id
-            && now()->lt(
-                $this->created_at->copy()->addHours(24)
-            );
+            && (int) $this->created_by === (int) $user->id;
     }
 }

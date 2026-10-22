@@ -8,6 +8,12 @@
 
     <meta name="theme-color" content="#0A2342">
 
+    <!-- PWA PB Alfa -->
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+
+    <!-- Ikon aplikasi untuk iPhone -->
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
+
     <meta name="description"
         content="Website PB Alfa BPS Sulawesi Barat: ranking pemain, pertandingan, kas, dan kegiatan klub.">
 

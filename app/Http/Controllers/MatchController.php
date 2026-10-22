@@ -123,57 +123,30 @@ class MatchController extends Controller
                 'required',
                 Rule::in(['tunggal', 'ganda']),
             ],
-            'shuttlecock_count' => [
-                'required',
-                'integer',
-                'between:0,65535',
-            ],
-            'set1_a' => ['required', 'integer', 'between:0,99'],
-            'set1_b' => ['required', 'integer', 'between:0,99'],
-            'set2_a' => ['required', 'integer', 'between:0,99'],
-            'set2_b' => ['required', 'integer', 'between:0,99'],
             'a1' => ['required', 'string'],
             'b1' => ['required', 'string'],
             'a2' => [
-                Rule::requiredIf($request->input('type') === 'ganda'),
+                Rule::requiredIf(
+                    $request->input('type') === 'ganda'
+                ),
                 'nullable',
                 'string',
             ],
             'b2' => [
-                Rule::requiredIf($request->input('type') === 'ganda'),
+                Rule::requiredIf(
+                    $request->input('type') === 'ganda'
+                ),
                 'nullable',
                 'string',
             ],
         ]);
 
-        // Validasi skor
-        if (
-            $data['set1_a'] === $data['set1_b']
-            || $data['set2_a'] === $data['set2_b']
-        ) {
-            throw ValidationException::withMessages([
-                'set1_a' => 'Skor dalam satu set tidak boleh seri.',
-            ]);
-        }
+        // Validasi skor dan tentukan hasil otomatis.
+        $data = array_merge(
+            $data,
+            $this->validatedScores($request)
+        );
 
-        // Hasil otomatis
-        $winsA = 0;
-
-        if ($data['set1_a'] > $data['set1_b']) {
-            $winsA++;
-        }
-
-        if ($data['set2_a'] > $data['set2_b']) {
-            $winsA++;
-        }
-
-        $data['result'] = match ($winsA) {
-            2 => 'a',
-            0 => 'b',
-            default => 'seri',
-        };
-
-        // Peserta
         $slots = $data['type'] === 'ganda'
             ? ['a1', 'a2', 'b1', 'b2']
             : ['a1', 'b1'];
@@ -205,7 +178,7 @@ class MatchController extends Controller
         $found = Player::query()
             ->whereIn('id', $realIds)
             ->pluck('id')
-            ->map(fn ($id) => (int) $id)
+            ->map(fn($id) => (int) $id)
             ->all();
 
         if (count($found) !== count($realIds)) {
@@ -243,5 +216,128 @@ class MatchController extends Controller
         }
 
         return $participants;
+    }
+
+    // Halaman edit pertandingan
+    public function edit(Request $request, BadmintonMatch $match)
+    {
+        $this->ensureCanViewEditor($request, $match);
+
+        $match->load('participants.player');
+
+        return view('matches.edit', compact('match'));
+    }
+
+    // Simpan perubahan skor dan kok
+    public function update(Request $request, BadmintonMatch $match)
+    {
+        abort_unless(
+            $match->editableBy($request->user()),
+            403,
+            'Batas waktu edit pertandingan sudah berakhir.'
+        );
+
+        $data = $this->validatedScores($request);
+
+        $match->update($data);
+
+        return redirect()
+            ->route('matches.index')
+            ->with(
+                'success',
+                'Skor dan jumlah kok berhasil diperbarui.'
+            );
+    }
+
+    // Hak membuka halaman edit
+    private function ensureCanViewEditor(
+        Request $request,
+        BadmintonMatch $match
+    ): void {
+        $user = $request->user();
+
+        abort_unless($user && $user->is_active, 403);
+
+        if ($user->canManage()) {
+            return;
+        }
+
+        abort_unless(
+            $user->role === 'pemain'
+                && $user->player !== null
+                && (int) $match->created_by === (int) $user->id,
+            403
+        );
+    }
+
+    private function validatedScores(Request $request): array
+    {
+        $data = $request->validate([
+            'shuttlecock_count' => [
+                'required',
+                'integer',
+                'between:0,65535',
+            ],
+            'set1_a' => ['nullable', 'integer', 'between:0,99'],
+            'set1_b' => ['nullable', 'integer', 'between:0,99'],
+            'set2_a' => ['nullable', 'integer', 'between:0,99'],
+            'set2_b' => ['nullable', 'integer', 'between:0,99'],
+        ]);
+
+        $fields = [
+            'set1_a',
+            'set1_b',
+            'set2_a',
+            'set2_b',
+        ];
+
+        $filled = 0;
+
+        foreach ($fields as $field) {
+            $value = $data[$field] ?? null;
+
+            $data[$field] = $value === null
+                ? null
+                : (int) $value;
+
+            if ($data[$field] !== null) {
+                $filled++;
+            }
+        }
+
+        // Skor boleh seluruhnya kosong atau seluruhnya terisi.
+        if ($filled !== 0 && $filled !== 4) {
+            throw ValidationException::withMessages([
+                'set1_a' =>
+                'Lengkapi semua skor atau kosongkan seluruh skor.',
+            ]);
+        }
+
+        if ($filled === 0) {
+            $data['result'] = null;
+
+            return $data;
+        }
+
+        if (
+            $data['set1_a'] === $data['set1_b'] ||
+            $data['set2_a'] === $data['set2_b']
+        ) {
+            throw ValidationException::withMessages([
+                'set1_a' => 'Skor dalam satu set tidak boleh seri.',
+            ]);
+        }
+
+        $winsA =
+            (int) ($data['set1_a'] > $data['set1_b']) +
+            (int) ($data['set2_a'] > $data['set2_b']);
+
+        $data['result'] = match ($winsA) {
+            2 => 'a',
+            0 => 'b',
+            default => 'seri',
+        };
+
+        return $data;
     }
 }

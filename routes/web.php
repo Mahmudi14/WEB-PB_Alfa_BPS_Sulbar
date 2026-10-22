@@ -146,6 +146,19 @@ Route::middleware('auth')->group(function () {
                 MatchController::class,
                 'store'
             ])->name('matches.store');
+            Route::get('/pertandingan/{match}/edit', [
+                MatchController::class,
+                'edit'
+            ])
+                ->whereNumber('match')
+                ->name('matches.edit');
+
+            Route::patch('/pertandingan/{match}', [
+                MatchController::class,
+                'update'
+            ])
+                ->whereNumber('match')
+                ->name('matches.update');
         });
 
 
