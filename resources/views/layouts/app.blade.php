@@ -14,6 +14,21 @@
     <!-- Ikon aplikasi untuk iPhone -->
     <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
 
+
+    {{-- Favicon mengikuti logo PB Alfa --}}
+    @php
+    $faviconLogo = ($siteSettings ?? null)?->logo_path;
+    @endphp
+
+    <link rel="icon" href="{{ $faviconLogo
+          ? asset('storage/' . $faviconLogo)
+          : asset('icons/icon-512.png') }}">
+
+    <link rel="apple-touch-icon" href="{{ $faviconLogo
+          ? asset('storage/' . $faviconLogo)
+          : asset('icons/icon-192.png') }}">
+
+
     <meta name="description"
         content="Website PB Alfa BPS Sulawesi Barat: ranking pemain, pertandingan, kas, dan kegiatan klub.">
 

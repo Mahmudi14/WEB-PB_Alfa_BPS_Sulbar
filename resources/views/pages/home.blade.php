@@ -3,6 +3,9 @@
 @section('title', 'Beranda - PB Alfa BPS Sulbar')
 @push('styles')
 <link rel="stylesheet" href="{{ asset('assets/css/ranking-tabs.css') }}?v=1">
+
+<link rel="stylesheet" href="{{ asset('assets/css/home-v3.css') }}?v=5">
+
 @endpush
 
 @section('content')
@@ -65,81 +68,28 @@
             </div>
         </div>
 
-        <div class="nova-hero__scene"
-            aria-label="Ilustrasi lapangan bulu tangkis hijau berskala standar, dengan kok animasi">
 
-            <div class="nova-hero__halo" aria-hidden="true"></div>
-            <div class="nova-hero__orbit" aria-hidden="true"></div>
+        <div class="nova-hero__scene nova-rally" data-rally-scene role="img"
+            aria-label="Animasi dua pemain bulu tangkis sedang melakukan rally di lapangan">
 
-            {{-- Lapangan SVG: 610 × 1340 unit = 6,10 × 13,40 meter --}}
-            <div class="nova-court">
-                <svg viewBox="-18 -18 646 1376" xmlns="http://www.w3.org/2000/svg" role="img"
-                    aria-label="Lapangan bulu tangkis ukuran ganda 13,40 kali 6,10 meter">
+            <canvas class="nova-rally__canvas" data-rally-canvas aria-hidden="true">
+            </canvas>
 
-                    <defs>
-                        <linearGradient id="courtGreen" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stop-color="#279B67" />
-                            <stop offset="55%" stop-color="#187B55" />
-                            <stop offset="100%" stop-color="#116A4C" />
-                        </linearGradient>
-                    </defs>
+            <div class="nova-rally__topline" aria-hidden="true">
 
-                    <rect x="0" y="0" width="610" height="1340" rx="4" fill="url(#courtGreen)" />
 
-                    {{-- Pola permukaan lapangan --}}
-                    <g fill="white" opacity=".035">
-                        <rect x="0" y="0" width="610" height="335" />
-                        <rect x="0" y="670" width="610" height="335" />
-                    </g>
-
-                    {{-- Semua garis lapangan lebar 4 unit = 40 mm --}}
-                    <g fill="none" stroke="#FFFFFF" stroke-width="4">
-                        {{-- Garis luar ganda --}}
-                        <rect x="0" y="0" width="610" height="1340" />
-
-                        {{-- Garis samping tunggal, 46 cm dari sisi luar --}}
-                        <path d="M46 0V1340 M564 0V1340" />
-
-                        {{-- Garis servis panjang ganda: 76 cm dari belakang --}}
-                        <path d="M0 76H610 M0 1264H610" />
-
-                        {{-- Garis servis pendek: 198 cm dari net --}}
-                        <path d="M0 472H610 M0 868H610" />
-
-                        {{-- Garis tengah masing-masing area servis --}}
-                        <path d="M305 0V472 M305 868V1340" />
-                    </g>
-
-                    {{-- Net di tengah lapangan, y = 670 --}}
-                    <rect x="-9" y="661" width="628" height="18" fill="#082E2D" opacity=".75" />
-                    <path d="M0 662H610" stroke="white" stroke-width="5" opacity=".9" />
-
-                    {{-- Pola jaring secara ilustratif --}}
-                    <path d="M0 670H610 M0 678H610" stroke="#E0F4EF" stroke-width="2" stroke-dasharray="8 5"
-                        opacity=".65" />
-
-                    {{-- Pos net di garis samping ganda --}}
-                    <circle cx="0" cy="670" r="9" fill="#F5F9FB" stroke="#0E4B42" stroke-width="3" />
-                    <circle cx="610" cy="670" r="9" fill="#F5F9FB" stroke="#0E4B42" stroke-width="3" />
-                </svg>
+                <span class="nova-rally__court-number">
+                    PB ALFA / COURT 01
+                </span>
             </div>
 
-            <svg class="nova-hero__shuttle" aria-hidden="true" viewBox="0 0 80 110">
-                <use href="#nova-shuttle"></use>
-            </svg>
+            <span class="nova-rally__smash" data-rally-smash aria-hidden="true">
+                SMASH!
+            </span>
 
-            <span class="nova-hero__smash" aria-hidden="true">SMASH!</span>
 
-            <div class="nova-hero__court-caption">
-                <span class="nova-hero__caption-dot"></span>
-                REGULATION COURT
-                <strong>13.40 × 6.10 M</strong>
-            </div>
-
-            <span class="nova-hero__spark nova-hero__spark--a"></span>
-            <span class="nova-hero__spark nova-hero__spark--b"></span>
-            <span class="nova-hero__spark nova-hero__spark--c"></span>
         </div>
+
 
         <span class="nova-hero__corner" aria-hidden="true">01 / RALLY ON</span>
     </section>
@@ -376,6 +326,9 @@
 
 
 @push('scripts')
+
+<script src="{{ asset('assets/js/hero-rally.js') }}?v=1" defer></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
