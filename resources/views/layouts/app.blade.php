@@ -44,7 +44,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/site.css') }}?v=8">
 
     {{-- CSS V3 dipakai secara global untuk navbar dan footer --}}
-    <link rel="stylesheet" href="{{ asset('assets/css/home-v3.css') }}?v=4">
+    <link rel="stylesheet" href="{{ asset('assets/css/home-v3.css') }}?v=5">
 
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/password-toggle.css') }}?v=1">
