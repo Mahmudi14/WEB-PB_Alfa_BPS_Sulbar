@@ -355,3 +355,5 @@ Route::middleware('auth')->group(function () {
                 ->name('admin.gallery.destroy');
         });
 });
+
+require __DIR__ . '/tournaments.php';

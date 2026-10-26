@@ -105,6 +105,14 @@
                     Pertandingan
                 </a>
 
+                <a href="{{ route('tournaments.index') }}"
+                    class="nova-nav-link {{ request()->routeIs('tournaments.*') ? 'is-active' : '' }}"
+                    @if(request()->routeIs('tournaments.*'))
+                    aria-current="page"
+                    @endif>
+                    Turnamen
+                </a>
+
                 <a href="{{ route('cash.index') }}"
                     class="nova-nav-link {{ request()->routeIs('cash.*') ? 'is-active' : '' }}"
                     @if(request()->routeIs('cash.*')) aria-current="page" @endif
