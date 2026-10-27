@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Pratinjau Bagan - PB Alfa')
+@section('title', 'Bagan Pertandingan - PB Alfa')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=5">
+<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=10">
 @endpush
 
 @section('content')
@@ -11,40 +11,16 @@
 @php
 $isLiga = $tournament->format === 'liga';
 
-$totalPeserta = count($order);
-$totalRonde = count($plan);
-
-$totalSlot = collect($plan)->sum(
-fn ($round) => count($round)
-);
-
-$jumlahPertemuan = (int) ($tournament->league_legs ?? 1);
-
-$poinMenang = (int) ($tournament->league_win_points ?? 3);
-$poinSeri = (int) ($tournament->league_draw_points ?? 1);
-$poinKalah = (int) ($tournament->league_loss_points ?? 0);
-
-/*
-* Data bagan Cup untuk tahap pratinjau.
-* Sama dengan struktur yang digunakan
-* pada halaman show.blade.php.
-*/
 $bracketRounds = [];
 
 if (!$isLiga) {
-
 $bracketRounds = collect($plan)
 ->map(function ($matches) use ($entryMap) {
-
 return collect($matches)
 ->map(function ($match) use ($entryMap) {
-
-$isBye = (bool) (
-$match['bye'] ?? false
-);
-
 $aId = $match['a'] ?? null;
 $bId = $match['b'] ?? null;
+$isBye = (bool) ($match['bye'] ?? false);
 
 $a = $aId !== null
 ? $entryMap->get($aId)
@@ -56,26 +32,18 @@ $b = $bId !== null
 
 return [
 'a' => $a?->display_name
-?? ($isBye
-? 'BYE'
-: 'Menunggu pemenang'),
+?? ($isBye ? 'BYE' : 'Menunggu pemenang'),
 
 'b' => $b?->display_name
-?? ($isBye
-? 'BYE'
-: 'Menunggu pemenang'),
+?? ($isBye ? 'BYE' : 'Menunggu pemenang'),
 
 'a_id' => $aId,
 'b_id' => $bId,
-
 'winner_id' => null,
-
 'score' => '',
-
 'status' => $isBye
 ? 'Lolos otomatis'
 : 'Belum dimainkan',
-
 'edit_url' => null,
 ];
 })
@@ -87,14 +55,10 @@ return [
 }
 @endphp
 
-
 <div class="tr-page">
 
-    {{-- =========================================
-    HEADER HALAMAN
-    ========================================= --}}
+    {{-- HEADER --}}
     <header class="tr-page-heading">
-
         <div class="tr-page-heading__main">
 
             <a href="{{ route('tournaments.entries', $tournament) }}" class="tr-back">
@@ -107,463 +71,209 @@ return [
 
             <h1>
                 {{ $isLiga ? 'JADWAL' : 'BAGAN' }}
-
-                <span>
-                    {{ $isLiga ? 'LIGA.' : 'CUP.' }}
-                </span>
+                <span>PERTANDINGAN.</span>
             </h1>
-
-            <p>
-                Langkah 3 dari 4 —
-                Periksa susunan lawan dan seluruh
-                ronde sebelum turnamen dimulai.
-            </p>
 
         </div>
 
         <span class="tr-hero__decoration" aria-hidden="true">
             03
         </span>
-
     </header>
 
-
-    {{-- =========================================
-    PROGRESS WIZARD
-    ========================================= --}}
     @include('tournaments._steps', [
     'step' => 3
     ])
 
-
-    {{-- =========================================
-    PESAN VALIDASI
-    ========================================= --}}
+    {{-- VALIDASI --}}
     @if($errors->any())
-
     <div class="tr-alert" role="alert">
-
-        <strong>
-            Periksa kembali susunan pertandingan.
-        </strong>
-
+        <strong>Periksa susunan pertandingan.</strong>
         <ul>
             @foreach($errors->all() as $error)
             <li>{{ $error }}</li>
             @endforeach
         </ul>
-
     </div>
-
     @endif
 
-
-    {{-- =========================================
-    RINGKASAN TURNAMEN
-    ========================================= --}}
-    <section class="tr-summary" aria-label="Ringkasan jadwal turnamen">
-
-        <div>
-
-            <small>Format</small>
-
-            <strong>
-                {{ $isLiga ? 'Liga' : 'Cup' }}
-            </strong>
-
-        </div>
-
-        <div>
-
-            <small>Peserta</small>
-
-            <strong>
-                {{ $totalPeserta }}
-            </strong>
-
-        </div>
-
-        <div>
-
-            <small>Total Ronde</small>
-
-            <strong>
-                {{ $totalRonde }}
-            </strong>
-
-        </div>
-
-        <div>
-
-            @if($isLiga)
-
-            <small>Pertemuan</small>
-
-            <strong>
-                {{ $jumlahPertemuan }} Kali
-            </strong>
-
-            @else
-
-            <small>Target Poin</small>
-
-            <strong>
-                {{ $tournament->target_points }} Poin
-            </strong>
-
-            @endif
-
-        </div>
-
-    </section>
-
-
-    {{-- =========================================
-    PENGATURAN SUSUNAN PESERTA
-    ========================================= --}}
+    {{-- SUSUNAN PESERTA --}}
     <section class="tr-panel" aria-labelledby="tr-order-title">
 
         <div class="tr-section-head">
-
             <div>
-
                 <span class="tr-eyebrow">
-                    PENGATURAN LAWAN
+                    TOURNAMENT SETUP
                 </span>
-
                 <h2 id="tr-order-title">
                     Susunan Peserta
                 </h2>
-
             </div>
-
-            <span class="tr-board-count">
-                {{ $totalPeserta }} Peserta
-            </span>
-
         </div>
 
-
-        @if($isLiga)
-
-        <p class="tr-hint">
-            Atur urutan atau acak peserta
-            untuk menyusun jadwal Liga.
-
-            Setiap peserta akan bertemu
-            {{ $jumlahPertemuan }} kali
-            sesuai pengaturan turnamen.
-
-            Seluruh ronde akan digenerate otomatis.
-        </p>
-
-        @else
-
-        <p class="tr-hint">
-            Tentukan posisi peserta untuk
-            mengatur lawan pada bagan Cup.
-
-            Gunakan Acak Peserta untuk
-            mengundi posisi secara otomatis.
-
-            Bagan akan membagi peserta menjadi
-            Grup A dan Grup B yang bertemu
-            pada Grand Final.
-
-            Jika jumlah peserta tidak sesuai
-            kapasitas bagan, sistem akan
-            memberikan BYE secara otomatis.
-        </p>
-
-        @endif
-
-
-        {{-- FORM PENGATURAN URUTAN --}}
-        <form id="tr-preview-form" action="{{ route('tournaments.schedule', $tournament) }}" method="GET">
+        <form id="tr-preview-form" method="GET" action="{{ route('tournaments.schedule', $tournament) }}">
 
             <div class="tr-order-grid">
 
                 @foreach($order as $i => $id)
 
+                @php
+                $selectedEntry = $entryMap->get((int) $id);
+                @endphp
+
                 <div class="tr-field">
 
-                    <label for="tr-order-{{ $i }}">
+                    <label id="tr-order-label-{{ $i }}">
                         Posisi {{ $i + 1 }}
                     </label>
 
-                    <select id="tr-order-{{ $i }}" name="order[]" data-order-select required>
+                    <div class="tr-order-picker" data-order-picker>
 
-                        @foreach($entryMap as $entry)
+                        <input type="hidden" name="order[]" data-order-value value="{{ $id }}">
 
-                        <option value="{{ $entry->id }}" @selected((int) $id===(int) $entry->id)>
+                        <button type="button" class="tr-order-trigger is-selected" data-order-trigger
+                            aria-expanded="false" aria-labelledby="tr-order-label-{{ $i }} tr-order-selected-{{ $i }}">
 
-                            {{ $entry->display_name }}
+                            <span id="tr-order-selected-{{ $i }}" class="tr-order-label" data-order-label>
+                                {{ $selectedEntry?->display_name ?? 'Pilih peserta' }}
+                            </span>
 
-                        </option>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
 
-                        @endforeach
+                        </button>
 
-                    </select>
+                        <div class="tr-order-menu" data-order-menu hidden>
 
+                            <input type="search" class="tr-order-search" data-order-search placeholder="Cari peserta..."
+                                aria-label="Cari peserta" autocomplete="off">
+
+                            <div class="tr-order-options">
+
+                                @foreach($entryMap as $entry)
+                                <button type="button" class="tr-order-option" data-order-option
+                                    data-id="{{ $entry->id }}" data-name="{{ $entry->display_name }}">
+                                    {{ $entry->display_name }}
+                                </button>
+                                @endforeach
+
+                            </div>
+
+                            <p class="tr-order-empty" data-order-empty hidden>
+                                Peserta tidak ditemukan.
+                            </p>
+
+                        </div>
+
+                    </div>
                 </div>
 
                 @endforeach
 
             </div>
 
-
-            {{-- TOMBOL ACAK DAN PRATINJAU --}}
-            <div class="tr-actions" style="margin-top: 15px;">
+            <div class="tr-actions tr-order-actions">
 
                 <button type="button" id="tr-shuffle" class="tr-btn tr-btn--outline">
-
                     ↻ Acak Peserta
-
                 </button>
 
                 <button type="submit" class="tr-btn">
-
-                    Perbarui Pratinjau
-
+                    Generate Bagan
                 </button>
 
             </div>
 
-
-            {{-- ERROR PENGATURAN POSISI --}}
             <p id="tr-order-error" class="tr-hint tr-hint--error" role="alert" hidden>
-
-                Peserta tidak boleh menempati
-                lebih dari satu posisi.
-
             </p>
 
         </form>
-
     </section>
 
-
-    {{-- =========================================
-    INFORMASI ATURAN LIGA
-    ========================================= --}}
-    @if($isLiga)
-
-    <section class="tr-panel" aria-labelledby="tr-league-rules-title">
-
-        <div class="tr-section-head">
-
-            <div>
-
-                <span class="tr-eyebrow">
-                    LEAGUE SETTINGS
-                </span>
-
-                <h2 id="tr-league-rules-title">
-                    Aturan Klasemen
-                </h2>
-
-            </div>
-
-        </div>
-
-
-        <div class="tr-summary">
-
-            <div>
-
-                <small>Poin Menang</small>
-
-                <strong>
-                    {{ $poinMenang > 0 ? '+' : '' }}{{ $poinMenang }}
-                </strong>
-
-            </div>
-
-            <div>
-
-                <small>Poin Seri</small>
-
-                <strong>
-                    {{ $poinSeri > 0 ? '+' : '' }}{{ $poinSeri }}
-                </strong>
-
-            </div>
-
-            <div>
-
-                <small>Poin Kalah</small>
-
-                <strong>
-                    {{ $poinKalah > 0 ? '+' : '' }}{{ $poinKalah }}
-                </strong>
-
-            </div>
-
-            <div>
-
-                <small>Jumlah Pertemuan</small>
-
-                <strong>
-                    {{ $jumlahPertemuan }} Kali
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <p class="tr-hint" style="margin: 12px 0 0;">
-
-            @if($jumlahPertemuan === 2)
-
-            Liga menggunakan dua putaran.
-            Pertemuan kedua membalik posisi
-            Tim A dan Tim B.
-
-            @else
-
-            Liga menggunakan satu putaran.
-            Setiap peserta bertemu satu kali.
-
-            @endif
-
-            Poin klasemen dihitung berdasarkan
-            hasil pertandingan dan dapat
-            bernilai negatif.
-
-        </p>
-
-    </section>
-
-    @endif
-
-
-    {{-- =========================================
-    PRATINJAU SELURUH RONDE
-    ========================================= --}}
+    {{-- HASIL GENERATE --}}
     <section class="tr-panel tr-schedule-preview" aria-labelledby="tr-preview-title">
 
         <div class="tr-section-head">
-
             <div>
-
                 <span class="tr-eyebrow">
-                    PRATINJAU PERTANDINGAN
+                    MATCH PREVIEW
                 </span>
 
                 <h2 id="tr-preview-title">
                     {{ $isLiga
-                    ? 'Seluruh Ronde'
-                    : 'Bagan Pertandingan Cup' }}
+                    ? 'Hasil Generate Jadwal'
+                    : 'Hasil Generate Bagan' }}
                 </h2>
-
             </div>
-
-            <span class="tr-board-count">
-                {{ $totalRonde }} Ronde
-                · {{ $totalSlot }} Slot
-            </span>
-
         </div>
 
-
-        {{-- INFORMASI PRATINJAU --}}
-        <p class="tr-hint">
-
-            @if($isLiga)
-
-            Seluruh jadwal Liga telah
-            digenerate hingga ronde terakhir.
-
-            Periksa setiap pertandingan
-            sebelum memulai Liga.
-
-            @else
-
-            Berikut bagan pertandingan Cup
-            dari Grup A dan Grup B menuju
-            Grand Final.
-
-            Pemenang setiap pertandingan
-            akan otomatis maju ke ronde
-            berikutnya.
-
-            @endif
-
-        </p>
-
-
-        {{-- =====================================
-        PRATINJAU LIGA
-        ===================================== --}}
         @if($isLiga)
 
-        <div class="tr-round-grid">
+        <div class="tr-league-preview-scroll tr-pinch-viewport" data-pinch-viewport tabindex="0" role="region"
+            aria-label="Jadwal Liga yang dapat digeser dan diperbesar">
 
-            @foreach($plan as $r => $matches)
+            <div class="tr-pinch-stage" data-pinch-stage>
 
-            <div class="tr-preview-round">
+                <div class="tr-pinch-content" data-pinch-content>
 
-                <h3>
-                    Ronde {{ $r + 1 }}
-                </h3>
+                    <div class="tr-round-grid">
 
+                        @foreach($plan as $r => $matches)
 
-                @forelse($matches as $m => $match)
+                        <div class="tr-preview-round">
 
-                @php
-                $a = $entryMap->get(
-                $match['a']
-                );
+                            <h3>Ronde {{ $r + 1 }}</h3>
 
-                $b = $entryMap->get(
-                $match['b']
-                );
-                @endphp
+                            @forelse($matches as $m => $match)
 
-                <article class="tr-preview-match">
+                            @php
+                            $a = $entryMap->get(
+                            $match['a']
+                            );
 
-                    <span class="tr-preview-no">
-                        PERTANDINGAN {{ $m + 1 }}
-                    </span>
+                            $b = $entryMap->get(
+                            $match['b']
+                            );
+                            @endphp
 
-                    <strong>
-                        {{ $a?->display_name
-                        ?? 'Menunggu peserta' }}
-                    </strong>
+                            <article class="tr-preview-match">
 
-                    <small>
-                        VS
-                    </small>
+                                <span class="tr-preview-no">
+                                    PERTANDINGAN {{ $m + 1 }}
+                                </span>
 
-                    <strong>
-                        {{ $b?->display_name
-                        ?? 'Menunggu peserta' }}
-                    </strong>
+                                <strong>
+                                    {{ $a?->display_name ?? '—' }}
+                                </strong>
 
-                </article>
+                                <small>VS</small>
 
-                @empty
+                                <strong>
+                                    {{ $b?->display_name ?? '—' }}
+                                </strong>
 
-                <div class="tr-empty">
-                    <strong>
-                        Tidak ada pertandingan
-                        pada ronde ini.
-                    </strong>
+                            </article>
+
+                            @empty
+
+                            <div class="tr-empty">
+                                Tidak ada pertandingan.
+                            </div>
+
+                            @endforelse
+
+                        </div>
+
+                        @endforeach
+
+                    </div>
+
                 </div>
-
-                @endforelse
-
             </div>
-
-            @endforeach
-
         </div>
 
-
-        {{-- =====================================
-        PRATINJAU CUP KIRI-KANAN
-        ===================================== --}}
         @else
 
         @if(count($bracketRounds) > 0)
@@ -575,129 +285,42 @@ return [
         @else
 
         <div class="tr-empty">
-
-            <strong>
-                Bagan Cup belum tersedia.
-            </strong>
-
+            Bagan belum tersedia.
         </div>
 
         @endif
 
         @endif
 
+        <p id="tr-preview-outdated" class="tr-hint tr-hint--error" role="status" hidden>
+            Susunan berubah. Generate ulang bagan
+            sebelum memulai turnamen.
+        </p>
+
     </section>
 
-
-    {{-- =========================================
-    SELESAIKAN PEMBUATAN TURNAMEN
-    ========================================= --}}
+    {{-- SELESAIKAN --}}
     <form id="tr-start-form" class="tr-finish" method="POST" action="{{ route('tournaments.start', $tournament) }}"
-        data-single-submit data-confirm="Mulai turnamen dengan susunan peserta dan ronde ini?"
-        data-confirm-title="Mulai Turnamen" data-confirm-text="Ya, Mulai">
+        data-single-submit data-confirm="Mulai turnamen dengan susunan peserta ini?" data-confirm-title="Mulai Turnamen"
+        data-confirm-text="Ya, Mulai">
 
         @csrf
 
-        {{-- URUTAN PESERTA YANG TELAH DIPREVIEW --}}
         @foreach($order as $id)
-
         <input type="hidden" name="order[]" value="{{ $id }}">
-
         @endforeach
 
-
-        <div>
-
-            <strong>
-                Susunan pertandingan sudah sesuai?
-            </strong>
-
-            <p>
-                Setelah turnamen dimulai,
-                aturan, peserta dan jadwal
-                akan terkunci.
-
-                Admin serta pengelola tetap dapat
-                mengubah skor dan jumlah kok
-                pertandingan kapan saja.
-            </p>
-
-        </div>
-
-
-        <button class="tr-btn tr-btn--accent" type="submit">
-
+        <button type="submit" class="tr-btn tr-btn--accent">
             Selesaikan &amp; Mulai Turnamen →
-
         </button>
 
     </form>
-
-
-    {{-- =========================================
-    HAPUS TURNAMEN DRAFT
-    ========================================= --}}
-    <section class="tr-panel" aria-labelledby="tr-delete-draft-title">
-
-        <div class="tr-section-head">
-
-            <div>
-
-                <span class="tr-eyebrow">
-                    TOURNAMENT MANAGEMENT
-                </span>
-
-                <h2 id="tr-delete-draft-title">
-                    Hapus Draft Turnamen
-                </h2>
-
-            </div>
-
-        </div>
-
-        <p class="tr-hint">
-            Jika turnamen ini tidak jadi dibuat,
-            admin dan pengelola dapat menghapusnya.
-
-            Seluruh peserta dan data draft
-            akan dihapus secara permanen.
-        </p>
-
-
-        <form method="POST" action="{{ route('tournaments.destroy', $tournament) }}" class="tr-delete-form"
-            data-single-submit
-            data-confirm="Hapus draft turnamen {{ $tournament->name }}? Seluruh data yang sudah disimpan akan dihapus permanen."
-            data-confirm-title="Hapus Draft Turnamen" data-confirm-text="Ya, Hapus">
-
-            @csrf
-            @method('DELETE')
-
-            <button type="submit" class="tr-delete-btn">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-
-                    <path d="M3 6h18" />
-                    <path d="M8 6V4h8v2" />
-                    <path d="M5 6l1 15h12l1-15" />
-                    <path d="M10 10v7M14 10v7" />
-
-                </svg>
-
-                Hapus Draft Turnamen
-
-            </button>
-
-        </form>
-
-    </section>
 
 </div>
 
 @endsection
 
-
 @push('scripts')
-<script src="{{ asset('assets/js/tournaments.js') }}?v=5" defer>
+<script src="{{ asset('assets/js/tournaments.js') }}?v=10" defer>
 </script>
 @endpush

@@ -3,7 +3,7 @@
 @section('title', 'Turnamen - PB Alfa')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=5">
+<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=13">
 @endpush
 
 @section('content')
@@ -20,48 +20,46 @@
             <h1>TURNAMEN <span>PB ALFA.</span></h1>
 
             <p>
-                Kompetisi, jadwal ronde, hasil pertandingan,
-                dan klasemen PB Alfa BPS Sulawesi Barat.
+                Kompetisi, klasemen, bagan dan
+                hasil pertandingan PB Alfa.
             </p>
+
         </div>
 
         @if($canManage)
         <div class="tr-hero__actions">
-            <a class="tr-btn tr-btn--accent" href="{{ route('tournaments.create') }}">
+            <a href="{{ route('tournaments.create') }}" class="tr-btn tr-btn--accent">
                 + Buat Turnamen
             </a>
         </div>
-        @else
-        <span class="tr-hero__decoration" aria-hidden="true">🏆</span>
         @endif
+
     </header>
 
-    <section class="tr-board" aria-labelledby="tr-list-title">
+    <section class="tr-board">
 
         <div class="tr-board-head">
             <div>
                 <span class="tr-eyebrow">
                     OFFICIAL TOURNAMENTS
                 </span>
-                <h2 id="tr-list-title">
-                    Daftar Turnamen
-                </h2>
+                <h2>Daftar Turnamen</h2>
             </div>
 
             <span class="tr-board-count">
-                {{ $tournaments->total() }} turnamen
+                {{ $tournaments->total() }} Turnamen
             </span>
         </div>
 
         @if($tournaments->isEmpty())
+
         <div class="tr-empty">
             <span class="tr-empty__icon" aria-hidden="true">🏆</span>
+
             <h2>Belum ada turnamen</h2>
-            <p>
-                Turnamen yang dibuat oleh admin atau
-                pengelola akan muncul di sini.
-            </p>
+            <p>Belum tersedia kompetisi PB Alfa.</p>
         </div>
+
         @else
 
         <div class="tr-list">
@@ -69,23 +67,17 @@
             @foreach($tournaments as $tournament)
 
             @php
-            $isDraft = $tournament->status === 'draft';
-
-            $detailUrl = $isDraft
-            ? route('tournaments.entries', $tournament)
-            : route('tournaments.show', $tournament);
-
             $statusText = match ($tournament->status) {
             'draft' => 'Draft',
             'active' => 'Berlangsung',
             'completed' => 'Selesai',
-            default => 'Tidak diketahui'
+            default => 'Tidak diketahui',
             };
             @endphp
 
             <div class="tr-list-row">
 
-                <a href="{{ $detailUrl }}" class="tr-list-card">
+                <a href="{{ route('tournaments.show', $tournament) }}" class="tr-list-card">
 
                     <span class="tr-list-icon" aria-hidden="true">
                         {{ $tournament->format === 'cup'
@@ -111,15 +103,14 @@
 
                         <p>
                             {{ ucfirst($tournament->match_type) }}
-                            · {{ $tournament->entries_count }} peserta
+                            · {{ $tournament->entries_count }} Peserta
                             · {{ $tournament->set_format_label }}
-                            · {{ $tournament->target_points }} poin
                         </p>
 
                         @if($tournament->format === 'liga')
                         <p>
                             {{ $tournament->league_legs ?? 1 }}
-                            kali pertemuan
+                            Kali Pertemuan
                         </p>
                         @endif
 
@@ -131,15 +122,15 @@
 
                 @if($canManage)
 
-                <form method="POST" class="tr-delete-form" action="{{ route('tournaments.destroy', $tournament) }}"
+                <form method="POST" action="{{ route('tournaments.destroy', $tournament) }}" class="tr-delete-form"
                     data-single-submit
-                    data-confirm="Hapus turnamen {{ $tournament->name }}? Semua peserta, jadwal dan skor turnamen ini akan dihapus permanen."
+                    data-confirm="Hapus turnamen {{ $tournament->name }} secara permanen beserta seluruh jadwal dan skor?"
                     data-confirm-title="Hapus Turnamen" data-confirm-text="Ya, Hapus">
 
                     @csrf
                     @method('DELETE')
 
-                    <button type="submit" class="tr-delete-btn" aria-label="Hapus turnamen {{ $tournament->name }}"
+                    <button type="submit" class="tr-delete-btn" aria-label="Hapus {{ $tournament->name }}"
                         title="Hapus Turnamen">
 
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -151,8 +142,8 @@
                         </svg>
 
                         <span>Hapus</span>
-                    </button>
 
+                    </button>
                 </form>
 
                 @endif

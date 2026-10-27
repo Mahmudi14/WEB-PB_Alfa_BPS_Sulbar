@@ -3,7 +3,7 @@
 @section('title', 'Atur Pemain - PB Alfa')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=4">
+<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=6">
 @endpush
 
 @section('content')
@@ -12,6 +12,10 @@
 $isGanda = $tournament->match_type === 'ganda';
 
 $slots = $isGanda ? [0, 1] : [0];
+
+$slotTitles = $isGanda
+? ['Pemain 1', 'Pemain 2']
+: ['Pilih Pemain'];
 
 $playerMap = $players->keyBy('id');
 
@@ -51,7 +55,7 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
                 <p>
                     Langkah 2 dari 4 —
                     {{ $isGanda
-                    ? 'Tentukan dua pemain untuk setiap pasangan.'
+                    ? 'Tentukan dua pemain untuk setiap peserta ganda.'
                     : 'Pilih pemain yang mengikuti turnamen.'
                     }}
                     Minimal 2 dan maksimal 32 peserta.
@@ -65,12 +69,10 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
         </header>
 
-
         {{-- LANGKAH PEMBUATAN --}}
         @include('tournaments._steps', [
         'step' => 2
         ])
-
 
         {{-- FORM PESERTA --}}
         <form id="tr-entries-form" class="tr-panel tr-form" method="POST"
@@ -79,7 +81,6 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
             @csrf
             @method('PUT')
-
 
             {{-- ERROR SERVER --}}
             @if($errors->any())
@@ -100,7 +101,6 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
             @endif
 
-
             {{-- HEADING --}}
             <div class="tr-form-section-title">
 
@@ -112,7 +112,7 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
                     <h2>
                         {{ $isGanda
-                        ? 'Pasangan Ganda'
+                        ? 'Peserta Ganda'
                         : 'Peserta Tunggal'
                         }}
                     </h2>
@@ -125,7 +125,6 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
             </div>
 
-
             {{-- DAFTAR PESERTA --}}
             <div id="tr-entry-rows" class="tr-entry-rows">
 
@@ -136,7 +135,7 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
                     <div class="tr-entry-heading">
 
                         <strong>
-                            {{ $isGanda ? 'Pasangan' : 'Peserta' }}
+                            {{ $isGanda ? 'Peserta Ganda' : 'Peserta' }}
                             <span data-entry-label>
                                 {{ $loop->iteration }}
                             </span>
@@ -148,8 +147,8 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
                     </div>
 
-
-                    <div class="tr-entry-selects">
+                    <div
+                        class="tr-entry-selects {{ $isGanda ? 'tr-entry-selects--double' : 'tr-entry-selects--single' }}">
 
                         @foreach($slots as $slot)
 
@@ -165,74 +164,71 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
                         : null;
                         @endphp
 
-                        <div class="tr-field">
-
-                            <label class="tr-player-field-label">
-                                {{ $isGanda
-                                ? 'Pemain ' . ($slot + 1)
-                                : 'Pilih Pemain'
-                                }}
-                            </label>
+                        <div class="tr-entry-slot">
 
 
-                            {{-- CUSTOM PLAYER PICKER --}}
-                            <div class="tr-player-picker" data-player-picker data-slot="{{ $slot }}">
+                            <div class="tr-field">
 
-                                <input type="hidden" data-player-value name="entries[{{ $i }}][players][{{ $slot }}]"
-                                    value="{{ $selectedId }}">
+                                <label class="tr-player-field-label">
+                                    {{ $slotTitles[$slot] ?? 'Pilih Pemain' }}
+                                </label>
 
+                                {{-- CUSTOM PLAYER PICKER --}}
+                                <div class="tr-player-picker" data-player-picker data-slot="{{ $slot }}">
 
-                                {{-- TOMBOL PILIH PEMAIN --}}
-                                <button type="button" class="tr-player-trigger" data-player-trigger aria-haspopup="true"
-                                    aria-expanded="false">
+                                    <input type="hidden" data-player-value
+                                        name="entries[{{ $i }}][players][{{ $slot }}]" value="{{ $selectedId }}">
 
-                                    <span class="tr-player-label" data-player-label>
+                                    {{-- TOMBOL PILIH PEMAIN --}}
+                                    <button type="button"
+                                        class="tr-player-trigger {{ $selectedPlayer ? 'is-selected' : '' }}"
+                                        data-player-trigger aria-haspopup="true" aria-expanded="false">
 
-                                        {{ $selectedPlayer?->name
-                                        ?? 'Pilih pemain'
-                                        }}
+                                        <span class="tr-player-label" data-player-label>
 
-                                    </span>
+                                            {{ $selectedPlayer?->name
+                                            ?? 'Pilih pemain'
+                                            }}
 
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        </span>
 
-                                        <path d="m6 9 6 6 6-6" />
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 
-                                    </svg>
+                                            <path d="m6 9 6 6 6-6" />
 
-                                </button>
+                                        </svg>
 
+                                    </button>
 
-                                {{-- MENU PENCARIAN --}}
-                                <div class="tr-player-menu" data-player-menu hidden>
+                                    {{-- MENU PENCARIAN --}}
+                                    <div class="tr-player-menu" data-player-menu hidden>
 
-                                    <input type="search" class="tr-player-search" data-player-search
-                                        placeholder="Cari nama pemain..." aria-label="Cari nama pemain"
-                                        autocomplete="off">
+                                        <input type="search" class="tr-player-search" data-player-search
+                                            placeholder="Cari nama pemain..." aria-label="Cari nama pemain"
+                                            autocomplete="off">
 
+                                        <div class="tr-player-options">
 
-                                    {{-- PILIHAN PEMAIN --}}
-                                    <div class="tr-player-options">
+                                            @foreach($players as $player)
 
-                                        @foreach($players as $player)
+                                            <button type="button" class="tr-player-option" data-player-option
+                                                data-id="{{ $player->id }}" data-name="{{ $player->name }}">
 
-                                        <button type="button" class="tr-player-option" data-player-option
-                                            data-id="{{ $player->id }}" data-name="{{ $player->name }}">
+                                                {{ $player->name }}
 
-                                            {{ $player->name }}
+                                            </button>
 
-                                        </button>
+                                            @endforeach
 
-                                        @endforeach
+                                        </div>
+
+                                        <p class="tr-player-empty" data-player-empty hidden>
+                                            Pemain tidak ditemukan atau
+                                            sudah dipilih.
+                                        </p>
 
                                     </div>
-
-
-                                    <p class="tr-player-empty" data-player-empty hidden>
-                                        Pemain tidak ditemukan atau
-                                        sudah dipilih.
-                                    </p>
 
                                 </div>
 
@@ -250,7 +246,6 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
             </div>
 
-
             {{-- TEMPLATE PESERTA BARU --}}
             <template id="tr-entry-template">
 
@@ -259,7 +254,7 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
                     <div class="tr-entry-heading">
 
                         <strong>
-                            {{ $isGanda ? 'Pasangan' : 'Peserta' }}
+                            {{ $isGanda ? 'Peserta Ganda' : 'Peserta' }}
                             <span data-entry-label></span>
                         </strong>
 
@@ -269,70 +264,67 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
                     </div>
 
-
-                    <div class="tr-entry-selects">
+                    <div
+                        class="tr-entry-selects {{ $isGanda ? 'tr-entry-selects--double' : 'tr-entry-selects--single' }}">
 
                         @foreach($slots as $slot)
 
-                        <div class="tr-field">
-
-                            <label class="tr-player-field-label">
-                                {{ $isGanda
-                                ? 'Pemain ' . ($slot + 1)
-                                : 'Pilih Pemain'
-                                }}
-                            </label>
+                        <div class="tr-entry-slot">
 
 
-                            <div class="tr-player-picker" data-player-picker data-slot="{{ $slot }}">
+                            <div class="tr-field">
 
-                                <input type="hidden" data-player-value value="">
+                                <label class="tr-player-field-label">
+                                    {{ $slotTitles[$slot] ?? 'Pilih Pemain' }}
+                                </label>
 
+                                <div class="tr-player-picker" data-player-picker data-slot="{{ $slot }}">
 
-                                <button type="button" class="tr-player-trigger" data-player-trigger aria-haspopup="true"
-                                    aria-expanded="false">
+                                    <input type="hidden" data-player-value value="">
 
-                                    <span class="tr-player-label" data-player-label>
-                                        Pilih pemain
-                                    </span>
+                                    <button type="button" class="tr-player-trigger" data-player-trigger
+                                        aria-haspopup="true" aria-expanded="false">
 
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <span class="tr-player-label" data-player-label>
+                                            Pilih pemain
+                                        </span>
 
-                                        <path d="m6 9 6 6 6-6" />
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 
-                                    </svg>
+                                            <path d="m6 9 6 6 6-6" />
 
-                                </button>
+                                        </svg>
 
+                                    </button>
 
-                                <div class="tr-player-menu" data-player-menu hidden>
+                                    <div class="tr-player-menu" data-player-menu hidden>
 
-                                    <input type="search" class="tr-player-search" data-player-search
-                                        placeholder="Cari nama pemain..." aria-label="Cari nama pemain"
-                                        autocomplete="off">
+                                        <input type="search" class="tr-player-search" data-player-search
+                                            placeholder="Cari nama pemain..." aria-label="Cari nama pemain"
+                                            autocomplete="off">
 
+                                        <div class="tr-player-options">
 
-                                    <div class="tr-player-options">
+                                            @foreach($players as $player)
 
-                                        @foreach($players as $player)
+                                            <button type="button" class="tr-player-option" data-player-option
+                                                data-id="{{ $player->id }}" data-name="{{ $player->name }}">
 
-                                        <button type="button" class="tr-player-option" data-player-option
-                                            data-id="{{ $player->id }}" data-name="{{ $player->name }}">
+                                                {{ $player->name }}
 
-                                            {{ $player->name }}
+                                            </button>
 
-                                        </button>
+                                            @endforeach
 
-                                        @endforeach
+                                        </div>
+
+                                        <p class="tr-player-empty" data-player-empty hidden>
+                                            Pemain tidak ditemukan atau
+                                            sudah dipilih.
+                                        </p>
 
                                     </div>
-
-
-                                    <p class="tr-player-empty" data-player-empty hidden>
-                                        Pemain tidak ditemukan atau
-                                        sudah dipilih.
-                                    </p>
 
                                 </div>
 
@@ -348,24 +340,21 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
 
             </template>
 
-
             {{-- TOMBOL TAMBAH PESERTA --}}
             <div class="tr-actions">
 
                 <button type="button" class="tr-btn tr-btn--outline" id="tr-add-entry">
 
                     + Tambah
-                    {{ $isGanda ? 'Pasangan' : 'Peserta' }}
+                    {{ $isGanda ? 'Peserta Ganda' : 'Peserta' }}
 
                 </button>
 
             </div>
 
-
             {{-- VALIDASI CLIENT --}}
             <p id="tr-entry-error" class="tr-hint tr-hint--error" role="alert" hidden>
             </p>
-
 
             {{-- AKSI --}}
             <div class="tr-form-footer">
@@ -387,6 +376,6 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
     @endsection
 
     @push('scripts')
-    <script src="{{ asset('assets/js/tournaments.js') }}?v=4" defer>
+    <script src="{{ asset('assets/js/tournaments.js') }}?v=6" defer>
     </script>
     @endpush

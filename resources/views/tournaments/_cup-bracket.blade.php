@@ -1,6 +1,7 @@
 @php
-$roundCount = count($bracketRounds);
+$bracketRounds = array_values($bracketRounds);
 
+$roundCount = count($bracketRounds);
 $levels = max(0, $roundCount - 1);
 
 $firstRound = $bracketRounds[0] ?? [];
@@ -9,7 +10,6 @@ $leafPerSide = $levels > 0
 ? max(1, intdiv(count($firstRound), 2))
 : 1;
 
-// Ukuran kanvas bagan dalam piksel
 $columnWidth = 210;
 $finalWidth = 220;
 $cardWidth = 184;
@@ -18,239 +18,272 @@ $stepHeight = 112;
 
 $sideWidth = $levels * $columnWidth;
 
-$boardWidth = ($sideWidth * 2) + $finalWidth;
+$boardWidth = $sideWidth * 2 + $finalWidth;
 $boardHeight = $leafPerSide * $stepHeight;
-
 $finalY = $boardHeight / 2;
 
 $cards = [];
 $lines = [];
+$headers = [];
+$roundNames = [];
 
-// Susun kartu dari sisi luar menuju tengah.
+// Penamaan babak otomatis.
+foreach ($bracketRounds as $r => $matches) {
+$roundNames[$r] = match (count($matches)) {
+1 => 'FINAL',
+2 => 'SEMIFINAL',
+4 => 'QUARTERFINAL',
+default => 'RONDE ' . ($r + 1),
+};
+}
+
+// Susun bagan kiri dan kanan menuju tengah.
 for ($stage = 0; $stage < $levels; $stage++) { $matches=array_values( $bracketRounds[$stage] ?? [] );
-    $perSide=intdiv(count($matches), 2); foreach ([0, 1] as $side) { for ($i=0; $i < $perSide; $i++) {
-    $matchIndex=$side===0 ? $i : $perSide + $i; $match=$matches[$matchIndex]; $factor=2 ** $stage; $centerY=($i + 0.5) *
-    $factor * $stepHeight; if ($side===0) { $columnX=$stage * $columnWidth; } else { $columnX=$sideWidth + $finalWidth +
-    ($levels - 1 - $stage) * $columnWidth; } $left=$columnX + ($columnWidth - $cardWidth) / 2; $top=$centerY -
-    $cardHeight / 2; $cards[]=[ 'left'=> $left,
-    'top' => $top,
-    'match' => $match,
-    'label' => 'RONDE ' . ($stage + 1)
-    . ' · M' . ($matchIndex + 1),
+    $perSide=intdiv(count($matches), 2); $factor=2 ** $stage; foreach ([0, 1] as $side) { $columnX=$side===0 ? $stage *
+    $columnWidth : $sideWidth + $finalWidth + ($levels - 1 - $stage) * $columnWidth; $headers[]=[ 'left'=> $columnX,
+    'width' => $columnWidth,
+    'label' => $roundNames[$stage],
     'final' => false,
     ];
 
-    // Titik tujuan: ronde berikutnya atau final.
-    if ($stage === $levels - 1) {
-    $targetY = $finalY;
-    } else {
-    $targetY = (
-    intdiv($i, 2) + 0.5
-    ) * (2 ** ($stage + 1)) * $stepHeight;
-    }
+    for ($i = 0; $i < $perSide; $i++) { $matchIndex=$side===0 ? $i : $perSide + $i; $match=$matches[$matchIndex];
+        $centerY=($i + 0.5) * $factor * $stepHeight; $left=$columnX + ($columnWidth - $cardWidth) / 2; $top=$centerY -
+        $cardHeight / 2; $cards[]=[ 'left'=> $left,
+        'top' => $top,
+        'match' => $match,
+        'label' => $roundNames[$stage]
+        . ' · M' . ($matchIndex + 1),
+        'final' => false,
+        ];
 
-    if ($side === 0) {
+        $targetY = $stage === $levels - 1
+        ? $finalY
+        : (intdiv($i, 2) + 0.5)
+        * (2 ** ($stage + 1))
+        * $stepHeight;
 
-    $x1 = $left + $cardWidth;
+        if ($side === 0) {
+        $x1 = $left + $cardWidth;
 
-    $x2 = $stage === $levels - 1
-    ? $sideWidth
-    + ($finalWidth - $cardWidth) / 2
-    : ($stage + 1) * $columnWidth
-    + ($columnWidth - $cardWidth) / 2;
+        $x2 = $stage === $levels - 1
+        ? $sideWidth
+        + ($finalWidth - $cardWidth) / 2
+        : ($stage + 1) * $columnWidth
+        + ($columnWidth - $cardWidth) / 2;
+        } else {
+        $x1 = $left;
 
-    } else {
+        $x2 = $stage === $levels - 1
+        ? $sideWidth
+        + ($finalWidth + $cardWidth) / 2
+        : $sideWidth
+        + $finalWidth
+        + ($levels - 2 - $stage) * $columnWidth
+        + ($columnWidth + $cardWidth) / 2;
+        }
 
-    $x1 = $left;
+        $lines[] = [
+        'x1' => $x1,
+        'x2' => $x2,
+        'xm' => ($x1 + $x2) / 2,
+        'y1' => $centerY,
+        'y2' => $targetY,
+        ];
+        }
+        }
+        }
 
-    $x2 = $stage === $levels - 1
-    ? $sideWidth
-    + ($finalWidth + $cardWidth) / 2
-    : $sideWidth
-    + $finalWidth
-    + ($levels - 2 - $stage) * $columnWidth
-    + ($columnWidth + $cardWidth) / 2;
-    }
+        // Final di tengah.
+        $headers[] = [
+        'left' => $sideWidth,
+        'width' => $finalWidth,
+        'label' => 'FINAL',
+        'final' => true,
+        ];
 
-    $lines[] = [
-    'x1' => $x1,
-    'x2' => $x2,
-    'xm' => ($x1 + $x2) / 2,
-    'y1' => $centerY,
-    'y2' => $targetY,
-    ];
-    }
-    }
-    }
+        $finalMatch = $bracketRounds[$roundCount - 1][0]
+        ?? null;
 
-    // Kartu final di tengah.
-    $finalMatch = $bracketRounds[$roundCount - 1][0] ?? null;
+        if ($finalMatch) {
+        $cards[] = [
+        'left' => $sideWidth
+        + ($finalWidth - $cardWidth) / 2,
+        'top' => $finalY - $cardHeight / 2,
+        'match' => $finalMatch,
+        'label' => 'FINAL',
+        'final' => true,
+        ];
+        }
+        @endphp
 
-    if ($finalMatch) {
-    $cards[] = [
-    'left' => $sideWidth
-    + ($finalWidth - $cardWidth) / 2,
-    'top' => $finalY - $cardHeight / 2,
-    'match' => $finalMatch,
-    'label' => 'GRAND FINAL',
-    'final' => true,
-    ];
-    }
-    @endphp
+        <div class="tr-cup-bracket">
 
-    <div class="tr-cup-bracket">
+            <div class="tr-cup-scroll tr-bracket-viewport" data-bracket-viewport tabindex="0" role="region"
+                aria-label="Bagan pertandingan Cup">
 
-        <p class="tr-cup-hint">
-            Bagan menampilkan jalur pertandingan
-            dari Grup A dan Grup B menuju Grand Final.
-            Geser ke samping untuk melihat seluruh bagan.
-        </p>
+                <div class="tr-bracket-stage" data-bracket-stage>
 
-        <div class="tr-cup-scroll" tabindex="0" role="region"
-            aria-label="Bagan Cup dari Grup A dan Grup B menuju Grand Final">
+                    <div class="tr-bracket-content" data-bracket-content>
 
-            <div class="tr-cup-map" style="width: {{ $boardWidth }}px;">
+                        <div class="tr-cup-map" style="width: {{ $boardWidth }}px;">
 
-                {{-- JUDUL BAGAN --}}
-                <div class="tr-cup-head" style="grid-template-columns:
-                    {{ $sideWidth }}px
-                    {{ $finalWidth }}px
-                    {{ $sideWidth }}px;">
+                            {{-- JUDUL BABAK --}}
+                            <div class="tr-cup-round-titles" style="width: {{ $boardWidth }}px;">
 
-                    <strong>
-                        @if($levels > 0)
-                        GRUP A
-                        @endif
-                    </strong>
+                                @foreach($headers as $header)
 
-                    <strong class="tr-cup-head__final">
-                        GRAND FINAL
-                    </strong>
+                                <div class="tr-cup-round-title {{ $header['final'] ? 'is-final' : '' }}" style="
+                                    left: {{ $header['left'] }}px;
+                                    width: {{ $header['width'] }}px;
+                                ">
 
-                    <strong>
-                        @if($levels > 0)
-                        GRUP B
-                        @endif
-                    </strong>
+                                    {{ $header['label'] }}
 
-                </div>
+                                </div>
 
-                {{-- KANVAS BAGAN --}}
-                <div class="tr-cup-canvas" style="
-                    width: {{ $boardWidth }}px;
-                    height: {{ $boardHeight }}px;
-                ">
+                                @endforeach
 
-                    {{-- GARIS PENGHUBUNG --}}
-                    <svg class="tr-cup-lines" xmlns="http://www.w3.org/2000/svg" width="{{ $boardWidth }}"
-                        height="{{ $boardHeight }}" viewBox="0 0 {{ $boardWidth }} {{ $boardHeight }}" fill="none"
-                        aria-hidden="true">
+                            </div>
 
-                        @foreach($lines as $line)
-
-                        <path d="
-                                M {{ $line['x1'] }} {{ $line['y1'] }}
-                                H {{ $line['xm'] }}
-                                V {{ $line['y2'] }}
-                                H {{ $line['x2'] }}
-                            " stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-
-                        @endforeach
-
-                    </svg>
-
-                    {{-- KARTU PERTANDINGAN --}}
-                    @foreach($cards as $card)
-
-                    @php
-                    $match = $card['match'];
-
-                    $winnerId = $match['winner_id'] ?? null;
-
-                    $aWin = $winnerId !== null
-                    && $winnerId == ($match['a_id'] ?? null);
-
-                    $bWin = $winnerId !== null
-                    && $winnerId == ($match['b_id'] ?? null);
-
-                    $aLose = $bWin;
-                    $bLose = $aWin;
-
-                    $nameA = $match['a'] ?? 'Menunggu peserta';
-                    $nameB = $match['b'] ?? 'Menunggu peserta';
-
-                    $scoreText = $match['score'] ?? '';
-
-                    $statusText = $match['status']
-                    ?? 'Belum dimainkan';
-                    @endphp
-
-                    <article class="tr-cup-game {{ $card['final'] ? 'tr-cup-game--final' : '' }}" style="
-                            left: {{ $card['left'] }}px;
-                            top: {{ $card['top'] }}px;
-                            width: {{ $cardWidth }}px;
-                            height: {{ $cardHeight }}px;
+                            {{-- KANVAS --}}
+                            <div class="tr-cup-canvas" style="
+                            width: {{ $boardWidth }}px;
+                            height: {{ $boardHeight }}px;
                         ">
 
-                        <div class="tr-cup-game__top">
+                                <svg class="tr-cup-lines" xmlns="http://www.w3.org/2000/svg" width="{{ $boardWidth }}"
+                                    height="{{ $boardHeight }}" viewBox="0 0 {{ $boardWidth }} {{ $boardHeight }}"
+                                    fill="none" aria-hidden="true">
 
-                            <span>
-                                {{ $card['label'] }}
-                            </span>
+                                    @foreach($lines as $line)
 
-                            @if(!empty($match['edit_url']))
+                                    <path d="
+                                        M {{ $line['x1'] }} {{ $line['y1'] }}
+                                        H {{ $line['xm'] }}
+                                        V {{ $line['y2'] }}
+                                        H {{ $line['x2'] }}
+                                    " stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
 
-                            <a href="{{ $match['edit_url'] }}" aria-label="Edit skor pertandingan {{ $card['label'] }}"
-                                title="Edit skor dan jumlah kok">
-                                Edit
-                            </a>
+                                    @endforeach
 
-                            @endif
+                                </svg>
 
+
+                                {{-- KARTU PERTANDINGAN --}}
+                                @foreach($cards as $card)
+
+                                @php
+                                $match = $card['match'];
+
+                                $winnerId = $match['winner_id']
+                                ?? null;
+
+                                $aId = $match['a_id'] ?? null;
+                                $bId = $match['b_id'] ?? null;
+
+                                $aWin = $winnerId !== null
+                                && $aId !== null
+                                && (int) $winnerId === (int) $aId;
+
+                                $bWin = $winnerId !== null
+                                && $bId !== null
+                                && (int) $winnerId === (int) $bId;
+
+                                $rawA = trim((string) (
+                                $match['a'] ?? ''
+                                ));
+
+                                $rawB = trim((string) (
+                                $match['b'] ?? ''
+                                ));
+
+                                // Semua placeholder menjadi "Menunggu".
+                                $nameA = $rawA === ''
+                                || preg_match('/^menunggu\b/i', $rawA)
+                                ? 'Menunggu'
+                                : $rawA;
+
+                                $nameB = $rawB === ''
+                                || preg_match('/^menunggu\b/i', $rawB)
+                                ? 'Menunggu'
+                                : $rawB;
+
+                                $scoreText = $match['score'] ?? '';
+
+                                $statusText = $match['status']
+                                ?? 'Belum dimainkan';
+                                @endphp
+
+                                <article class="tr-cup-game {{ $card['final'] ? 'tr-cup-game--final' : '' }}" style="
+                                    left: {{ $card['left'] }}px;
+                                    top: {{ $card['top'] }}px;
+                                    width: {{ $cardWidth }}px;
+                                    height: {{ $cardHeight }}px;
+                                ">
+
+                                    <div class="tr-cup-game__top">
+
+                                        <span>{{ $card['label'] }}</span>
+
+                                        @if(!empty($match['edit_url']))
+                                        <a href="{{ $match['edit_url'] }}" title="Isi atau edit skor">
+                                            Edit
+                                        </a>
+                                        @endif
+
+                                    </div>
+
+                                    <div class="tr-cup-player
+                                    {{ $aWin ? 'is-winner' : '' }}
+                                    {{ $bWin ? 'is-loser' : '' }}">
+
+                                        <span title="{{ $nameA }}">
+                                            {{ $nameA }}
+                                        </span>
+
+                                        @if($aWin)
+                                        <b aria-label="Pemenang">✓</b>
+                                        @endif
+
+                                    </div>
+
+                                    <div class="tr-cup-player
+                                    {{ $bWin ? 'is-winner' : '' }}
+                                    {{ $aWin ? 'is-loser' : '' }}">
+
+                                        <span title="{{ $nameB }}">
+                                            {{ $nameB }}
+                                        </span>
+
+                                        @if($bWin)
+                                        <b aria-label="Pemenang">✓</b>
+                                        @endif
+
+                                    </div>
+
+                                    <div class="tr-cup-game__bottom" title="{{ $scoreText ?: $statusText }}">
+
+                                        {{ $scoreText ?: $statusText }}
+
+                                    </div>
+
+                                </article>
+
+                                @endforeach
+
+                            </div>
                         </div>
-
-                        <div class="tr-cup-player
-                            {{ $aWin ? 'is-winner' : '' }}
-                            {{ $aLose ? 'is-loser' : '' }}">
-
-                            <span title="{{ $nameA }}">
-                                {{ $nameA }}
-                            </span>
-
-                            @if($aWin)
-                            <b aria-label="Pemenang">✓</b>
-                            @endif
-
-                        </div>
-
-                        <div class="tr-cup-player
-                            {{ $bWin ? 'is-winner' : '' }}
-                            {{ $bLose ? 'is-loser' : '' }}">
-
-                            <span title="{{ $nameB }}">
-                                {{ $nameB }}
-                            </span>
-
-                            @if($bWin)
-                            <b aria-label="Pemenang">✓</b>
-                            @endif
-
-                        </div>
-
-                        <div class="tr-cup-game__bottom" title="{{ $scoreText ?: $statusText }}">
-
-                            {{ $scoreText ?: $statusText }}
-
-                        </div>
-
-                    </article>
-
-                    @endforeach
-
+                    </div>
                 </div>
-
             </div>
 
         </div>
 
-    </div>
+        {{-- Aktif untuk halaman Detail dan pratinjau Cup --}}
+        @once
+        @push('scripts')
+        <script src="{{ asset('assets/js/tournament-bracket-zoom.js') }}?v=13" defer>
+        </script>
+        @endpush
+        @endonce

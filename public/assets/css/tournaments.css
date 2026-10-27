@@ -1962,3 +1962,1233 @@
         scroll-behavior: auto;
     }
 }
+/* ==========================================
+   LAYOUT PEMILIHAN PEMAIN - TAHAP 2 TURNAMEN
+   ========================================== */
+
+.tr-entry-selects--double {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+}
+
+.tr-entry-selects--single {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+}
+
+.tr-entry-slot {
+    min-width: 0;
+}
+
+.tr-entry-slot-head {
+    margin-bottom: 8px;
+}
+
+.tr-entry-slot-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 7px 12px;
+    border: 1px solid #cddbe7;
+    border-radius: 10px;
+    background: #eef4f9;
+    color: #1769aa;
+    font-size: 12px;
+    font-weight: 850;
+    text-align: center;
+}
+
+/* Label field */
+.tr-player-field-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #264864;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* Trigger default */
+.tr-player-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+
+    padding: 10px 12px;
+
+    border: 1.5px solid #cbd9e6;
+    border-radius: 10px;
+
+    background: #ffffff;
+    color: #64748b;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+
+    cursor: pointer;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s,
+        background 0.2s,
+        color 0.2s;
+}
+
+.tr-player-trigger:hover {
+    border-color: #8ab9d8;
+}
+
+/* Kalau SUDAH terpilih -> hijau */
+.tr-player-trigger.is-selected {
+    border-color: #b9ddc4;
+    background: #eaf7ef;
+    color: #216c3d;
+}
+
+.tr-player-trigger.is-selected .tr-player-label {
+    color: #216c3d;
+    font-weight: 800;
+}
+
+.tr-player-trigger.is-selected svg {
+    color: #318a53;
+}
+
+/* Saat dropdown sedang dibuka */
+.tr-player-trigger[aria-expanded="true"] {
+    border-color: #1769aa;
+    box-shadow: 0 0 0 3px rgba(23, 105, 170, 0.1);
+}
+
+/* Kalau selected lalu dibuka, tetap hijau */
+.tr-player-trigger.is-selected[aria-expanded="true"] {
+    border-color: #318a53;
+    box-shadow: 0 0 0 3px rgba(49, 138, 83, 0.12);
+}
+
+/* Responsive HP */
+@media (max-width: 640px) {
+    .tr-entry-selects--double {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .tr-entry-slot-pill {
+        min-height: 33px;
+        font-size: 11px;
+    }
+}
+
+/* ==========================================
+   PEMILIHAN PEMAIN - RESPONSIVE HP
+   Tetap kiri dan kanan untuk Ganda
+   ========================================== */
+
+@media (max-width: 640px) {
+    /* GANDA: tetap 2 kolom */
+    .tr-page .tr-entry-selects.tr-entry-selects--double {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        align-items: start;
+    }
+
+    /* TUNGGAL: 1 kolom penuh */
+    .tr-page .tr-entry-selects.tr-entry-selects--single {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .tr-entry-slot,
+    .tr-player-picker {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Header Pemain 1 dan Pemain 2 */
+    .tr-entry-slot-pill {
+        min-height: 33px;
+        padding: 7px 5px;
+        font-size: 11px;
+    }
+
+    /* Field pemilihan pemain */
+    .tr-player-trigger {
+        width: 100%;
+        min-width: 0;
+        min-height: 45px;
+        padding: 8px 9px;
+        gap: 5px;
+        font-size: 11px;
+    }
+
+    .tr-player-label {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tr-player-trigger svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+    }
+
+    /* Dropdown pencarian lebih lebar */
+    .tr-player-menu {
+        width: min(250px, calc(100vw - 40px));
+        max-width: calc(100vw - 40px);
+        right: auto;
+        left: 0;
+        z-index: 100;
+    }
+
+    /* Dropdown pemain kanan dibuka ke kiri */
+    .tr-entry-slot:nth-child(2) .tr-player-menu {
+        left: auto;
+        right: 0;
+    }
+
+    /* Field hijau setelah pemain dipilih */
+    .tr-player-trigger.is-selected {
+        background: #eaf7ef;
+        border-color: #b9ddc4;
+        color: #216c3d;
+    }
+
+    .tr-player-trigger.is-selected .tr-player-label {
+        color: #216c3d;
+        font-weight: 800;
+    }
+}
+
+/* ==========================================
+   TAHAP 3 - SUSUNAN PESERTA
+   ========================================== */
+
+.tr-page .tr-order-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+/* Custom dropdown peserta */
+.tr-order-picker {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+}
+
+.tr-order-picker:focus-within {
+    z-index: 60;
+}
+
+.tr-order-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 12px;
+
+    border: 1.5px solid #cbd9e6;
+    border-radius: 9px;
+
+    background: white;
+    color: #64748b;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 750;
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.tr-order-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tr-order-trigger svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+}
+
+/* Warna hijau ketika terpilih */
+.tr-order-trigger.is-selected {
+    background: #eaf7ef;
+    border-color: #b9ddc4;
+    color: #216c3d;
+}
+
+.tr-order-trigger.is-selected svg {
+    color: #318a53;
+}
+
+.tr-order-trigger[aria-expanded="true"] {
+    border-color: #318a53;
+    box-shadow: 0 0 0 3px rgba(49, 138, 83, 0.12);
+}
+
+/* Menu pencarian */
+.tr-order-menu {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    z-index: 100;
+
+    width: 100%;
+    min-width: 0;
+    padding: 9px;
+
+    border: 1px solid #d8e4ed;
+    border-radius: 10px;
+
+    background: #fff;
+    box-shadow: 0 14px 30px rgba(9, 35, 66, 0.16);
+}
+
+.tr-order-menu[hidden],
+.tr-order-option[hidden],
+.tr-order-empty[hidden] {
+    display: none !important;
+}
+
+.site-main .tr-order-search {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 9px 11px;
+
+    border: 1px solid #cbd9e6;
+    border-radius: 8px;
+
+    background: white;
+    color: #173b5a;
+    font-size: 12px;
+}
+
+.tr-order-options {
+    display: grid;
+    gap: 3px;
+
+    max-height: 210px;
+    margin-top: 7px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.tr-order-option {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 11px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: white;
+    color: #274760;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 650;
+    text-align: left;
+
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.tr-order-option:hover,
+.tr-order-option:focus-visible,
+.tr-order-option[aria-selected="true"] {
+    background: #eaf7ef;
+    color: #216c3d;
+}
+
+.tr-order-empty {
+    padding: 10px 6px;
+    color: #8193a5;
+    font-size: 12px;
+    text-align: center;
+}
+
+.tr-order-actions {
+    margin-top: 15px;
+}
+
+/* ==========================================
+   HASIL GENERATE - ZOOM DAN SCROLL
+   ========================================== */
+
+.tr-preview-viewer {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Toolbar zoom */
+.tr-preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 9px;
+
+    padding: 10px 12px;
+    margin-bottom: 10px;
+
+    border: 1px solid #dfe8f0;
+    border-radius: 10px;
+
+    background: #f8fafc;
+}
+
+.tr-preview-toolbar__hint {
+    color: #647b8f;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.tr-zoom-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.tr-zoom-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 37px;
+    min-height: 36px;
+    padding: 7px 10px;
+
+    border: 1px solid #cbd9e6;
+    border-radius: 8px;
+
+    background: white;
+    color: #1769aa;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.tr-zoom-controls button:hover {
+    background: #eaf4fc;
+}
+
+.tr-zoom-controls button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.tr-zoom-controls output {
+    display: grid;
+    place-items: center;
+
+    min-width: 52px;
+    min-height: 36px;
+
+    color: #153b5e;
+    font-size: 12px;
+    font-weight: 850;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Area bagan */
+.tr-preview-viewport {
+    width: 100%;
+    min-width: 0;
+    max-height: min(75vh, 850px);
+    min-height: 180px;
+
+    overflow: auto;
+    padding: 12px;
+
+    border: 1px solid #dfe8f0;
+    border-radius: 12px;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(23, 105, 170, 0.06),
+            transparent 48%
+        ),
+        #f8fafc;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+
+    cursor: grab;
+}
+
+.tr-preview-viewport.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+}
+
+.tr-preview-stage {
+    position: relative;
+    width: max-content;
+    max-width: none;
+}
+
+.tr-preview-content {
+    position: relative;
+    width: max-content;
+    max-width: none;
+    transform-origin: top left;
+}
+
+/* Aktif setelah ukuran asli dibaca JS */
+.tr-preview-stage.is-zoom-ready {
+    overflow: hidden;
+}
+
+.tr-preview-stage.is-zoom-ready .tr-preview-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Bagan Cup memakai viewport zoom utama */
+.tr-preview-content .tr-cup-bracket {
+    width: max-content;
+    max-width: none;
+}
+
+.tr-preview-content .tr-cup-scroll {
+    width: max-content !important;
+    max-width: none !important;
+    overflow: visible !important;
+
+    padding: 0 !important;
+    border: none;
+    background: transparent;
+}
+
+.tr-preview-content .tr-cup-map {
+    margin: 0;
+}
+
+/* Liga: seluruh ronde secara horizontal */
+.tr-preview-content .tr-round-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 14px;
+    width: max-content;
+}
+
+.tr-preview-content .tr-preview-round {
+    flex: 0 0 230px;
+    width: 230px;
+    min-width: 230px;
+}
+
+/* Perubahan susunan */
+#tr-preview-outdated {
+    margin: 12px 0 0;
+}
+
+/* ==========================================
+   TAMPILAN HP
+   ========================================== */
+
+@media (max-width: 600px) {
+    .tr-page .tr-order-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .tr-order-trigger {
+        min-height: 41px;
+        padding: 8px 9px;
+        font-size: 11px;
+    }
+
+    .tr-order-menu {
+        width: min(245px, calc(100vw - 44px));
+        max-width: calc(100vw - 44px);
+        padding: 8px;
+    }
+
+    /* Dropdown kolom kanan dibuka ke kiri */
+    .tr-order-grid > .tr-field:nth-child(even) .tr-order-menu {
+        left: auto;
+        right: 0;
+    }
+
+    .tr-order-options {
+        max-height: 185px;
+    }
+
+    .tr-order-option {
+        padding: 10px 9px;
+        font-size: 11px;
+    }
+
+    .tr-preview-toolbar {
+        gap: 8px;
+        padding: 9px;
+    }
+
+    .tr-preview-toolbar__hint {
+        width: 100%;
+        font-size: 10px;
+    }
+
+    .tr-zoom-controls {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tr-zoom-controls button {
+        min-width: 35px;
+        min-height: 35px;
+        font-size: 12px;
+    }
+
+    .tr-preview-viewport {
+        max-height: 65vh;
+        min-height: 170px;
+        padding: 8px;
+    }
+
+    .tr-preview-content .tr-preview-round {
+        flex-basis: 205px;
+        width: 205px;
+        min-width: 205px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tr-preview-viewport {
+        scroll-behavior: auto;
+    }
+}
+
+/* ==========================================
+   CUP BRACKET - CLEAN DESIGN
+   ========================================== */
+
+/* Hilangkan teks keterangan lama */
+.tr-cup-hint,
+.tr-cup-head {
+    display: none !important;
+}
+
+/* Judul Quarterfinal, Semifinal, Final */
+.tr-cup-round-titles {
+    position: relative;
+    height: 36px;
+    min-width: 0;
+}
+
+.tr-cup-round-title {
+    position: absolute;
+    top: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 30px;
+    padding: 0 5px;
+
+    color: #1769aa;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.045em;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.tr-cup-round-title.is-final {
+    color: #a65b08;
+}
+
+/* ==========================================
+   PINCH TO ZOOM - CUP DAN LIGA
+   ========================================== */
+
+.tr-page .tr-pinch-viewport {
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    max-height: min(72vh, 780px);
+
+    overflow: auto !important;
+
+    border: 1px solid #dfe8f0;
+    border-radius: 12px;
+
+    background: #f8fafc;
+
+    /* Gerakan satu dan dua jari ditangani JS */
+    touch-action: none;
+
+    overscroll-behavior: contain;
+    cursor: grab;
+}
+
+.tr-page .tr-pinch-viewport:active {
+    cursor: grabbing;
+}
+
+.tr-pinch-stage {
+    position: relative;
+    width: max-content;
+    max-width: none;
+    min-width: 0;
+}
+
+.tr-pinch-content {
+    position: relative;
+    width: max-content;
+    max-width: none;
+
+    transform-origin: top left;
+    will-change: transform;
+}
+
+.tr-pinch-stage.is-ready .tr-pinch-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Cup */
+.tr-page .tr-cup-scroll.tr-pinch-viewport {
+    padding: 10px;
+    -webkit-overflow-scrolling: auto;
+}
+
+.tr-page .tr-cup-map {
+    max-width: none;
+}
+
+/* Liga */
+.tr-league-preview-scroll {
+    padding: 12px;
+}
+
+.tr-page .tr-league-preview-scroll .tr-round-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 14px;
+
+    width: max-content;
+    max-width: none;
+}
+
+.tr-league-preview-scroll .tr-preview-round {
+    flex: 0 0 225px;
+    width: 225px;
+    min-width: 225px;
+}
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 600px) {
+    .tr-page .tr-pinch-viewport {
+        max-height: 65vh;
+        border-radius: 10px;
+    }
+
+    .tr-page .tr-cup-scroll.tr-pinch-viewport {
+        padding: 8px;
+    }
+
+    .tr-league-preview-scroll {
+        padding: 8px;
+    }
+
+    .tr-league-preview-scroll .tr-preview-round {
+        flex-basis: 205px;
+        width: 205px;
+        min-width: 205px;
+    }
+
+    .tr-cup-round-title {
+        font-size: 10px;
+    }
+}
+
+/* ==========================================
+   PB ALFA - TOURNAMENT DETAIL V13
+   ========================================== */
+
+/* NAVIGASI DETAIL / BAGAN / PERTANDINGAN */
+
+.tr-detail-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+    width: 100%;
+    min-width: 0;
+    padding: 7px;
+    border: 1px solid #dfe8f0;
+    border-radius: 13px;
+    background: #fff;
+}
+
+.tr-detail-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 8px;
+
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: #f1f5f9;
+
+    color: #617b90 !important;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+}
+
+.tr-detail-tab:hover {
+    background: #eaf4fc;
+    color: #1769aa !important;
+}
+
+.tr-detail-tab.is-active {
+    border-color: #bad8ed;
+    background: #eaf4fc;
+    color: #1769aa !important;
+}
+
+/* INFORMASI TURNAMEN */
+
+.tr-detail-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    min-width: 0;
+}
+
+.tr-detail-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+    padding: 13px;
+
+    border: 1px solid #dfe8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.tr-detail-info-item small {
+    color: #647b8f;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.tr-detail-info-item strong {
+    color: #153b5e;
+    font-size: 13px;
+    font-weight: 850;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.tr-detail-description {
+    margin-top: 17px;
+    padding-top: 15px;
+    border-top: 1px solid #e4ecf2;
+}
+
+.tr-detail-description h3 {
+    margin: 0 0 8px;
+    color: #153b5e;
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.tr-detail-description p {
+    margin: 0;
+    color: #647b8f;
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+/* DAFTAR PESERTA */
+
+.tr-detail-entry-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.tr-detail-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 10px 12px;
+
+    border: 1px solid #e2eaf1;
+    border-radius: 9px;
+    background: #fff;
+}
+
+.tr-detail-entry__number {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 29px;
+    height: 29px;
+
+    border-radius: 8px;
+    background: #eaf4fc;
+    color: #1769aa;
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.tr-detail-entry strong {
+    min-width: 0;
+    color: #25455f;
+    font-size: 12px;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+}
+
+/* DRAFT */
+
+.tr-detail-draft {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px;
+
+    border: 1px solid #f3d7b1;
+    border-radius: 12px;
+    background: #fff8ee;
+}
+
+.tr-detail-draft strong {
+    color: #955d18;
+    font-size: 13px;
+    font-weight: 850;
+}
+
+.tr-detail-draft p {
+    margin: 5px 0 0;
+    color: #946e42;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* KARTU PERTANDINGAN DAN FORM SKOR */
+
+.tr-fixture-entry {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    scroll-margin-top: 20px;
+}
+
+.tr-fixture-entry > .tr-match {
+    border-radius: 11px 11px 0 0;
+}
+
+.tr-fixture-entry > .tr-match:last-child {
+    border-radius: 11px;
+}
+
+.tr-inline-editor {
+    min-width: 0;
+    border: 1px solid #dfe8f0;
+    border-top: 0;
+    border-radius: 0 0 11px 11px;
+    background: #f8fafc;
+}
+
+.tr-inline-editor > summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 9px 12px;
+
+    color: #1769aa;
+    font-size: 12px;
+    font-weight: 850;
+    cursor: pointer;
+    list-style: none;
+}
+
+.tr-inline-editor > summary::-webkit-details-marker {
+    display: none;
+}
+
+.tr-inline-editor > summary::after {
+    content: "+";
+    margin-left: 8px;
+    font-size: 17px;
+}
+
+.tr-inline-editor[open] > summary {
+    background: #eaf4fc;
+    border-bottom: 1px solid #dfe8f0;
+}
+
+.tr-inline-editor[open] > summary::after {
+    content: "−";
+}
+
+.tr-inline-editor__form {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+    padding: 14px;
+}
+
+.tr-inline-editor__form .tr-score-set {
+    min-width: 0;
+    margin: 0;
+}
+
+.tr-inline-editor__form .tr-score-inputs,
+.tr-inline-editor__form .tr-field {
+    min-width: 0;
+}
+
+.tr-inline-editor__form input[type="number"] {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    font-variant-numeric: tabular-nums;
+}
+
+.tr-inline-editor__form .tr-btn {
+    width: 100%;
+    min-height: 43px;
+}
+
+/* Navigasi ronde dengan link */
+
+.tr-round-nav a.tr-round-arrow {
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+}
+
+.tr-round-arrow.is-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* ==========================================
+   BAGAN CUP - JUDUL BABAK
+   ========================================== */
+
+.tr-cup-round-titles {
+    position: relative;
+    height: 36px;
+    min-width: 0;
+}
+
+.tr-cup-round-title {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 0 5px;
+
+    color: #1769aa;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.tr-cup-round-title.is-final {
+    color: #a65b08;
+}
+
+/* Bagan dapat digeser dan dicubit */
+
+.tr-page .tr-bracket-viewport {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    max-height: min(72vh, 800px);
+
+    overflow: auto !important;
+    padding: 12px !important;
+    border: 1px solid #dfe8f0;
+    border-radius: 12px;
+
+    background: #f8fafc;
+    overscroll-behavior: contain;
+    touch-action: none;
+    cursor: grab;
+}
+
+.tr-page .tr-bracket-viewport:active {
+    cursor: grabbing;
+}
+
+.tr-bracket-stage {
+    position: relative;
+    width: max-content;
+    max-width: none;
+}
+
+.tr-bracket-content {
+    position: relative;
+    width: max-content;
+    max-width: none;
+    transform-origin: top left;
+}
+
+.tr-bracket-stage.is-ready .tr-bracket-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.tr-page .tr-cup-map {
+    max-width: none;
+    margin: 0;
+}
+
+.tr-page .tr-cup-game {
+    touch-action: none;
+}
+
+.tr-page .tr-cup-game a {
+    position: relative;
+    z-index: 2;
+    touch-action: manipulation;
+}
+
+/* ==========================================
+   RESPONSIVE TABLET
+   ========================================== */
+
+@media (max-width: 900px) {
+    .tr-detail-info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* ==========================================
+   RESPONSIVE HP
+   ========================================== */
+
+@media (max-width: 600px) {
+    .tr-detail-tabs {
+        gap: 5px;
+        padding: 5px;
+        border-radius: 11px;
+    }
+
+    .tr-detail-tab {
+        min-height: 42px;
+        padding: 9px 4px;
+        font-size: 11px;
+        border-radius: 7px;
+    }
+
+    .tr-detail-info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .tr-detail-info-item {
+        padding: 10px;
+        gap: 5px;
+    }
+
+    .tr-detail-info-item small {
+        font-size: 10px;
+    }
+
+    .tr-detail-info-item strong {
+        font-size: 12px;
+    }
+
+    .tr-detail-entry-list {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 7px;
+    }
+
+    .tr-detail-entry {
+        padding: 9px 10px;
+    }
+
+    .tr-detail-draft {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .tr-detail-draft .tr-btn {
+        width: 100%;
+    }
+
+    .tr-inline-editor__form {
+        padding: 11px;
+        gap: 10px;
+    }
+
+    .tr-inline-editor > summary {
+        min-height: 42px;
+        font-size: 11px;
+    }
+
+    .tr-page .tr-bracket-viewport {
+        max-height: 65vh;
+        padding: 8px !important;
+        border-radius: 10px;
+    }
+
+    .tr-cup-round-title {
+        font-size: 10px;
+    }
+}
