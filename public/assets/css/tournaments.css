@@ -4399,3 +4399,358 @@
         font-size: 11px;
     }
 }
+
+/* ==========================================
+   KLASemen LIGA PB ALFA - TOP 3 COMPACT
+   ========================================== */
+
+.tr-page .tr-league-standings {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Semua baris memiliki ukuran seragam */
+.tr-page .tr-league-standings tbody td {
+    padding: 11px 10px;
+    height: 54px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e4ecf2;
+    background: #fff;
+    font-size: 12px;
+}
+
+/* Nama peserta */
+.tr-league-standings .tr-standings-name strong {
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1.4;
+    color: #234663;
+}
+
+/* ==========================================
+   NOMOR PERINGKAT
+   ========================================== */
+
+.tr-page .tr-league-standings .tr-rank-cell {
+    width: 60px;
+    text-align: center;
+}
+
+.tr-page .tr-league-standings .tr-rank-number {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+
+    min-width: 30px;
+    width: auto;
+    height: 29px;
+    min-height: 29px;
+
+    padding: 0 6px;
+    box-sizing: border-box;
+
+    border-radius: 7px;
+    background: #f1f5f9;
+    color: #607588;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+/* Mahkota kecil, sejajar dengan angka 1 */
+.tr-page .tr-league-standings .tr-rank-crown {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    color: #c68b0c;
+    filter: none;
+}
+
+/* ==========================================
+   PERINGKAT 1 - EMAS
+   ========================================== */
+
+.tr-page .tr-league-standings tbody tr.tr-rank--first > td {
+    background: #fff9e9;
+    border-bottom-color: #f1dfb5;
+}
+
+.tr-page .tr-league-standings tr.tr-rank--first > td:first-child {
+    border-left: 3px solid #d6a02c;
+}
+
+.tr-page .tr-league-standings .tr-rank--first .tr-rank-number {
+    background: #ffedbb;
+    color: #966311;
+    border: 1px solid #efd48e;
+}
+
+.tr-page .tr-league-standings .tr-rank--first .tr-standings-name strong {
+    color: #8d5d11;
+}
+
+/* ==========================================
+   PERINGKAT 2 - PERAK
+   ========================================== */
+
+.tr-page .tr-league-standings tbody tr.tr-rank--second > td {
+    background: #f3f6fa;
+    border-bottom-color: #dfe6ed;
+}
+
+.tr-page .tr-league-standings tr.tr-rank--second > td:first-child {
+    border-left: 3px solid #95a4b5;
+}
+
+.tr-page .tr-league-standings .tr-rank--second .tr-rank-number {
+    background: #e4eaf0;
+    color: #52677d;
+    border: 1px solid #cbd5e1;
+}
+
+/* ==========================================
+   PERINGKAT 3 - PERUNGGU
+   ========================================== */
+
+.tr-page .tr-league-standings tbody tr.tr-rank--third > td {
+    background: #fcf5ef;
+    border-bottom-color: #eddccf;
+}
+
+.tr-page .tr-league-standings tr.tr-rank--third > td:first-child {
+    border-left: 3px solid #be8760;
+}
+
+.tr-page .tr-league-standings .tr-rank--third .tr-rank-number {
+    background: #f3dfce;
+    color: #965e3a;
+    border: 1px solid #e6c7ae;
+}
+
+/* Peringkat lainnya */
+.tr-page
+    .tr-league-standings
+    tbody
+    tr:not(.tr-rank--first):not(.tr-rank--second):not(.tr-rank--third)
+    > td:first-child {
+    border-left: 3px solid transparent;
+}
+
+/* ==========================================
+   POIN KLASemen
+   ========================================== */
+
+.tr-page .tr-league-standings .tr-rank-points {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 32px;
+    min-height: 28px;
+    height: 28px;
+
+    padding: 3px 8px;
+    border-radius: 7px;
+
+    background: #eaf4fc;
+    color: #1769aa;
+
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.tr-page .tr-league-standings .tr-rank--first .tr-rank-points {
+    background: #f7e6b9;
+    color: #936411;
+}
+
+.tr-page .tr-league-standings .tr-rank--second .tr-rank-points {
+    background: #e1e8ef;
+    color: #52677d;
+}
+
+.tr-page .tr-league-standings .tr-rank--third .tr-rank-points {
+    background: #f1dfcf;
+    color: #965e3a;
+}
+
+/* ==========================================
+   SET MENANG - KALAH
+   POIN DIPEROLEH - POIN LAWAN
+   ========================================== */
+
+.tr-for-against {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+
+    font-size: 12px;
+    font-weight: 850;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Menang / poin diperoleh */
+.tr-stat-for {
+    color: #198754;
+    font-weight: 900;
+}
+
+/* Kalah / poin lawan */
+.tr-stat-against {
+    color: #dc3545;
+    font-weight: 900;
+}
+
+/* Tanda pengurang */
+.tr-stat-separator {
+    color: #98a8b6;
+    font-weight: 700;
+}
+
+/* ==========================================
+   TAMPILAN HP
+   ========================================== */
+
+@media (max-width: 600px) {
+    .tr-page .tr-league-standings tbody td {
+        height: 49px;
+        padding: 9px 8px;
+        font-size: 11px;
+    }
+
+    .tr-page .tr-league-standings th {
+        padding: 10px 8px;
+        font-size: 9px;
+    }
+
+    .tr-page .tr-league-standings .tr-rank-number {
+        min-width: 28px;
+        height: 27px;
+        min-height: 27px;
+        padding: 0 5px;
+        font-size: 11px;
+    }
+
+    .tr-page .tr-league-standings .tr-rank-crown {
+        width: 13px;
+        height: 13px;
+    }
+
+    .tr-page .tr-league-standings .tr-standings-name strong {
+        font-size: 11px;
+    }
+
+    .tr-page .tr-league-standings .tr-rank-points {
+        min-width: 29px;
+        height: 26px;
+        min-height: 26px;
+        font-size: 12px;
+    }
+
+    .tr-for-against {
+        gap: 5px;
+        font-size: 11px;
+    }
+}
+
+/* ==========================================
+   TOP 3 KLASemen - WARNA BPS
+   ========================================== */
+
+/* Peringkat 1: Biru BPS */
+.tr-league-standings .tr-rank--first {
+    --rank-bg: #eaf4fc;
+    --rank-border: #1769aa;
+    --rank-soft: #d4eafa;
+    --rank-text: #145b91;
+}
+
+/* Peringkat 2: Hijau BPS */
+.tr-league-standings .tr-rank--second {
+    --rank-bg: #eaf8ef;
+    --rank-border: #28945b;
+    --rank-soft: #d5f0df;
+    --rank-text: #196f42;
+}
+
+/* Peringkat 3: Oranye BPS */
+.tr-league-standings .tr-rank--third {
+    --rank-bg: #fff3e8;
+    --rank-border: #e28a32;
+    --rank-soft: #ffe3c7;
+    --rank-text: #a95f1d;
+}
+
+/* Latar seluruh baris tiga besar */
+.tr-page
+    .tr-league-standings
+    tbody
+    tr:is(.tr-rank--first, .tr-rank--second, .tr-rank--third)
+    > td {
+    background: var(--rank-bg);
+    border-bottom-color: var(--rank-soft);
+}
+
+/* Garis warna di sisi kiri */
+.tr-page
+    .tr-league-standings
+    tbody
+    tr:is(.tr-rank--first, .tr-rank--second, .tr-rank--third)
+    > td:first-child {
+    border-left: 3px solid var(--rank-border);
+}
+
+/* Kotak nomor peringkat */
+.tr-page
+    .tr-league-standings
+    tr:is(.tr-rank--first, .tr-rank--second, .tr-rank--third)
+    .tr-rank-number {
+    background: var(--rank-soft);
+    border: 1px solid var(--rank-border);
+    color: var(--rank-text);
+}
+
+/* Nama peserta */
+.tr-page
+    .tr-league-standings
+    tr:is(.tr-rank--first, .tr-rank--second, .tr-rank--third)
+    .tr-standings-name
+    strong {
+    color: var(--rank-text);
+}
+
+/* Kotak poin klasemen */
+.tr-page
+    .tr-league-standings
+    tr:is(.tr-rank--first, .tr-rank--second, .tr-rank--third)
+    .tr-rank-points {
+    background: var(--rank-soft);
+    color: var(--rank-text);
+}
+
+/* Mahkota peringkat 1 mengikuti biru BPS */
+.tr-page .tr-league-standings .tr-rank--first .tr-rank-crown {
+    color: #1769aa;
+    width: 14px;
+    height: 14px;
+}
+
+/* Jaga tinggi seluruh baris konsisten */
+.tr-page .tr-league-standings tbody td {
+    height: 50px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+}
+
+@media (max-width: 600px) {
+    .tr-page .tr-league-standings tbody td {
+        height: 46px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+}

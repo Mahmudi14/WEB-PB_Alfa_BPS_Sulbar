@@ -423,19 +423,20 @@ $nextRound = $roundIndex !== false
 
             <div class="tr-table-scroll" tabindex="0" role="region" aria-label="Klasemen Liga">
 
-                <table class="tr-table">
+
+                <table class="tr-table tr-league-standings">
 
                     <thead>
                         <tr>
                             <th>#</th>
                             <th>Peserta</th>
+                            <th>Poin</th>
                             <th>Main</th>
                             <th>M</th>
                             <th>S</th>
                             <th>K</th>
                             <th>Selisih Set</th>
                             <th>Selisih Poin</th>
-                            <th>Poin</th>
                         </tr>
                     </thead>
 
@@ -444,40 +445,106 @@ $nextRound = $roundIndex !== false
                         @forelse($standings as $row)
 
                         @php
-                        $setDiff =
-                        $row['sets_for']
-                        - $row['sets_against'];
+                        $rank = $loop->iteration;
 
-                        $pointDiff =
-                        $row['points_for']
-                        - $row['points_against'];
+                        $rankClass = match ($rank) {
+                        1 => 'tr-rank--first',
+                        2 => 'tr-rank--second',
+                        3 => 'tr-rank--third',
+                        default => '',
+                        };
                         @endphp
 
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
+                        <tr class="{{ $rankClass }}">
 
-                            <td class="tr-standings-name">
-                                {{ $row['entry']->display_name }}
+                            {{-- NOMOR PERINGKAT --}}
+                            <td class="tr-rank-cell">
+
+                                <span class="tr-rank-number">
+
+                                    @if($rank === 1)
+                                    <svg class="tr-rank-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        aria-hidden="true">
+
+                                        <path d="m2 8 5 4 5-7 5 7 5-4-2 11H4L2 8Z" />
+                                        <path d="M4 22h16" />
+
+                                    </svg>
+                                    @endif
+
+                                    {{ $rank }}
+
+                                </span>
+
                             </td>
 
+                            {{-- NAMA PESERTA --}}
+                            <td class="tr-standings-name">
+
+                                <strong>
+                                    {{ $row['entry']->display_name }}
+                                </strong>
+
+                            </td>
+
+                            {{-- POIN KLASEMEN --}}
+                            <td class="tr-points-cell">
+
+                                <strong class="tr-rank-points">
+                                    {{ $row['league_points'] }}
+                                </strong>
+
+                            </td>
+
+                            {{-- STATISTIK --}}
                             <td>{{ $row['played'] }}</td>
                             <td>{{ $row['wins'] }}</td>
                             <td>{{ $row['draws'] }}</td>
                             <td>{{ $row['losses'] }}</td>
 
+                            {{-- SET MENANG - SET KALAH --}}
                             <td>
-                                {{ $setDiff > 0 ? '+' : '' }}{{ $setDiff }}
+
+                                <span class="tr-for-against">
+
+                                    <span class="tr-stat-for">
+                                        {{ $row['sets_for'] }}
+                                    </span>
+
+                                    <span class="tr-stat-separator">
+                                        −
+                                    </span>
+
+                                    <span class="tr-stat-against">
+                                        {{ $row['sets_against'] }}
+                                    </span>
+
+                                </span>
+
                             </td>
 
+                            {{-- POIN DIPEROLEH - POIN LAWAN --}}
                             <td>
-                                {{ $pointDiff > 0 ? '+' : '' }}{{ $pointDiff }}
+
+                                <span class="tr-for-against">
+
+                                    <span class="tr-stat-for">
+                                        {{ $row['points_for'] }}
+                                    </span>
+
+                                    <span class="tr-stat-separator">
+                                        −
+                                    </span>
+
+                                    <span class="tr-stat-against">
+                                        {{ $row['points_against'] }}
+                                    </span>
+
+                                </span>
+
                             </td>
 
-                            <td>
-                                <strong>
-                                    {{ $row['league_points'] }}
-                                </strong>
-                            </td>
                         </tr>
 
                         @empty
@@ -493,6 +560,7 @@ $nextRound = $roundIndex !== false
                     </tbody>
 
                 </table>
+
 
             </div>
 
