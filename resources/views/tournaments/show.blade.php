@@ -5,7 +5,7 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=7">
 
-<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=14">
+<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=15">
 @endpush
 
 @section('content')
