@@ -10,102 +10,227 @@ class PlayerRankingService
     public function all()
     {
         /*
-         * Statistik hanya menghitung pertandingan
-         * yang sudah mempunyai hasil lengkap.
-         *
-         * Pertandingan pending tidak menambah:
-         * - Jumlah pertandingan
-         * - Menang
-         * - Seri
-         * - Kalah
-         * - Total poin
-         */
+        |--------------------------------------------------------------------------
+        | PERTANDINGAN REGULER
+        |--------------------------------------------------------------------------
+        |
+        | Menang = win
+        | Seri   = draw
+        | Kalah  = loss
+        |
+        | Hanya pertandingan selesai yang dihitung.
+        |
+        */
 
-        $stats = DB::table('match_participants as mp')
+        $regularResults = DB::table('match_participants as mp')
             ->join(
                 'matches as m',
                 'm.id',
                 '=',
                 'mp.match_id'
             )
-
-            // Abaikan pertandingan terhapus
             ->whereNull('m.deleted_at')
-
-            // Abaikan pertandingan tanpa hasil
-            ->whereNotNull('m.result')
-
-            // Semua skor wajib tersedia
+            ->whereIn('m.result', ['a', 'b', 'seri'])
             ->whereNotNull('m.set1_a')
             ->whereNotNull('m.set1_b')
             ->whereNotNull('m.set2_a')
             ->whereNotNull('m.set2_b')
-
-            // Abaikan pemain luar yang tidak terdaftar
             ->whereNotNull('mp.player_id')
+            ->whereIn('mp.team', ['a', 'b'])
 
             ->select('mp.player_id')
 
-            // Total pertandingan selesai
-            ->selectRaw('COUNT(*) AS played_count')
+            ->selectRaw("
+                CASE
+                    WHEN m.result = 'seri'
+                        THEN 'draw'
+                    WHEN m.result = mp.team
+                        THEN 'win'
+                    ELSE 'loss'
+                END AS outcome
+            ");
 
-            // Total kemenangan
+
+        /*
+        |--------------------------------------------------------------------------
+        | PERTANDINGAN TURNAMEN - TIM A
+        |--------------------------------------------------------------------------
+        |
+        | Berlaku untuk Liga dan Cup.
+        | BYE dan pertandingan pending diabaikan.
+        |
+        */
+
+        $tournamentResultsA = DB::table(
+            'tournament_entry_players as tep'
+        )
+            ->join(
+                'tournament_fixtures as tf',
+                'tf.a_entry_id',
+                '=',
+                'tep.entry_id'
+            )
+            ->join(
+                'tournaments as t',
+                't.id',
+                '=',
+                'tf.tournament_id'
+            )
+            ->whereColumn(
+                'tep.tournament_id',
+                'tf.tournament_id'
+            )
+            ->whereIn(
+                't.status',
+                ['active', 'completed']
+            )
+            ->where('tf.is_bye', false)
+            ->whereNotNull('tf.a_entry_id')
+            ->whereNotNull('tf.b_entry_id')
+            ->whereIn(
+                'tf.result',
+                ['a', 'b', 'draw']
+            )
+
+            ->select('tep.player_id')
+
+            ->selectRaw("
+                CASE
+                    WHEN tf.result = 'draw'
+                        THEN 'draw'
+                    WHEN tf.result = 'a'
+                        THEN 'win'
+                    ELSE 'loss'
+                END AS outcome
+            ");
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PERTANDINGAN TURNAMEN - TIM B
+        |--------------------------------------------------------------------------
+        */
+
+        $tournamentResultsB = DB::table(
+            'tournament_entry_players as tep'
+        )
+            ->join(
+                'tournament_fixtures as tf',
+                'tf.b_entry_id',
+                '=',
+                'tep.entry_id'
+            )
+            ->join(
+                'tournaments as t',
+                't.id',
+                '=',
+                'tf.tournament_id'
+            )
+            ->whereColumn(
+                'tep.tournament_id',
+                'tf.tournament_id'
+            )
+            ->whereIn(
+                't.status',
+                ['active', 'completed']
+            )
+            ->where('tf.is_bye', false)
+            ->whereNotNull('tf.a_entry_id')
+            ->whereNotNull('tf.b_entry_id')
+            ->whereIn(
+                'tf.result',
+                ['a', 'b', 'draw']
+            )
+
+            ->select('tep.player_id')
+
+            ->selectRaw("
+                CASE
+                    WHEN tf.result = 'draw'
+                        THEN 'draw'
+                    WHEN tf.result = 'b'
+                        THEN 'win'
+                    ELSE 'loss'
+                END AS outcome
+            ");
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GABUNGKAN REGULER + LIGA + CUP
+        |--------------------------------------------------------------------------
+        |
+        | UNION ALL menggabungkan hasil tanpa
+        | memindahkan atau menduplikasi pertandingan
+        | ke tabel matches.
+        |
+        */
+
+        $allResults = $regularResults
+            ->unionAll($tournamentResultsA)
+            ->unionAll($tournamentResultsB);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | HITUNG STATISTIK SETIAP PEMAIN
+        |--------------------------------------------------------------------------
+        */
+
+        $stats = DB::query()
+            ->fromSub($allResults, 'hasil')
+
+            ->select('hasil.player_id')
+
+            ->selectRaw("
+                COUNT(*) AS played_count
+            ")
+
             ->selectRaw("
                 SUM(
                     CASE
-                        WHEN
-                            (
-                                m.result = 'a'
-                                AND mp.team = 'a'
-                            )
-                            OR
-                            (
-                                m.result = 'b'
-                                AND mp.team = 'b'
-                            )
+                        WHEN hasil.outcome = 'win'
                         THEN 1
                         ELSE 0
                     END
                 ) AS wins
             ")
 
-            // Total hasil seri
             ->selectRaw("
                 SUM(
                     CASE
-                        WHEN m.result = 'seri'
+                        WHEN hasil.outcome = 'draw'
                         THEN 1
                         ELSE 0
                     END
                 ) AS draws
             ")
 
-            // Total kekalahan
             ->selectRaw("
                 SUM(
                     CASE
-                        WHEN
-                            (
-                                m.result = 'a'
-                                AND mp.team = 'b'
-                            )
-                            OR
-                            (
-                                m.result = 'b'
-                                AND mp.team = 'a'
-                            )
+                        WHEN hasil.outcome = 'loss'
                         THEN 1
                         ELSE 0
                     END
                 ) AS losses
             ")
 
-            ->groupBy('mp.player_id');
+            ->groupBy('hasil.player_id');
+
 
         /*
-         * Ambil seluruh pemain beserta
-         * hasil pertandingan yang sudah selesai.
-         */
+        |--------------------------------------------------------------------------
+        | HITUNG POIN RANKING GLOBAL
+        |--------------------------------------------------------------------------
+        |
+        | Menang +30
+        | Seri   +10
+        | Kalah  -30
+        |
+        | Skor awal tetap digunakan.
+        |
+        */
 
         $players = Player::query()
 
@@ -125,39 +250,25 @@ class PlayerRankingService
 
             ->select('players.*')
 
-            // Total pertandingan
             ->selectRaw("
                 COALESCE(stats.played_count, 0)
                 AS played_count
             ")
 
-            // Total kemenangan
             ->selectRaw("
                 COALESCE(stats.wins, 0)
                 AS wins
             ")
 
-            // Total seri
             ->selectRaw("
                 COALESCE(stats.draws, 0)
                 AS draws
             ")
 
-            // Total kekalahan
             ->selectRaw("
                 COALESCE(stats.losses, 0)
                 AS losses
             ")
-
-            /*
-             * Perhitungan poin ranking:
-             *
-             * Menang = +30
-             * Seri   = +10
-             * Kalah  = -30
-             *
-             * Skor awal tetap diperhitungkan.
-             */
 
             ->selectRaw("
                 (
@@ -168,7 +279,6 @@ class PlayerRankingService
                 ) AS total_score
             ")
 
-            // Urutan ranking
             ->orderByDesc('total_score')
             ->orderByDesc('wins')
             ->orderByDesc('draws')
@@ -178,10 +288,12 @@ class PlayerRankingService
 
             ->get();
 
+
         /*
-         * Ranking Putra dan Putri
-         * dihitung secara terpisah.
-         */
+        |--------------------------------------------------------------------------
+        | RANKING PUTRA DAN PUTRI
+        |--------------------------------------------------------------------------
+        */
 
         $positions = [
             'L' => 0,
@@ -198,7 +310,8 @@ class PlayerRankingService
 
             $positions[$gender]++;
 
-            $player->rank_position = $positions[$gender];
+            $player->rank_position =
+                $positions[$gender];
         }
 
         return $players;
