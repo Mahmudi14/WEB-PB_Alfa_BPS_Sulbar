@@ -54,56 +54,314 @@
     update();
 }
 
-    function entryForm() {
-        const form = $("#tr-entries-form");
-        if (!form) return;
-        const wrap = $("#tr-entry-rows");
-        const template = $("#tr-entry-template");
-        const addButton = $("#tr-add-entry");
-        const error = $("#tr-entry-error");
-        const update = () => {
-            const rows = $$("[data-entry-row]", wrap);
-            rows.forEach((row, i) => {
-                $("[data-entry-label]", row).textContent = String(i + 1);
-                $$("select", row).forEach((select, slot) => {
-                    select.name = `entries[${i}][players][${slot}]`;
-                });
-                $("[data-entry-remove]", row).disabled = rows.length <= 2;
-            });
-            addButton.disabled = rows.length >= 32;
-        };
-        wrap.addEventListener("click", (event) => {
-            const button = event.target.closest("[data-entry-remove]");
-            if (!button) return;
-            if ($$("[data-entry-row]", wrap).length > 2)
-                button.closest("[data-entry-row]").remove();
-            update();
+    
+function entryForm() {
+    const form = document.getElementById('tr-entries-form');
+
+    if (!form) return;
+
+    const wrap = document.getElementById('tr-entry-rows');
+    const template = document.getElementById('tr-entry-template');
+    const addButton = document.getElementById('tr-add-entry');
+    const error = document.getElementById('tr-entry-error');
+
+    const getRows = () =>
+        Array.from(wrap.querySelectorAll('[data-entry-row]'));
+
+    const getPickers = () =>
+        Array.from(wrap.querySelectorAll('[data-player-picker]'));
+
+    const normalize = (text) =>
+        String(text || '')
+            .normalize('NFKC')
+            .toLocaleLowerCase('id-ID')
+            .trim();
+
+
+    // Tutup semua menu pemilihan pemain
+    function closeMenus() {
+        getPickers().forEach(picker => {
+
+            picker.querySelector(
+                '[data-player-menu]'
+            ).hidden = true;
+
+            picker.querySelector(
+                '[data-player-trigger]'
+            ).setAttribute('aria-expanded', 'false');
+
         });
-        addButton.addEventListener("click", () => {
-            if ($$("[data-entry-row]", wrap).length >= 32) return;
-            wrap.appendChild(template.content.cloneNode(true));
-            update();
-        });
-        form.addEventListener(
-            "submit",
-            (event) => {
-                const values = $$("select", wrap).map((select) => select.value);
-                if (
-                    values.some((v) => !v) ||
-                    new Set(values).size !== values.length
-                ) {
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-                    error.textContent =
-                        "Isi semua pemain dan pastikan setiap pemain hanya terdaftar sekali.";
-                    error.hidden = false;
-                    error.scrollIntoView({ block: "nearest" });
-                } else error.hidden = true;
-            },
-            true,
-        );
-        update();
     }
+
+
+    // Perbarui label dan daftar pemain tersedia
+    function refresh() {
+        const all = getPickers();
+
+        all.forEach(picker => {
+            const input = picker.querySelector(
+                '[data-player-value]'
+            );
+
+            const selected = input.value;
+
+            const option = Array.from(
+                picker.querySelectorAll('[data-player-option]')
+            ).find(item => item.dataset.id === selected);
+
+            picker.querySelector(
+                '[data-player-label]'
+            ).textContent = option?.dataset.name || 'Pilih pemain';
+
+            picker.querySelector(
+                '[data-player-trigger]'
+            ).classList.toggle('is-selected', !!option);
+
+
+            // Cari pemain yang dipilih di slot lain
+            const used = new Set(
+                all
+                    .filter(other => other !== picker)
+                    .map(other => other.querySelector(
+                        '[data-player-value]'
+                    ).value)
+                    .filter(Boolean)
+            );
+
+            const keyword = normalize(
+                picker.querySelector('[data-player-search]').value
+            );
+
+            let available = 0;
+
+            picker.querySelectorAll(
+                '[data-player-option]'
+            ).forEach(item => {
+
+                const taken = used.has(item.dataset.id);
+
+                const match = normalize(
+                    item.dataset.name
+                ).includes(keyword);
+
+                item.disabled = taken;
+                item.hidden = taken || !match;
+
+                if (!item.hidden) available++;
+
+            });
+
+            picker.querySelector(
+                '[data-player-empty]'
+            ).hidden = available > 0;
+        });
+    }
+
+
+    // Nomor peserta dan nama input ke Laravel
+    function updateRows() {
+        const rows = getRows();
+
+        rows.forEach((row, i) => {
+
+            row.querySelector(
+                '[data-entry-label]'
+            ).textContent = String(i + 1);
+
+            row.querySelectorAll(
+                '[data-player-picker]'
+            ).forEach((picker, slot) => {
+
+                picker.querySelector(
+                    '[data-player-value]'
+                ).name = `entries[${i}][players][${slot}]`;
+
+                picker.querySelector(
+                    '[data-player-trigger]'
+                ).setAttribute(
+                    'aria-label',
+                    `Peserta ${i + 1}, pemain ${slot + 1}`
+                );
+            });
+
+            row.querySelector(
+                '[data-entry-remove]'
+            ).disabled = rows.length <= 2;
+
+        });
+
+        addButton.disabled = rows.length >= 32;
+
+        refresh();
+    }
+
+
+    // Klik pilihan pemain, buka menu, dan hapus peserta
+    wrap.addEventListener('click', (event) => {
+
+        const option = event.target.closest(
+            '[data-player-option]'
+        );
+
+        if (option && !option.disabled) {
+            const picker = option.closest(
+                '[data-player-picker]'
+            );
+
+            picker.querySelector(
+                '[data-player-value]'
+            ).value = option.dataset.id;
+
+            closeMenus();
+            refresh();
+
+            error.hidden = true;
+            return;
+        }
+
+
+        // Buka dropdown
+        const trigger = event.target.closest(
+            '[data-player-trigger]'
+        );
+
+        if (trigger) {
+            const picker = trigger.closest(
+                '[data-player-picker]'
+            );
+
+            const menu = picker.querySelector(
+                '[data-player-menu]'
+            );
+
+            const wasOpen = !menu.hidden;
+
+            closeMenus();
+
+            if (!wasOpen) {
+                menu.hidden = false;
+
+                trigger.setAttribute(
+                    'aria-expanded',
+                    'true'
+                );
+
+                const search = picker.querySelector(
+                    '[data-player-search]'
+                );
+
+                search.value = '';
+
+                refresh();
+                search.focus();
+            }
+
+            return;
+        }
+
+
+        // Hapus peserta
+        const remove = event.target.closest(
+            '[data-entry-remove]'
+        );
+
+        if (remove && getRows().length > 2) {
+            closeMenus();
+
+            remove.closest(
+                '[data-entry-row]'
+            ).remove();
+
+            updateRows();
+
+            error.hidden = true;
+        }
+    });
+
+
+    // Pencarian langsung ketika mengetik
+    wrap.addEventListener('input', (event) => {
+        if (event.target.matches('[data-player-search]')) {
+            refresh();
+        }
+    });
+
+
+    // Tambah peserta atau pasangan baru
+    addButton.addEventListener('click', () => {
+        if (getRows().length >= 32) return;
+
+        closeMenus();
+
+        wrap.appendChild(
+            template.content.cloneNode(true)
+        );
+
+        updateRows();
+
+        getRows().at(-1)?.querySelector(
+            '[data-player-trigger]'
+        )?.focus();
+    });
+
+
+    // Tutup menu ketika klik di luar
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('[data-player-picker]')) {
+            closeMenus();
+        }
+    });
+
+
+    // Tutup dengan tombol Escape
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeMenus();
+        }
+    });
+
+
+    // Validasi sebelum menyimpan
+    form.addEventListener('submit', (event) => {
+
+        const values = getPickers().map(picker =>
+            picker.querySelector('[data-player-value]').value
+        );
+
+        let message = '';
+
+        if (getRows().length < 2) {
+            message = 'Minimal harus ada 2 peserta.';
+        } else if (values.some(value => !value)) {
+            message = 'Pilih semua pemain terlebih dahulu.';
+        } else if (new Set(values).size !== values.length) {
+            message =
+                'Pemain yang sama tidak boleh dipilih dua kali dalam turnamen.';
+        }
+
+        if (!message) {
+            error.hidden = true;
+            return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        error.textContent = message;
+        error.hidden = false;
+
+        error.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+
+    }, true);
+
+
+    // Inisialisasi
+    updateRows();
+}
+
 
     function orderForm() {
         const form = $("#tr-preview-form");

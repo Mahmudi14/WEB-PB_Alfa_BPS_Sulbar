@@ -18,7 +18,7 @@ class TournamentController extends Controller
     {
         $canManage = $request->user()?->is_active && $request->user()->canManage();
         $tournaments = Tournament::withCount(['entries', 'fixtures'])
-            ->when(!$canManage, fn ($query) => $query->where('status', '!=', 'draft'))
+            ->when(!$canManage, fn($query) => $query->where('status', '!=', 'draft'))
             ->latest()->paginate(12);
         return view('tournaments.index', compact('tournaments', 'canManage'));
     }
@@ -31,7 +31,8 @@ class TournamentController extends Controller
     public function store(StoreTournamentRequest $request)
     {
         $tournament = Tournament::create($request->validated() + [
-            'status' => 'draft', 'created_by' => $request->user()->id,
+            'status' => 'draft',
+            'created_by' => $request->user()->id,
         ]);
         return redirect()->route('tournaments.entries', $tournament)
             ->with('success', 'Aturan tersimpan. Sekarang pilih peserta.');
@@ -70,7 +71,8 @@ class TournamentController extends Controller
                 $entry = $locked->entries()->create(['seed' => $index + 1]);
                 foreach (array_values($item['players']) as $slot => $playerId) {
                     $entry->players()->attach((int) $playerId, [
-                        'slot' => $slot + 1, 'tournament_id' => $locked->id,
+                        'slot' => $slot + 1,
+                        'tournament_id' => $locked->id,
                     ]);
                 }
             }
@@ -85,13 +87,15 @@ class TournamentController extends Controller
         $tournament->load('entries.players');
         if ($tournament->entries->count() < 2) return redirect()->route('tournaments.entries', $tournament);
         $entryMap = $tournament->entries->keyBy('id');
-        $defaultOrder = $tournament->entries->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $defaultOrder = $tournament->entries->pluck('id')->map(fn($id) => (int) $id)->all();
         $requested = $request->query('order');
         $order = $defaultOrder;
-        if (is_array($requested) && count($requested) === count($defaultOrder)
-            && collect($requested)->every(fn ($id) => is_scalar($id) && ctype_digit((string) $id))
+        if (
+            is_array($requested) && count($requested) === count($defaultOrder)
+            && collect($requested)->every(fn($id) => is_scalar($id) && ctype_digit((string) $id))
             && count(array_unique($requested)) === count($requested)
-            && !array_diff($defaultOrder, array_map('intval', $requested))) {
+            && !array_diff($defaultOrder, array_map('intval', $requested))
+        ) {
             $order = array_map('intval', $requested);
         }
         $plan = $scheduler->preview($tournament, $order);
@@ -125,5 +129,36 @@ class TournamentController extends Controller
     private function ensureDraft(Tournament $tournament): void
     {
         abort_unless($tournament->status === 'draft', 403, 'Turnamen sudah dimulai. Aturan dan peserta terkunci.');
+    }
+
+    public function destroy(
+        Request $request,
+        Tournament $tournament
+    ) {
+        // Hanya Admin dan Pengelola aktif
+        $user = $request->user();
+
+        abort_unless(
+            $user && $user->is_active && $user->canManage(),
+            403
+        );
+
+        DB::transaction(function () use ($tournament) {
+
+            $locked = Tournament::query()
+                ->whereKey($tournament->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Berlaku untuk draft, active, dan completed
+            $locked->delete();
+        }, 3);
+
+        return redirect()
+            ->route('tournaments.index')
+            ->with(
+                'success',
+                'Turnamen beserta jadwal dan hasil pertandingannya berhasil dihapus.'
+            );
     }
 }

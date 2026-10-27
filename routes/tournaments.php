@@ -18,4 +18,10 @@ Route::middleware(['auth', 'role:admin,pengelola'])->group(function () {
     Route::post('/turnamen/{tournament}/bagan', [TournamentController::class, 'start'])->whereNumber('tournament')->name('tournaments.start');
     Route::get('/turnamen/{tournament}/pertandingan/{fixture}/edit', [TournamentResultController::class, 'edit'])->whereNumber(['tournament', 'fixture'])->name('tournaments.fixtures.edit');
     Route::patch('/turnamen/{tournament}/pertandingan/{fixture}', [TournamentResultController::class, 'update'])->whereNumber(['tournament', 'fixture'])->name('tournaments.fixtures.update');
+    Route::delete('/turnamen/{tournament}', [
+        TournamentController::class,
+        'destroy'
+    ])
+        ->whereNumber('tournament')
+        ->name('tournaments.destroy');
 });
