@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Bagan Pertandingan - PB Alfa')
+@section('title', 'Persiapan Turnamen - PB Alfa')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=10">
+<link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=20">
 @endpush
 
 @section('content')
@@ -13,11 +13,13 @@ $isLiga = $tournament->format === 'liga';
 
 $bracketRounds = [];
 
+// Bagan hanya untuk Cup.
 if (!$isLiga) {
 $bracketRounds = collect($plan)
 ->map(function ($matches) use ($entryMap) {
 return collect($matches)
 ->map(function ($match) use ($entryMap) {
+
 $aId = $match['a'] ?? null;
 $bId = $match['b'] ?? null;
 $isBye = (bool) ($match['bye'] ?? false);
@@ -32,18 +34,20 @@ $b = $bId !== null
 
 return [
 'a' => $a?->display_name
-?? ($isBye ? 'BYE' : 'Menunggu pemenang'),
+?? ($isBye ? 'BYE' : 'Menunggu'),
 
 'b' => $b?->display_name
-?? ($isBye ? 'BYE' : 'Menunggu pemenang'),
+?? ($isBye ? 'BYE' : 'Menunggu'),
 
 'a_id' => $aId,
 'b_id' => $bId,
 'winner_id' => null,
 'score' => '',
+
 'status' => $isBye
 ? 'Lolos otomatis'
 : 'Belum dimainkan',
+
 'edit_url' => null,
 ];
 })
@@ -59,56 +63,130 @@ return [
 
     {{-- HEADER --}}
     <header class="tr-page-heading">
+
         <div class="tr-page-heading__main">
 
             <a href="{{ route('tournaments.entries', $tournament) }}" class="tr-back">
-                ← Ubah Peserta
+                ← Ubah Pemain
             </a>
 
             <span class="tr-eyebrow">
                 PB ALFA / TOURNAMENT SETUP
             </span>
 
+            @if($isLiga)
             <h1>
-                {{ $isLiga ? 'JADWAL' : 'BAGAN' }}
-                <span>PERTANDINGAN.</span>
+                DAFTAR <span>PEMAIN.</span>
             </h1>
+            @else
+            <h1>
+                BAGAN <span>PERTANDINGAN.</span>
+            </h1>
+            @endif
 
         </div>
 
         <span class="tr-hero__decoration" aria-hidden="true">
             03
         </span>
+
     </header>
 
+    {{-- TAHAP PEMBUATAN --}}
     @include('tournaments._steps', [
-    'step' => 3
+    'step' => 3,
+    'isLiga' => $isLiga
     ])
 
     {{-- VALIDASI --}}
     @if($errors->any())
     <div class="tr-alert" role="alert">
-        <strong>Periksa susunan pertandingan.</strong>
+
+        <strong>Periksa kembali data turnamen.</strong>
+
         <ul>
             @foreach($errors->all() as $error)
             <li>{{ $error }}</li>
             @endforeach
         </ul>
+
     </div>
     @endif
 
-    {{-- SUSUNAN PESERTA --}}
+
+    {{-- =====================================
+    MODE LIGA: DAFTAR PEMAIN SAJA
+    ===================================== --}}
+    @if($isLiga)
+
+    <section class="tr-panel" aria-labelledby="tr-league-players-title">
+
+        <div class="tr-section-head">
+
+            <div>
+                <span class="tr-eyebrow">
+                    DAFTAR PESERTA
+                </span>
+
+                <h2 id="tr-league-players-title">
+                    Pemain Liga
+                </h2>
+            </div>
+
+            <span class="tr-board-count">
+                {{ count($order) }} Peserta
+            </span>
+
+        </div>
+
+        {{-- HANYA MENAMPILKAN PEMAIN --}}
+        <div class="tr-detail-entry-list">
+
+            @foreach($order as $i => $id)
+
+            @php
+            $entry = $entryMap->get((int) $id);
+            @endphp
+
+            <div class="tr-detail-entry">
+
+                <span class="tr-detail-entry__number">
+                    {{ $i + 1 }}
+                </span>
+
+                <strong>
+                    {{ $entry?->display_name ?? 'Menunggu' }}
+                </strong>
+
+            </div>
+
+            @endforeach
+
+        </div>
+
+    </section>
+
+
+    {{-- =====================================
+    MODE CUP: SUSUNAN DAN BAGAN
+    ===================================== --}}
+    @else
+
+    {{-- SUSUNAN PESERTA CUP --}}
     <section class="tr-panel" aria-labelledby="tr-order-title">
 
         <div class="tr-section-head">
+
             <div>
                 <span class="tr-eyebrow">
                     TOURNAMENT SETUP
                 </span>
+
                 <h2 id="tr-order-title">
                     Susunan Peserta
                 </h2>
             </div>
+
         </div>
 
         <form id="tr-preview-form" method="GET" action="{{ route('tournaments.schedule', $tournament) }}">
@@ -118,7 +196,9 @@ return [
                 @foreach($order as $i => $id)
 
                 @php
-                $selectedEntry = $entryMap->get((int) $id);
+                $selectedEntry = $entryMap->get(
+                (int) $id
+                );
                 @endphp
 
                 <div class="tr-field">
@@ -135,16 +215,21 @@ return [
                             aria-expanded="false" aria-labelledby="tr-order-label-{{ $i }} tr-order-selected-{{ $i }}">
 
                             <span id="tr-order-selected-{{ $i }}" class="tr-order-label" data-order-label>
+
                                 {{ $selectedEntry?->display_name ?? 'Pilih peserta' }}
+
                             </span>
 
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+
                                 <path d="m6 9 6 6 6-6" />
+
                             </svg>
 
                         </button>
 
+                        {{-- DROPDOWN PENCARIAN --}}
                         <div class="tr-order-menu" data-order-menu hidden>
 
                             <input type="search" class="tr-order-search" data-order-search placeholder="Cari peserta..."
@@ -153,10 +238,14 @@ return [
                             <div class="tr-order-options">
 
                                 @foreach($entryMap as $entry)
+
                                 <button type="button" class="tr-order-option" data-order-option
                                     data-id="{{ $entry->id }}" data-name="{{ $entry->display_name }}">
+
                                     {{ $entry->display_name }}
+
                                 </button>
+
                                 @endforeach
 
                             </div>
@@ -168,12 +257,14 @@ return [
                         </div>
 
                     </div>
+
                 </div>
 
                 @endforeach
 
             </div>
 
+            {{-- TOMBOL KHUSUS CUP --}}
             <div class="tr-actions tr-order-actions">
 
                 <button type="button" id="tr-shuffle" class="tr-btn tr-btn--outline">
@@ -190,91 +281,31 @@ return [
             </p>
 
         </form>
+
+        <p id="tr-preview-outdated" class="tr-hint tr-hint--error" role="status" hidden>
+            Susunan berubah. Generate ulang bagan
+            sebelum memulai turnamen.
+        </p>
+
     </section>
 
-    {{-- HASIL GENERATE --}}
+
+    {{-- BAGAN CUP --}}
     <section class="tr-panel tr-schedule-preview" aria-labelledby="tr-preview-title">
 
         <div class="tr-section-head">
+
             <div>
                 <span class="tr-eyebrow">
                     MATCH PREVIEW
                 </span>
 
                 <h2 id="tr-preview-title">
-                    {{ $isLiga
-                    ? 'Hasil Generate Jadwal'
-                    : 'Hasil Generate Bagan' }}
+                    Hasil Generate Bagan
                 </h2>
             </div>
+
         </div>
-
-        @if($isLiga)
-
-        <div class="tr-league-preview-scroll tr-pinch-viewport" data-pinch-viewport tabindex="0" role="region"
-            aria-label="Jadwal Liga yang dapat digeser dan diperbesar">
-
-            <div class="tr-pinch-stage" data-pinch-stage>
-
-                <div class="tr-pinch-content" data-pinch-content>
-
-                    <div class="tr-round-grid">
-
-                        @foreach($plan as $r => $matches)
-
-                        <div class="tr-preview-round">
-
-                            <h3>Ronde {{ $r + 1 }}</h3>
-
-                            @forelse($matches as $m => $match)
-
-                            @php
-                            $a = $entryMap->get(
-                            $match['a']
-                            );
-
-                            $b = $entryMap->get(
-                            $match['b']
-                            );
-                            @endphp
-
-                            <article class="tr-preview-match">
-
-                                <span class="tr-preview-no">
-                                    PERTANDINGAN {{ $m + 1 }}
-                                </span>
-
-                                <strong>
-                                    {{ $a?->display_name ?? '—' }}
-                                </strong>
-
-                                <small>VS</small>
-
-                                <strong>
-                                    {{ $b?->display_name ?? '—' }}
-                                </strong>
-
-                            </article>
-
-                            @empty
-
-                            <div class="tr-empty">
-                                Tidak ada pertandingan.
-                            </div>
-
-                            @endforelse
-
-                        </div>
-
-                        @endforeach
-
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        @else
 
         @if(count($bracketRounds) > 0)
 
@@ -290,28 +321,34 @@ return [
 
         @endif
 
-        @endif
-
-        <p id="tr-preview-outdated" class="tr-hint tr-hint--error" role="status" hidden>
-            Susunan berubah. Generate ulang bagan
-            sebelum memulai turnamen.
-        </p>
-
     </section>
 
-    {{-- SELESAIKAN --}}
+    @endif
+
+
+    {{-- =====================================
+    TOMBOL MULAI DI BAWAH DAFTAR
+    ===================================== --}}
     <form id="tr-start-form" class="tr-finish" method="POST" action="{{ route('tournaments.start', $tournament) }}"
-        data-single-submit data-confirm="Mulai turnamen dengan susunan peserta ini?" data-confirm-title="Mulai Turnamen"
-        data-confirm-text="Ya, Mulai">
+        data-single-submit data-confirm="{{ $isLiga
+            ? 'Mulai Liga dengan daftar pemain ini?'
+            : 'Mulai Cup dengan bagan ini?' }}" data-confirm-title="Mulai Turnamen" data-confirm-text="Ya, Mulai">
 
         @csrf
 
+        {{-- Susunan asli tetap dikirim ke backend --}}
         @foreach($order as $id)
+
         <input type="hidden" name="order[]" value="{{ $id }}">
+
         @endforeach
 
         <button type="submit" class="tr-btn tr-btn--accent">
-            Selesaikan &amp; Mulai Turnamen →
+
+            {{ $isLiga
+            ? 'Mulai Liga →'
+            : 'Selesaikan & Mulai Cup →' }}
+
         </button>
 
     </form>
@@ -321,6 +358,6 @@ return [
 @endsection
 
 @push('scripts')
-<script src="{{ asset('assets/js/tournaments.js') }}?v=10" defer>
+<script src="{{ asset('assets/js/tournaments.js') }}?v=20" defer>
 </script>
 @endpush

@@ -1,8 +1,33 @@
+@php
+$isLiga = $isLiga
+?? (isset($tournament) && $tournament->format === 'liga');
+
+$steps = [
+'Aturan',
+'Pemain',
+$isLiga ? 'Daftar' : 'Bagan',
+'Selesai',
+];
+@endphp
+
 <nav class="tr-steps" aria-label="Tahap pembuatan turnamen">
-    @foreach(['Aturan', 'Pemain', 'Bagan', 'Selesai'] as $i => $label)
-        <div class="tr-step {{ ($step ?? 1) === $i + 1 ? 'is-current' : '' }} {{ ($step ?? 1) > $i + 1 ? 'is-done' : '' }}" @if(($step ?? 1) === $i + 1) aria-current="step" @endif>
-            <span>{{ $i + 1 }}</span>
-            <strong>{{ $label }}</strong>
-        </div>
+
+    @foreach($steps as $i => $label)
+
+    @php
+    $number = $i + 1;
+    $currentStep = $step ?? 1;
+    @endphp
+
+    <div class="tr-step
+                {{ $currentStep === $number ? 'is-current' : '' }}
+                {{ $currentStep > $number ? 'is-done' : '' }}" @if($currentStep===$number) aria-current="step" @endif>
+
+        <span>{{ $number }}</span>
+        <strong>{{ $label }}</strong>
+
+    </div>
+
     @endforeach
+
 </nav>

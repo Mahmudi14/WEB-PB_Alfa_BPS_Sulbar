@@ -364,7 +364,9 @@ while (count($existing) < 2) { $existing[]=['players'=> []];
                 </a>
 
                 <button type="submit" class="tr-btn">
-                    Berikutnya: Lihat Bagan →
+                    {{ $tournament->format === 'liga'
+                    ? 'Berikutnya: Lihat Daftar Pemain →'
+                    : 'Berikutnya: Lihat Bagan →' }}
                 </button>
 
             </div>

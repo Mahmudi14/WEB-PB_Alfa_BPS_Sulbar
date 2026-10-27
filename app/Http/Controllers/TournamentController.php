@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class TournamentController extends Controller
 {
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -22,20 +23,71 @@ class TournamentController extends Controller
             $user?->is_active && $user->canManage()
         );
 
+        // Validasi filter dari URL.
+        $filters = $request->validate([
+            'cari' => ['nullable', 'string', 'max:100'],
+            'format' => ['nullable', 'in:liga,cup'],
+            'status' => ['nullable', 'in:draft,active,completed'],
+        ]);
+
+        $cari = trim($filters['cari'] ?? '');
+        $filterFormat = $filters['format'] ?? '';
+        $filterStatus = $filters['status'] ?? '';
+
         $tournaments = Tournament::query()
-            ->withCount(['entries', 'fixtures'])
+
+            // Draft hanya terlihat oleh admin/pengelola.
             ->when(
                 !$canManage,
-                fn($query) => $query->where('status', '!=', 'draft')
+                fn($query) => $query->where(
+                    'status',
+                    '!=',
+                    'draft'
+                )
             )
-            ->latest()
-            ->paginate(12);
+
+            // Pencarian nama turnamen.
+            ->when(
+                $cari !== '',
+                fn($query) => $query->where(
+                    'name',
+                    'like',
+                    '%' . $cari . '%'
+                )
+            )
+
+            // Filter Liga / Cup.
+            ->when(
+                $filterFormat !== '',
+                fn($query) => $query->where(
+                    'format',
+                    $filterFormat
+                )
+            )
+
+            // Filter status.
+            ->when(
+                $filterStatus !== '',
+                fn($query) => $query->where(
+                    'status',
+                    $filterStatus
+                )
+            )
+
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->paginate(12)
+            ->withQueryString();
 
         return view('tournaments.index', compact(
             'tournaments',
-            'canManage'
+            'canManage',
+            'cari',
+            'filterFormat',
+            'filterStatus'
         ));
     }
+
 
     public function create()
     {

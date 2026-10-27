@@ -53,12 +53,14 @@ class Tournament extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+
     public function getSetFormatLabelAttribute(): string
     {
         return match ($this->set_format) {
             'two_draw' => '2 Set — Boleh Seri',
-            'two_aggregate' => '2 Set — Akumulasi + Jus',
-            default => '3 Set — Best of 3',
+            'two_aggregate' => '2 Set — Total Poin',
+            'best_of_three' => '3 Set — Best of 3',
+            default => 'Sistem Set',
         };
     }
 }

@@ -106,8 +106,15 @@
                     <label class="tr-choice">
                         <input type="radio" name="set_format" value="two_aggregate" @checked(old('set_format',
                             $tournament->set_format ?? 'two_draw') === 'two_aggregate')>
-                        <span><strong>2 Set — Akumulasi</strong><small>Jumlahkan poin dari kedua set. Jika sama, lanjut
-                                jus hingga ada pemenang.</small></span>
+
+                        <span>
+                            <strong>2 Set — Total Poin</strong>
+                            <small>
+                                Pemenang ditentukan dari jumlah poin
+                                kedua set.
+                            </small>
+                        </span>
+
                     </label>
                     <label class="tr-choice">
                         <input type="radio" name="set_format" value="best_of_three" @checked(old('set_format',
@@ -133,8 +140,6 @@
                         <span><strong>21 Poin</strong><small>Target kemenangan per set.</small></span>
                     </label>
                 </div>
-                <small class="tr-hint">Sebuah set dimenangkan dengan selisih minimal 2 poin. Jus tidak dibatasi poin
-                    maksimum.</small>
             </div>
         </section>
 
@@ -198,11 +203,6 @@
                     </div>
                 </div>
 
-                <small class="tr-hint">
-                    Poin boleh negatif, misalnya:
-                    Menang +3, Seri 0, Kalah -1.
-                    Pada sistem tanpa seri, poin seri tidak digunakan.
-                </small>
             </div>
 
             {{-- Jumlah pertemuan --}}
@@ -247,10 +247,6 @@
 
                 </div>
 
-                <small class="tr-hint">
-                    Semua ronde akan dibuat otomatis
-                    sebelum turnamen dimulai.
-                </small>
             </div>
         </section>
 
