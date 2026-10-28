@@ -3,7 +3,7 @@
 @section('title', 'Edit Skor - PB Alfa')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=7">
+<link rel="stylesheet" href="{{ asset('assets/css/matches.css') }}?v=8">
 
 <link rel="stylesheet" href="{{ asset('assets/css/tournaments.css') }}?v=16">
 @endpush
