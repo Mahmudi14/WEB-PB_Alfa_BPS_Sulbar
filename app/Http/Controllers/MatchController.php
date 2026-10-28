@@ -4,16 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\BadmintonMatch;
 use App\Models\Player;
+use App\Models\TournamentFixture;
+use App\Services\CompletedMatchQuery;
+use App\Services\ShuttlecockCashService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use App\Services\CompletedMatchQuery;
-use App\Services\ShuttlecockCashService;
-use App\Models\TournamentFixture;
 
 class MatchController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | DAFTAR PERTANDINGAN
+    |--------------------------------------------------------------------------
+    |
+    | Reguler: selesai dan pending tampil.
+    | Liga/Cup: hanya pertandingan selesai dan valid.
+    |
+    | Reguler pending tetap tidak dihitung
+    | untuk Ranking Global dan Kas Kok.
+    |
+    */
 
     public function index(Request $request)
     {
@@ -23,17 +35,32 @@ class MatchController extends Controller
 
         $tanggal = $data['tanggal'] ?? null;
 
-        $regular = CompletedMatchQuery::regular()
+        /*
+         * Riwayat Reguler:
+         * Ambil seluruh pertandingan yang belum dihapus,
+         * termasuk pertandingan yang belum memiliki hasil.
+         *
+         * CompletedMatchQuery::regular() sengaja tidak
+         * digunakan di sini karena khusus hasil selesai.
+         */
+
+        $regular = DB::table('matches as m')
+            ->whereNull('m.deleted_at')
             ->when(
                 $tanggal,
                 fn($q) => $q->whereDate('m.played_on', $tanggal)
             )
             ->selectRaw("
-            'reguler' AS sumber,
-            m.id AS sumber_id,
-            m.played_on AS tanggal_main,
-            m.created_at AS urutan
-        ");
+                'reguler' AS sumber,
+                m.id AS sumber_id,
+                m.played_on AS tanggal_main,
+                m.created_at AS urutan
+            ");
+
+        /*
+         * Liga dan Cup:
+         * Hanya hasil yang sudah selesai dan valid.
+         */
 
         $turnamen = CompletedMatchQuery::tournament()
             ->when(
@@ -41,11 +68,16 @@ class MatchController extends Controller
                 fn($q) => $q->whereDate('tf.played_on', $tanggal)
             )
             ->selectRaw("
-            'turnamen' AS sumber,
-            tf.id AS sumber_id,
-            tf.played_on AS tanggal_main,
-            tf.updated_at AS urutan
-        ");
+                'turnamen' AS sumber,
+                tf.id AS sumber_id,
+                tf.played_on AS tanggal_main,
+                tf.updated_at AS urutan
+            ");
+
+        /*
+         * Gabungkan riwayat tiga sumber.
+         * Pagination berlaku untuk keseluruhan data.
+         */
 
         $matches = DB::query()
             ->fromSub(
@@ -60,7 +92,12 @@ class MatchController extends Controller
 
         $page = $matches->getCollection();
 
-        $regulars = BadmintonMatch::with('participants.player')
+        /*
+         * Ambil detail pertandingan reguler.
+         */
+
+        $regulars = BadmintonMatch::query()
+            ->with('participants.player')
             ->whereIn(
                 'id',
                 $page->where('sumber', 'reguler')
@@ -69,12 +106,17 @@ class MatchController extends Controller
             ->get()
             ->keyBy('id');
 
-        $fixtures = TournamentFixture::with([
-            'tournament',
-            'entryA.players',
-            'entryB.players',
-            'sets',
-        ])
+        /*
+         * Ambil detail pertandingan turnamen.
+         */
+
+        $fixtures = TournamentFixture::query()
+            ->with([
+                'tournament',
+                'entryA.players',
+                'entryB.players',
+                'sets',
+            ])
             ->whereIn(
                 'id',
                 $page->where('sumber', 'turnamen')
@@ -83,12 +125,23 @@ class MatchController extends Controller
             ->get()
             ->keyBy('id');
 
+        /*
+         * Siapkan data agar semua pertandingan
+         * menggunakan format kartu Blade yang sama.
+         */
+
         $matches->setCollection(
             $page->map(function ($row) use (
                 $regulars,
                 $fixtures
             ) {
+
+                /*
+                 * Pertandingan Reguler.
+                 */
+
                 if ($row->sumber === 'reguler') {
+
                     $match = $regulars->get($row->sumber_id);
 
                     if ($match) {
@@ -97,6 +150,10 @@ class MatchController extends Controller
 
                     return $match;
                 }
+
+                /*
+                 * Pertandingan Liga/Cup.
+                 */
 
                 $fixture = $fixtures->get($row->sumber_id);
 
@@ -112,14 +169,18 @@ class MatchController extends Controller
                         'b' => $fixture->entryB,
                     ] as $side => $entry
                 ) {
+
                     foreach (
                         $entry?->players ?? collect()
                         as $index => $player
                     ) {
+
                         $participants->push((object) [
                             'team' => $side,
+
                             'slot' => $player->pivot?->slot
                                 ?? ($index + 1),
+
                             'display_name' => $player->name,
                         ]);
                     }
@@ -128,6 +189,7 @@ class MatchController extends Controller
                 $sets = $fixture->sets->keyBy('set_number');
 
                 return (object) [
+
                     'history_source' =>
                     $fixture->tournament->format,
 
@@ -142,8 +204,11 @@ class MatchController extends Controller
                         [
                             'tournament' =>
                             $fixture->tournament_id,
+
                             'bagian' => 'pertandingan',
-                            'ronde' => $fixture->round_number,
+
+                            'ronde' =>
+                            $fixture->round_number,
                         ]
                     ),
 
@@ -187,51 +252,18 @@ class MatchController extends Controller
             })->filter()->values()
         );
 
-
-        $pendingReguler = collect();
-
-        $viewer = $request->user();
-
-        if (
-            $viewer
-            && $viewer->is_active
-            && (
-                $viewer->canManage()
-                || (
-                    $viewer->role === 'pemain'
-                    && $viewer->player !== null
-                )
-            )
-        ) {
-            $pendingReguler = BadmintonMatch::query()
-                ->with('participants.player')
-                ->where(function ($q) {
-                    $q->whereNull('result')
-                        ->orWhereNull('set1_a')
-                        ->orWhereNull('set1_b')
-                        ->orWhereNull('set2_a')
-                        ->orWhereNull('set2_b');
-                })
-                ->when(
-                    !$viewer->canManage(),
-                    fn($q) => $q->where('created_by', $viewer->id)
-                )
-                ->when(
-                    $tanggal,
-                    fn($q) => $q->whereDate('played_on', $tanggal)
-                )
-                ->orderByDesc('played_on')
-                ->orderByDesc('id')
-                ->get();
-        }
-
-
-        return view('matches.index', compact(
-            'matches',
-            'tanggal'
-        ));
+        return view(
+            'matches.index',
+            compact('matches', 'tanggal')
+        );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | FORM TAMBAH PERTANDINGAN
+    |--------------------------------------------------------------------------
+    */
 
     public function create(Request $request)
     {
@@ -241,6 +273,7 @@ class MatchController extends Controller
             'players' => Player::query()
                 ->orderBy('name')
                 ->get(['id', 'name']),
+
             'selected' => [
                 'a1' => '',
                 'a2' => '',
@@ -251,6 +284,12 @@ class MatchController extends Controller
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | SIMPAN PERTANDINGAN REGULER
+    |--------------------------------------------------------------------------
+    */
+
     public function store(
         Request $request,
         ShuttlecockCashService $cash
@@ -259,16 +298,24 @@ class MatchController extends Controller
 
         $data = $this->validatedMatch($request);
 
-        DB::transaction(function () use ($data, $request, $cash) {
+        DB::transaction(function () use (
+            $data,
+            $request,
+            $cash
+        ) {
+
             $match = BadmintonMatch::create([
                 'played_on' => $data['played_on'],
                 'type' => $data['type'],
                 'result' => $data['result'],
-                'shuttlecock_count' => $data['shuttlecock_count'],
+                'shuttlecock_count' =>
+                $data['shuttlecock_count'],
+
                 'set1_a' => $data['set1_a'],
                 'set1_b' => $data['set1_b'],
                 'set2_a' => $data['set2_a'],
                 'set2_b' => $data['set2_b'],
+
                 'created_by' => $request->user()->id,
             ]);
 
@@ -276,8 +323,12 @@ class MatchController extends Controller
                 $this->participantData($data)
             );
 
-            // Jika belum selesai, sinkronisasi tidak
-            // menemukan pemakaian kok yang valid.
+            /*
+             * Sinkronisasi kok.
+             * Hanya pertandingan selesai yang akan
+             * memberikan kontribusi ke Kas.
+             */
+
             $cash->syncPairs(
                 $cash->regularPairs($match),
                 (int) $request->user()->id
@@ -286,23 +337,35 @@ class MatchController extends Controller
 
         return redirect()
             ->route('matches.index')
-            ->with('success', 'Pertandingan berhasil disimpan.');
+            ->with(
+                'success',
+                'Pertandingan berhasil disimpan.'
+            );
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | HAPUS PERTANDINGAN REGULER
+    |--------------------------------------------------------------------------
+    */
 
     public function destroy(
         Request $request,
         BadmintonMatch $match,
         ShuttlecockCashService $cash
     ) {
-        abort_unless($request->user()?->canManage(), 403);
+        abort_unless(
+            $request->user()?->canManage(),
+            403
+        );
 
         DB::transaction(function () use (
             $match,
             $request,
             $cash
         ) {
+
             $pairs = $cash->regularPairs($match);
 
             $match->delete();
@@ -315,15 +378,27 @@ class MatchController extends Controller
 
         return redirect()
             ->route('matches.index')
-            ->with('success', 'Pertandingan berhasil dihapus.');
+            ->with(
+                'success',
+                'Pertandingan berhasil dihapus.'
+            );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | HAK MEMBUAT PERTANDINGAN
+    |--------------------------------------------------------------------------
+    */
 
     private function ensureCanCreate(Request $request): void
     {
         $user = $request->user();
 
-        abort_unless($user && $user->is_active, 403);
+        abort_unless(
+            $user && $user->is_active,
+            403
+        );
 
         if ($user->canManage()) {
             return;
@@ -336,19 +411,30 @@ class MatchController extends Controller
         );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI DATA PERTANDINGAN
+    |--------------------------------------------------------------------------
+    */
+
     private function validatedMatch(Request $request): array
     {
         $data = $request->validate([
+
             'played_on' => [
                 'required',
                 'date_format:Y-m-d',
             ],
+
             'type' => [
                 'required',
                 Rule::in(['tunggal', 'ganda']),
             ],
+
             'a1' => ['required', 'string'],
             'b1' => ['required', 'string'],
+
             'a2' => [
                 Rule::requiredIf(
                     $request->input('type') === 'ganda'
@@ -356,6 +442,7 @@ class MatchController extends Controller
                 'nullable',
                 'string',
             ],
+
             'b2' => [
                 Rule::requiredIf(
                     $request->input('type') === 'ganda'
@@ -365,7 +452,10 @@ class MatchController extends Controller
             ],
         ]);
 
-        // Validasi skor dan tentukan hasil otomatis.
+        /*
+         * Validasi skor dan tentukan hasil.
+         */
+
         $data = array_merge(
             $data,
             $this->validatedScores($request)
@@ -378,6 +468,7 @@ class MatchController extends Controller
         $realIds = [];
 
         foreach ($slots as $slot) {
+
             $value = (string) $data[$slot];
 
             if ($value === 'guest') {
@@ -393,11 +484,23 @@ class MatchController extends Controller
             $realIds[] = (int) $value;
         }
 
-        if (count($realIds) !== count(array_unique($realIds))) {
+        /*
+         * Cegah pemain sama dipilih dua kali.
+         */
+
+        if (
+            count($realIds)
+            !== count(array_unique($realIds))
+        ) {
             throw ValidationException::withMessages([
-                'a1' => 'Pemain yang sama tidak boleh dipilih dua kali.',
+                'a1' =>
+                'Pemain yang sama tidak boleh dipilih dua kali.',
             ]);
         }
+
+        /*
+         * Pastikan ID pemain valid.
+         */
 
         $found = Player::query()
             ->whereIn('id', $realIds)
@@ -419,6 +522,13 @@ class MatchController extends Controller
         return $data;
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATA PEMAIN PERTANDINGAN
+    |--------------------------------------------------------------------------
+    */
+
     private function participantData(array $data): array
     {
         $slots = $data['type'] === 'ganda'
@@ -428,13 +538,21 @@ class MatchController extends Controller
         $participants = [];
 
         foreach ($slots as $slot) {
+
             $value = (string) $data[$slot];
+
             $guest = $value === 'guest';
 
             $participants[] = [
-                'player_id' => $guest ? null : (int) $value,
-                'guest_name' => $guest ? 'Pemain Luar' : null,
+
+                'player_id' =>
+                $guest ? null : (int) $value,
+
+                'guest_name' =>
+                $guest ? 'Pemain Luar' : null,
+
                 'team' => substr($slot, 0, 1),
+
                 'slot' => (int) substr($slot, 1),
             ];
         }
@@ -442,16 +560,33 @@ class MatchController extends Controller
         return $participants;
     }
 
-    // Halaman edit pertandingan
-    public function edit(Request $request, BadmintonMatch $match)
-    {
+
+    /*
+    |--------------------------------------------------------------------------
+    | HALAMAN EDIT PERTANDINGAN
+    |--------------------------------------------------------------------------
+    */
+
+    public function edit(
+        Request $request,
+        BadmintonMatch $match
+    ) {
         $this->ensureCanViewEditor($request, $match);
 
         $match->load('participants.player');
 
-        return view('matches.edit', compact('match'));
+        return view(
+            'matches.edit',
+            compact('match')
+        );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE SKOR DAN KOK
+    |--------------------------------------------------------------------------
+    */
 
     public function update(
         Request $request,
@@ -472,6 +607,7 @@ class MatchController extends Controller
             $cash,
             $request
         ) {
+
             $match->update($data);
 
             $cash->syncPairs(
@@ -482,18 +618,29 @@ class MatchController extends Controller
 
         return redirect()
             ->route('matches.index')
-            ->with('success', 'Hasil pertandingan berhasil diperbarui.');
+            ->with(
+                'success',
+                'Hasil pertandingan berhasil diperbarui.'
+            );
     }
 
 
-    // Hak membuka halaman edit
+    /*
+    |--------------------------------------------------------------------------
+    | HAK MEMBUKA EDITOR REGULER
+    |--------------------------------------------------------------------------
+    */
+
     private function ensureCanViewEditor(
         Request $request,
         BadmintonMatch $match
     ): void {
         $user = $request->user();
 
-        abort_unless($user && $user->is_active, 403);
+        abort_unless(
+            $user && $user->is_active,
+            403
+        );
 
         if ($user->canManage()) {
             return;
@@ -502,23 +649,56 @@ class MatchController extends Controller
         abort_unless(
             $user->role === 'pemain'
                 && $user->player !== null
-                && (int) $match->created_by === (int) $user->id,
+                && (int) $match->created_by
+                === (int) $user->id,
             403
         );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI SKOR REGULER
+    |--------------------------------------------------------------------------
+    |
+    | Skor kosong diperbolehkan sebagai Pending.
+    | Hasil valid otomatis menentukan pemenang.
+    |
+    */
+
     private function validatedScores(Request $request): array
     {
         $data = $request->validate([
+
             'shuttlecock_count' => [
                 'required',
                 'integer',
                 'between:0,65535',
             ],
-            'set1_a' => ['nullable', 'integer', 'between:0,99'],
-            'set1_b' => ['nullable', 'integer', 'between:0,99'],
-            'set2_a' => ['nullable', 'integer', 'between:0,99'],
-            'set2_b' => ['nullable', 'integer', 'between:0,99'],
+
+            'set1_a' => [
+                'nullable',
+                'integer',
+                'between:0,99',
+            ],
+
+            'set1_b' => [
+                'nullable',
+                'integer',
+                'between:0,99',
+            ],
+
+            'set2_a' => [
+                'nullable',
+                'integer',
+                'between:0,99',
+            ],
+
+            'set2_b' => [
+                'nullable',
+                'integer',
+                'between:0,99',
+            ],
         ]);
 
         $fields = [
@@ -531,6 +711,7 @@ class MatchController extends Controller
         $filled = 0;
 
         foreach ($fields as $field) {
+
             $value = $data[$field] ?? null;
 
             $data[$field] = $value === null
@@ -542,7 +723,10 @@ class MatchController extends Controller
             }
         }
 
-        // Skor boleh seluruhnya kosong atau seluruhnya terisi.
+        /*
+         * Tidak boleh mengisi sebagian skor.
+         */
+
         if ($filled !== 0 && $filled !== 4) {
             throw ValidationException::withMessages([
                 'set1_a' =>
@@ -550,24 +734,37 @@ class MatchController extends Controller
             ]);
         }
 
+        /*
+         * Seluruh skor kosong = Pending.
+         */
+
         if ($filled === 0) {
             $data['result'] = null;
 
             return $data;
         }
 
+        /*
+         * Satu set tidak boleh berakhir seri.
+         */
+
         if (
-            $data['set1_a'] === $data['set1_b'] ||
-            $data['set2_a'] === $data['set2_b']
+            $data['set1_a'] === $data['set1_b']
+            || $data['set2_a'] === $data['set2_b']
         ) {
             throw ValidationException::withMessages([
-                'set1_a' => 'Skor dalam satu set tidak boleh seri.',
+                'set1_a' =>
+                'Skor dalam satu set tidak boleh seri.',
             ]);
         }
 
+        /*
+         * Hitung hasil otomatis.
+         */
+
         $winsA =
-            (int) ($data['set1_a'] > $data['set1_b']) +
-            (int) ($data['set2_a'] > $data['set2_b']);
+            (int) ($data['set1_a'] > $data['set1_b'])
+            + (int) ($data['set2_a'] > $data['set2_b']);
 
         $data['result'] = match ($winsA) {
             2 => 'a',

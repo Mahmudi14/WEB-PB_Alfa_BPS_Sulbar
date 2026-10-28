@@ -1,129 +1,208 @@
 @php
-$editing = isset($transaction) && $transaction?->exists;
+
+/*
+|--------------------------------------------------------------------------
+| STATUS FORM
+|--------------------------------------------------------------------------
+*/
+
+$editing = isset($transaction)
+&& $transaction?->exists;
+
 $isAuto = $editing
 && $transaction->shuttlecock_player_id !== null;
 
-$type = old(
+/*
+* Kas kok otomatis selalu Pemasukan.
+* Untuk transaksi manual, pilihan tetap bebas.
+*/
+
+$type = $isAuto
+? 'pemasukan'
+: old(
 'type',
-$editing ? $transaction->type : 'pemasukan'
+$editing
+? $transaction->type
+: 'pemasukan'
 );
+
 @endphp
+
 
 <form class="cash-form" method="POST" action="{{ $editing
         ? route('cash.update', $transaction)
         : route('cash.store') }}" data-single-submit>
+
     @csrf
 
     @if($editing)
     @method('PUT')
     @endif
 
-    {{-- =====================================================
-    1. VALIDASI FORM
-    ===================================================== --}}
+
+    {{-- ==========================================
+    PESAN VALIDASI
+    ========================================== --}}
 
     @if($errors->any())
+
     <div class="cash-alert" role="alert">
-        <strong>Periksa kembali data transaksi.</strong>
+
+        <strong>
+            Periksa kembali data transaksi.
+        </strong>
 
         <ul>
             @foreach($errors->all() as $message)
+
             <li>{{ $message }}</li>
+
             @endforeach
         </ul>
+
     </div>
+
     @endif
 
-    {{-- =====================================================
-    2. DATA TRANSAKSI
-    ===================================================== --}}
+
+    {{-- ==========================================
+    DATA TRANSAKSI
+    ========================================== --}}
 
     <div class="cash-form__grid">
 
-        {{-- Tanggal --}}
+
+        {{-- ======================================
+        TANGGAL TRANSAKSI
+        ====================================== --}}
 
         <div class="cash-field cash-field--date">
+
             <label for="transaction_date">
                 Tanggal Transaksi
             </label>
 
-            <input id="transaction_date" @readonly($isAuto) type="date" name="transaction_date" value="{{ old(
+            <input id="transaction_date" type="date" name="transaction_date" value="{{ old(
                     'transaction_date',
                     $editing
-                        ? \Illuminate\Support\Carbon::parse(
-                            $transaction->transaction_date
-                        )->format('Y-m-d')
+                        ? $transaction->transaction_date
+                            ->format('Y-m-d')
                         : now()->toDateString()
-                ) }}" required>
+                ) }}" @readonly($isAuto) required>
+
         </div>
 
-        {{-- Nominal --}}
+
+        {{-- ======================================
+        NOMINAL TRANSAKSI
+        ====================================== --}}
 
         <div class="cash-field cash-field--amount">
+
             <label for="amount">
                 Nominal Transaksi
             </label>
 
             <div class="cash-money">
-                <span aria-hidden="true">Rp</span>
+
+                <span aria-hidden="true">
+                    Rp
+                </span>
 
                 <input id="amount" type="number" name="amount" value="{{ old(
                         'amount',
-                        $editing ? $transaction->amount : ''
+                        $editing
+                            ? $transaction->amount
+                            : ''
                     ) }}" placeholder="0" min="{{ $isAuto ? 0 : 1 }}" step="1" inputmode="numeric" required>
+
             </div>
+
         </div>
 
-        {{-- Jenis transaksi --}}
+
+        {{-- ======================================
+        JENIS TRANSAKSI
+        ====================================== --}}
 
         <fieldset class="cash-field cash-field--type">
-            <legend>Jenis Transaksi</legend>
+
+            <legend>
+                Jenis Transaksi
+            </legend>
 
             <div class="cash-type">
 
+                {{-- PEMASUKAN --}}
+
                 <label>
+
                     <input type="radio" name="type" value="pemasukan" @checked($type==='pemasukan' ) @disabled($isAuto)
                         required>
 
-                    <span>Pemasukan</span>
+                    <span>
+                        Pemasukan
+                    </span>
+
                 </label>
 
-                <label>
-                    <input type="radio" name="type" value="pengeluaran" @checked($type==='pengeluaran' )>
 
-                    <span>Pengeluaran</span>
+                {{-- PENGELUARAN --}}
+
+                <label>
+
+                    <input type="radio" name="type" value="pengeluaran" @checked($type==='pengeluaran' )
+                        @disabled($isAuto)>
+
+                    <span>
+                        Pengeluaran
+                    </span>
+
                 </label>
 
             </div>
+
         </fieldset>
 
-        {{-- Keterangan --}}
+
+        {{-- ======================================
+        KETERANGAN TRANSAKSI
+        ====================================== --}}
 
         <div class="cash-field cash-field--description">
+
             <label for="description">
                 Keterangan
             </label>
 
-            <textarea id="description" name="description" rows="2" @readonly($isAuto)
-                placeholder="Masukkan keterangan transaksi" required>{{ old(
+            <textarea id="description" name="description" rows="2" placeholder="Masukkan keterangan transaksi"
+                @readonly($isAuto) required>{{ old(
                 'description',
-                $editing ? $transaction->description : ''
+                $editing
+                    ? $transaction->description
+                    : ''
             ) }}</textarea>
+
         </div>
+
 
     </div>
 
-    {{-- =====================================================
-    3. TOMBOL AKSI
-    ===================================================== --}}
+
+    {{-- ==========================================
+    TOMBOL AKSI
+    ========================================== --}}
 
     <div class="cash-form__actions">
 
         <button type="submit" class="cash-submit">
+
             {{ $editing
             ? 'Simpan Perubahan'
             : 'Simpan Transaksi' }}
+
         </button>
+
 
         <a href="{{ route('cash.index') }}" class="cash-cancel">
             Batal
