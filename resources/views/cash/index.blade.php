@@ -170,7 +170,7 @@ $canManage = $viewer?->canManage() ?? false;
                             <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z" />
                         </svg>
                     </a>
-
+                    @if($transaction->shuttlecock_player_id === null)
                     <form method="POST" action="{{ route('cash.destroy', $transaction) }}" data-single-submit
                         data-confirm="Hapus transaksi ini?">
                         @csrf
@@ -187,6 +187,7 @@ $canManage = $viewer?->canManage() ?? false;
                             </svg>
                         </button>
                     </form>
+                    @endif
 
                 </div>
                 @endif

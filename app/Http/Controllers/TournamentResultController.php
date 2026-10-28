@@ -46,7 +46,8 @@ class TournamentResultController extends Controller
         $service->save(
             $tournament,
             $fixture,
-            $request->validated()
+            $request->validated(),
+            (int) $request->user()->id
         );
 
         return redirect()

@@ -11,6 +11,7 @@ use App\Services\TournamentScheduleService;
 use App\Services\TournamentStandingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\ShuttlecockCashService;
 
 class TournamentController extends Controller
 {
@@ -331,9 +332,11 @@ class TournamentController extends Controller
         ));
     }
 
+
     public function destroy(
         Request $request,
-        Tournament $tournament
+        Tournament $tournament,
+        ShuttlecockCashService $cash
     ) {
         $user = $request->user();
 
@@ -342,22 +345,35 @@ class TournamentController extends Controller
             403
         );
 
-        DB::transaction(function () use ($tournament) {
-            $locked = Tournament::query()
-                ->whereKey($tournament->id)
+        DB::transaction(function () use (
+            $tournament,
+            $cash,
+            $user
+        ) {
+            $locked = Tournament::whereKey($tournament->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            $pairs = $cash->tournamentPairs(
+                (int) $locked->id
+            );
+
             $locked->delete();
+
+            $cash->syncPairs(
+                $pairs,
+                (int) $user->id
+            );
         }, 3);
 
         return redirect()
             ->route('tournaments.index')
             ->with(
                 'success',
-                'Turnamen dan seluruh hasilnya berhasil dihapus.'
+                'Turnamen dihapus dan pemakaian kok disesuaikan.'
             );
     }
+
 
     private function ensureDraft(Tournament $tournament): void
     {

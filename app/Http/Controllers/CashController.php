@@ -114,18 +114,48 @@ class CashController extends Controller
 
     // UPDATE TRANSAKSI
 
+
     public function update(
         Request $request,
         CashTransaction $transaction
     ) {
         $this->ensureManager($request);
 
-        $data = $this->validatedTransaction($request);
+        $isAutomatic =
+            $transaction->shuttlecock_player_id !== null;
 
-        $transaction->update([
-            ...$data,
-            'updated_by' => $request->user()->id,
-        ]);
+        if ($isAutomatic) {
+            $data = $request->validate([
+                'amount' => [
+                    'required',
+                    'integer',
+                    'between:0,999999999999',
+                ],
+            ]);
+
+            $transaction->update([
+                'amount' => $data['amount'],
+                'shuttlecock_review_required' => false,
+                'updated_by' => $request->user()->id,
+            ]);
+
+            // Jika koreksi pertandingan membuat kok menjadi nol,
+            // dan admin sudah mengosongkan uangnya, sembunyikan
+            // catatan otomatis yang tidak lagi diperlukan.
+            if (
+                (int) $transaction->shuttlecock_count === 0
+                && (int) $transaction->amount === 0
+            ) {
+                $transaction->delete();
+            }
+        } else {
+            $data = $this->validatedTransaction($request);
+
+            $transaction->update([
+                ...$data,
+                'updated_by' => $request->user()->id,
+            ]);
+        }
 
         return redirect()
             ->route('cash.index')
@@ -135,6 +165,7 @@ class CashController extends Controller
             );
     }
 
+
     // SOFT DELETE TRANSAKSI
 
     public function destroy(
@@ -142,6 +173,11 @@ class CashController extends Controller
         CashTransaction $transaction
     ) {
         $this->ensureManager($request);
+        abort_if(
+            $transaction->shuttlecock_player_id !== null,
+            403,
+            'Catatan kok otomatis tidak dapat dihapus langsung.'
+        );
 
         DB::transaction(function () use (
             $request,

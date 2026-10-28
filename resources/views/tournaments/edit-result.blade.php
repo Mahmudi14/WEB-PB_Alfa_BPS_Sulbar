@@ -100,6 +100,24 @@ $nextFixture->result !== null
 
             <input type="hidden" name="confirm_reset" value="0">
 
+            <section class="match-section">
+                <div class="match-section__heading">
+                    <h3>Tanggal Pertandingan</h3>
+                </div>
+
+                <div class="tr-cock-date-field">
+                    <label for="tr-played-on">
+                        Tanggal Bermain
+                    </label>
+
+                    <input id="tr-played-on" type="date" name="played_on" value="{{ old(
+                'played_on',
+                $fixture->played_on?->format('Y-m-d')
+                    ?? now()->toDateString()
+            ) }}" required>
+                </div>
+            </section>
+
 
             {{-- ===========================
             TIM A DAN TIM B

@@ -8,9 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Services\CompletedMatchQuery;
+use App\Services\ShuttlecockCashService;
+use App\Models\TournamentFixture;
 
 class MatchController extends Controller
 {
+
     public function index(Request $request)
     {
         $data = $request->validate([
@@ -19,21 +23,215 @@ class MatchController extends Controller
 
         $tanggal = $data['tanggal'] ?? null;
 
-        $matches = BadmintonMatch::query()
-            ->with(['participants.player', 'creator'])
-            ->when($tanggal, function ($query) use ($tanggal) {
-                $query->whereDate('played_on', $tanggal);
-            })
-            ->orderByDesc('played_on')
-            ->orderByDesc('id')
+        $regular = CompletedMatchQuery::regular()
+            ->when(
+                $tanggal,
+                fn($q) => $q->whereDate('m.played_on', $tanggal)
+            )
+            ->selectRaw("
+            'reguler' AS sumber,
+            m.id AS sumber_id,
+            m.played_on AS tanggal_main,
+            m.created_at AS urutan
+        ");
+
+        $turnamen = CompletedMatchQuery::tournament()
+            ->when(
+                $tanggal,
+                fn($q) => $q->whereDate('tf.played_on', $tanggal)
+            )
+            ->selectRaw("
+            'turnamen' AS sumber,
+            tf.id AS sumber_id,
+            tf.played_on AS tanggal_main,
+            tf.updated_at AS urutan
+        ");
+
+        $matches = DB::query()
+            ->fromSub(
+                $regular->unionAll($turnamen),
+                'riwayat'
+            )
+            ->orderByDesc('tanggal_main')
+            ->orderByDesc('urutan')
+            ->orderByDesc('sumber_id')
             ->paginate(20)
             ->withQueryString();
+
+        $page = $matches->getCollection();
+
+        $regulars = BadmintonMatch::with('participants.player')
+            ->whereIn(
+                'id',
+                $page->where('sumber', 'reguler')
+                    ->pluck('sumber_id')
+            )
+            ->get()
+            ->keyBy('id');
+
+        $fixtures = TournamentFixture::with([
+            'tournament',
+            'entryA.players',
+            'entryB.players',
+            'sets',
+        ])
+            ->whereIn(
+                'id',
+                $page->where('sumber', 'turnamen')
+                    ->pluck('sumber_id')
+            )
+            ->get()
+            ->keyBy('id');
+
+        $matches->setCollection(
+            $page->map(function ($row) use (
+                $regulars,
+                $fixtures
+            ) {
+                if ($row->sumber === 'reguler') {
+                    $match = $regulars->get($row->sumber_id);
+
+                    if ($match) {
+                        $match->history_source = 'reguler';
+                    }
+
+                    return $match;
+                }
+
+                $fixture = $fixtures->get($row->sumber_id);
+
+                if (!$fixture || !$fixture->tournament) {
+                    return null;
+                }
+
+                $participants = collect();
+
+                foreach (
+                    [
+                        'a' => $fixture->entryA,
+                        'b' => $fixture->entryB,
+                    ] as $side => $entry
+                ) {
+                    foreach (
+                        $entry?->players ?? collect()
+                        as $index => $player
+                    ) {
+                        $participants->push((object) [
+                            'team' => $side,
+                            'slot' => $player->pivot?->slot
+                                ?? ($index + 1),
+                            'display_name' => $player->name,
+                        ]);
+                    }
+                }
+
+                $sets = $fixture->sets->keyBy('set_number');
+
+                return (object) [
+                    'history_source' =>
+                    $fixture->tournament->format,
+
+                    'tournament_name' =>
+                    $fixture->tournament->name,
+
+                    'round_number' =>
+                    $fixture->round_number,
+
+                    'tournament_url' => route(
+                        'tournaments.show',
+                        [
+                            'tournament' =>
+                            $fixture->tournament_id,
+                            'bagian' => 'pertandingan',
+                            'ronde' => $fixture->round_number,
+                        ]
+                    ),
+
+                    'edit_url' => route(
+                        'tournaments.fixtures.edit',
+                        [
+                            $fixture->tournament_id,
+                            $fixture->id,
+                        ]
+                    ),
+
+                    'played_on' =>
+                    \Illuminate\Support\Carbon::parse(
+                        $row->tanggal_main
+                    ),
+
+                    'participants' => $participants,
+
+                    'result' =>
+                    $fixture->result === 'draw'
+                        ? 'seri'
+                        : $fixture->result,
+
+                    'set1_a' => $sets->get(1)?->a_score,
+                    'set1_b' => $sets->get(1)?->b_score,
+
+                    'set2_a' => $sets->get(2)?->a_score,
+                    'set2_b' => $sets->get(2)?->b_score,
+
+                    'set3_a' => $sets->get(3)?->a_score,
+                    'set3_b' => $sets->get(3)?->b_score,
+
+                    'jus_a' => $fixture->jus_a,
+                    'jus_b' => $fixture->jus_b,
+
+                    'shuttlecock_count' =>
+                    $fixture->shuttlecock_count,
+
+                    'created_by' => null,
+                ];
+            })->filter()->values()
+        );
+
+
+        $pendingReguler = collect();
+
+        $viewer = $request->user();
+
+        if (
+            $viewer
+            && $viewer->is_active
+            && (
+                $viewer->canManage()
+                || (
+                    $viewer->role === 'pemain'
+                    && $viewer->player !== null
+                )
+            )
+        ) {
+            $pendingReguler = BadmintonMatch::query()
+                ->with('participants.player')
+                ->where(function ($q) {
+                    $q->whereNull('result')
+                        ->orWhereNull('set1_a')
+                        ->orWhereNull('set1_b')
+                        ->orWhereNull('set2_a')
+                        ->orWhereNull('set2_b');
+                })
+                ->when(
+                    !$viewer->canManage(),
+                    fn($q) => $q->where('created_by', $viewer->id)
+                )
+                ->when(
+                    $tanggal,
+                    fn($q) => $q->whereDate('played_on', $tanggal)
+                )
+                ->orderByDesc('played_on')
+                ->orderByDesc('id')
+                ->get();
+        }
+
 
         return view('matches.index', compact(
             'matches',
             'tanggal'
         ));
     }
+
 
     public function create(Request $request)
     {
@@ -52,13 +250,16 @@ class MatchController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
+
+    public function store(
+        Request $request,
+        ShuttlecockCashService $cash
+    ) {
         $this->ensureCanCreate($request);
 
         $data = $this->validatedMatch($request);
 
-        DB::transaction(function () use ($data, $request) {
+        DB::transaction(function () use ($data, $request, $cash) {
             $match = BadmintonMatch::create([
                 'played_on' => $data['played_on'],
                 'type' => $data['type'],
@@ -74,26 +275,49 @@ class MatchController extends Controller
             $match->participants()->createMany(
                 $this->participantData($data)
             );
+
+            // Jika belum selesai, sinkronisasi tidak
+            // menemukan pemakaian kok yang valid.
+            $cash->syncPairs(
+                $cash->regularPairs($match),
+                (int) $request->user()->id
+            );
         }, 3);
 
         return redirect()
             ->route('matches.index')
-            ->with('success', 'Pertandingan berhasil ditambahkan.');
+            ->with('success', 'Pertandingan berhasil disimpan.');
     }
 
-    public function destroy(Request $request, BadmintonMatch $match)
-    {
-        abort_unless(
-            $request->user()?->canManage(),
-            403
-        );
 
-        $match->delete();
+
+    public function destroy(
+        Request $request,
+        BadmintonMatch $match,
+        ShuttlecockCashService $cash
+    ) {
+        abort_unless($request->user()?->canManage(), 403);
+
+        DB::transaction(function () use (
+            $match,
+            $request,
+            $cash
+        ) {
+            $pairs = $cash->regularPairs($match);
+
+            $match->delete();
+
+            $cash->syncPairs(
+                $pairs,
+                (int) $request->user()->id
+            );
+        }, 3);
 
         return redirect()
             ->route('matches.index')
             ->with('success', 'Pertandingan berhasil dihapus.');
     }
+
 
     private function ensureCanCreate(Request $request): void
     {
@@ -228,9 +452,12 @@ class MatchController extends Controller
         return view('matches.edit', compact('match'));
     }
 
-    // Simpan perubahan skor dan kok
-    public function update(Request $request, BadmintonMatch $match)
-    {
+
+    public function update(
+        Request $request,
+        BadmintonMatch $match,
+        ShuttlecockCashService $cash
+    ) {
         abort_unless(
             $match->editableBy($request->user()),
             403,
@@ -239,15 +466,25 @@ class MatchController extends Controller
 
         $data = $this->validatedScores($request);
 
-        $match->update($data);
+        DB::transaction(function () use (
+            $match,
+            $data,
+            $cash,
+            $request
+        ) {
+            $match->update($data);
+
+            $cash->syncPairs(
+                $cash->regularPairs($match),
+                (int) $request->user()->id
+            );
+        }, 3);
 
         return redirect()
             ->route('matches.index')
-            ->with(
-                'success',
-                'Skor dan jumlah kok berhasil diperbarui.'
-            );
+            ->with('success', 'Hasil pertandingan berhasil diperbarui.');
     }
+
 
     // Hak membuka halaman edit
     private function ensureCanViewEditor(

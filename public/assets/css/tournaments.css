@@ -4754,3 +4754,26 @@
         padding-bottom: 8px;
     }
 }
+.tr-cock-date-field {
+    display: grid;
+    gap: 7px;
+    width: 100%;
+}
+
+.tr-cock-date-field label {
+    color: #284e6d;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.site-main .tr-cock-date-field input[type="date"] {
+    width: 100%;
+    min-width: 0;
+    min-height: 43px;
+    padding: 9px 12px;
+    border: 1px solid #cbd9e6;
+    border-radius: 9px;
+    background: white;
+    color: #173b5a;
+    font-family: inherit;
+}

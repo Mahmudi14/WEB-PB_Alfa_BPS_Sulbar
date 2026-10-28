@@ -1,4 +1,3 @@
-
 /* Umum */
 
 .cash-page,
@@ -20,14 +19,14 @@
 }
 
 .cash-eyebrow {
-    color: #A7E4B4;
+    color: #a7e4b4;
     font-size: 10px;
     font-weight: 850;
-    letter-spacing: .11em;
+    letter-spacing: 0.11em;
 }
 
 .cash-eyebrow--green {
-    color: #318A53;
+    color: #318a53;
 }
 
 /* Header */
@@ -46,38 +45,38 @@
     background:
         radial-gradient(
             circle at 95% 10%,
-            rgba(104,180,73,.23),
+            rgba(104, 180, 73, 0.23),
             transparent 42%
         ),
-        linear-gradient(115deg,#092543,#15527C);
-    color: #FFFFFF;
+        linear-gradient(115deg, #092543, #15527c);
+    color: #ffffff;
     overflow: hidden;
 }
 
 .cash-hero h1,
 .cash-form-hero h1 {
     margin: 8px 0 5px;
-    color: #FFFFFF;
-    font-size: clamp(26px,4vw,41px);
+    color: #ffffff;
+    font-size: clamp(26px, 4vw, 41px);
     font-weight: 900;
     line-height: 1.12;
-    letter-spacing: -.045em;
+    letter-spacing: -0.045em;
 }
 
 .cash-hero h1 span,
 .cash-form-hero h1 span {
-    color: #FFA93E;
+    color: #ffa93e;
 }
 
 .cash-hero p {
     margin: 0;
-    color: #CCDEEB;
+    color: #ccdeeb;
     font-size: 12px;
 }
 
 .cash-hero__decoration {
     flex-shrink: 0;
-    color: rgba(255,255,255,.14);
+    color: rgba(255, 255, 255, 0.14);
     font-size: 79px;
     font-weight: 900;
     line-height: 1;
@@ -100,56 +99,56 @@
     gap: 8px;
     min-width: 0;
     padding: 19px;
-    border: 1px solid #DFE8F0;
+    border: 1px solid #dfe8f0;
     border-radius: 13px;
     background: white;
 }
 
 .cash-summary__card > span {
-    color: #617B91;
+    color: #617b91;
     font-size: 10px;
     font-weight: 850;
-    letter-spacing: .05em;
+    letter-spacing: 0.05em;
 }
 
 .cash-summary__card > strong {
-    color: #173B5A;
-    font-size: clamp(17px,2.2vw,26px);
+    color: #173b5a;
+    font-size: clamp(17px, 2.2vw, 26px);
     font-weight: 900;
-    letter-spacing: -.04em;
+    letter-spacing: -0.04em;
     font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;
 }
 
 .cash-summary__card--balance {
-    background: #EAF4FC;
-    border-color: #CFE3F3;
+    background: #eaf4fc;
+    border-color: #cfe3f3;
 }
 
 .cash-summary__card--balance > strong {
-    color: #124C7C;
+    color: #124c7c;
 }
 
 .cash-summary__card--balance > strong.is-negative {
-    color: #C54C4C;
+    color: #c54c4c;
 }
 
 .cash-summary__card--income {
-    background: #F0FAF2;
-    border-color: #CFEAD6;
+    background: #f0faf2;
+    border-color: #cfead6;
 }
 
 .cash-summary__card--income > strong {
-    color: #23834B;
+    color: #23834b;
 }
 
 .cash-summary__card--expense {
-    background: #FFF5E8;
-    border-color: #F2DCBB;
+    background: #fff5e8;
+    border-color: #f2dcbb;
 }
 
 .cash-summary__card--expense > strong {
-    color: #B76A13;
+    color: #b76a13;
 }
 
 /* Filter */
@@ -174,7 +173,7 @@
 .cash-filter label,
 .cash-filter > span {
     flex: 0 0 auto;
-    color: #284E6D;
+    color: #284e6d;
     font-size: 12px;
     font-weight: 750;
     white-space: nowrap;
@@ -189,10 +188,10 @@
     height: 47px;
     margin: 0;
     padding: 10px 13px;
-    border: 1.5px solid #C9DBEA;
+    border: 1.5px solid #c9dbea;
     border-radius: 10px;
-    background: #FFFFFF;
-    color: #1769AA;
+    background: #ffffff;
+    color: #1769aa;
     font-size: 13px;
     font-weight: 750;
     cursor: pointer;
@@ -200,8 +199,8 @@
 
 .site-main .cash-filter select:focus {
     outline: none;
-    border-color: #1769AA;
-    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+    border-color: #1769aa;
+    box-shadow: 0 0 0 3px rgba(23, 105, 170, 0.1);
 }
 
 .cash-add {
@@ -213,8 +212,8 @@
     min-height: 47px;
     padding: 10px 16px;
     border-radius: 10px;
-    background: #F39222;
-    color: #35230D;
+    background: #f39222;
+    color: #35230d;
     font-size: 12px;
     font-weight: 800;
     white-space: nowrap;
@@ -222,8 +221,8 @@
 }
 
 .cash-add:hover {
-    background: #FFB34D;
-    color: #35230D;
+    background: #ffb34d;
+    color: #35230d;
 }
 
 .cash-add > span {
@@ -237,9 +236,9 @@
     width: 100%;
     min-width: 0;
     padding: 18px;
-    border: 1px solid #DFE8F0;
+    border: 1px solid #dfe8f0;
     border-radius: 17px;
-    background: #FFFFFF;
+    background: #ffffff;
 }
 
 .cash-board__heading {
@@ -252,8 +251,8 @@
 
 .cash-board__heading h2 {
     margin: 5px 0 0;
-    color: #153B5E;
-    font-size: clamp(19px,3vw,25px);
+    color: #153b5e;
+    font-size: clamp(19px, 3vw, 25px);
     font-weight: 850;
 }
 
@@ -261,8 +260,8 @@
     flex-shrink: 0;
     padding: 7px 10px;
     border-radius: 30px;
-    background: #EDF5FB;
-    color: #386A8F;
+    background: #edf5fb;
+    color: #386a8f;
     font-size: 11px;
     font-weight: 800;
 }
@@ -280,7 +279,7 @@
     grid-template-columns:
         38px
         112px
-        minmax(0,1fr)
+        minmax(0, 1fr)
         155px;
     align-items: center;
     gap: 11px;
@@ -291,29 +290,29 @@
     grid-template-columns:
         38px
         112px
-        minmax(0,1fr)
+        minmax(0, 1fr)
         155px
         76px;
 }
 
 .cash-row--head {
     padding: 9px 11px;
-    border-bottom: 2px solid #DFE9F1;
-    color: #72879B;
+    border-bottom: 2px solid #dfe9f1;
+    color: #72879b;
     font-size: 11px;
     font-weight: 850;
 }
 
 .cash-row--data {
     padding: 10px 11px;
-    border: 1px solid #E2EAF1;
-    border-left: 3px solid #1769AA;
+    border: 1px solid #e2eaf1;
+    border-left: 3px solid #1769aa;
     border-radius: 10px;
-    background: #FFFFFF;
+    background: #ffffff;
 }
 
 .cash-row--data:hover {
-    background: #F8FBFE;
+    background: #f8fbfe;
 }
 
 .cash-align-right {
@@ -325,33 +324,31 @@
 }
 
 .cash-row__number {
-    color: #70869A;
+    color: #70869a;
     font-size: 12px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
 }
 
 .cash-row__date {
-    color: #395B78;
+    color: #395b78;
     font-size: 12px;
     font-weight: 750;
     font-variant-numeric: tabular-nums;
 }
-
 
 /* Keterangan */
 
 .cash-row__description {
     align-self: center;
     min-width: 0;
-    color: #1D3A55;
+    color: #1d3a55;
     font-size: 12px;
     font-weight: 650;
     line-height: 1.4;
     white-space: pre-line;
     overflow-wrap: anywhere;
 }
-
 
 /* Nominal */
 
@@ -365,29 +362,29 @@
 }
 
 .cash-row__amount strong {
-    color: #173B5A;
+    color: #173b5a;
     font-size: 14px;
     font-weight: 900;
     line-height: 1.2;
-    letter-spacing: -.025em;
+    letter-spacing: -0.025em;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
 }
 
 .cash-row__amount span {
-    color: #64748B;
+    color: #64748b;
     font-size: 10px;
     font-weight: 800;
 }
 
 .cash-row__amount--pemasukan strong,
 .cash-row__amount--pemasukan span {
-    color: #23834B;
+    color: #23834b;
 }
 
 .cash-row__amount--pengeluaran strong,
 .cash-row__amount--pengeluaran span {
-    color: #B76A13;
+    color: #b76a13;
 }
 
 /* Aksi */
@@ -399,7 +396,7 @@
     gap: 5px;
     min-width: 0;
     padding-left: 7px;
-    border-left: 1px solid #DFE7EE;
+    border-left: 1px solid #dfe7ee;
 }
 
 .cash-row__actions form {
@@ -425,25 +422,25 @@
 }
 
 .cash-action--edit {
-    background: #E1F0FC;
-    color: #1769AA;
+    background: #e1f0fc;
+    color: #1769aa;
 }
 
 .cash-action--edit:hover {
-    background: #CBE5F7;
+    background: #cbe5f7;
 }
 
 .cash-action--delete {
-    background: #FCE7E7;
-    color: #BF4545;
+    background: #fce7e7;
+    color: #bf4545;
 }
 
 .cash-action--delete:hover {
-    background: #FAD2D2;
+    background: #fad2d2;
 }
 
 .cash-action:disabled {
-    opacity: .5;
+    opacity: 0.5;
 }
 
 /* Pagination */
@@ -455,7 +452,7 @@
     gap: 8px;
     margin-top: 17px;
     padding-top: 14px;
-    border-top: 1px solid #E3EBF2;
+    border-top: 1px solid #e3ebf2;
 }
 
 .cash-pagination a,
@@ -464,30 +461,30 @@
     align-items: center;
     justify-content: center;
     padding: 9px 11px;
-    border: 1px solid #D8E7F2;
+    border: 1px solid #d8e7f2;
     border-radius: 8px;
-    background: #EDF5FB;
-    color: #1769AA;
+    background: #edf5fb;
+    color: #1769aa;
     font-size: 11px;
     font-weight: 750;
     white-space: nowrap;
 }
 
 .cash-pagination .is-disabled {
-    opacity: .4;
+    opacity: 0.4;
 }
 
 .cash-pagination__info {
-    color: #64748B;
+    color: #64748b;
     font-size: 11px;
     font-weight: 750;
 }
 
 .cash-empty {
     padding: 28px 15px;
-    border: 1px dashed #C9D9E6;
+    border: 1px dashed #c9d9e6;
     border-radius: 11px;
-    background: #F7FAFC;
+    background: #f7fafc;
     color: #264864;
     font-size: 13px;
     text-align: center;
@@ -499,10 +496,10 @@
     width: 100%;
     max-width: none;
     min-width: 0;
-    padding: clamp(16px,2.8vw,28px);
-    border: 1px solid #DFE8F0;
+    padding: clamp(16px, 2.8vw, 28px);
+    border: 1px solid #dfe8f0;
     border-radius: 17px;
-    background: #FFFFFF;
+    background: #ffffff;
 }
 
 .cash-form-card__heading {
@@ -512,13 +509,13 @@
     gap: 10px;
     margin-bottom: 21px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #E4ECF2;
+    border-bottom: 1px solid #e4ecf2;
 }
 
 .cash-form-card__heading h2 {
     margin: 5px 0 0;
-    color: #153B5E;
-    font-size: clamp(19px,3vw,25px);
+    color: #153b5e;
+    font-size: clamp(19px, 3vw, 25px);
     font-weight: 850;
 }
 
@@ -526,8 +523,8 @@
     flex-shrink: 0;
     padding: 6px 11px;
     border-radius: 8px;
-    background: #EAF4FC;
-    color: #1769AA;
+    background: #eaf4fc;
+    color: #1769aa;
     font-size: 10px;
     font-weight: 850;
 }
@@ -544,9 +541,9 @@
 .cash-form__grid {
     display: grid;
     grid-template-columns:
-        minmax(0,1fr)
-        minmax(0,1.2fr)
-        minmax(0,1fr);
+        minmax(0, 1fr)
+        minmax(0, 1.2fr)
+        minmax(0, 1fr);
     gap: 19px 15px;
     min-width: 0;
 }
@@ -584,10 +581,10 @@
     max-width: none;
     min-width: 0;
     margin: 0;
-    border: 1.5px solid #CBD9E6;
+    border: 1.5px solid #cbd9e6;
     border-radius: 9px;
-    background: #FFFFFF;
-    color: #173B5A;
+    background: #ffffff;
+    color: #173b5a;
     font-size: 13px;
     font-weight: 650;
     outline: none;
@@ -610,13 +607,13 @@
 
 .site-main .cash-field input:focus,
 .site-main .cash-field textarea:focus {
-    border-color: #1769AA;
-    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+    border-color: #1769aa;
+    box-shadow: 0 0 0 3px rgba(23, 105, 170, 0.1);
 }
 
 .site-main .cash-field input::placeholder,
 .site-main .cash-field textarea::placeholder {
-    color: #9AAAB8;
+    color: #9aaab8;
     font-weight: 400;
 }
 
@@ -624,7 +621,7 @@
 
 .cash-type {
     display: grid;
-    grid-template-columns: repeat(2,minmax(0,1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     min-width: 0;
 }
@@ -652,29 +649,29 @@
     min-width: 0;
     min-height: 45px;
     padding: 8px;
-    border: 1.5px solid #D7E3ED;
+    border: 1.5px solid #d7e3ed;
     border-radius: 9px;
-    background: #FFFFFF;
-    color: #48657D;
+    background: #ffffff;
+    color: #48657d;
     font-size: 12px;
     font-weight: 750;
     text-align: center;
 }
 
 .cash-type input[value="pemasukan"]:checked + span {
-    border-color: #7BCB91;
-    background: #EAF8EF;
-    color: #217C43;
+    border-color: #7bcb91;
+    background: #eaf8ef;
+    color: #217c43;
 }
 
 .cash-type input[value="pengeluaran"]:checked + span {
-    border-color: #F1C98B;
-    background: #FFF3E3;
-    color: #A65B08;
+    border-color: #f1c98b;
+    background: #fff3e3;
+    color: #a65b08;
 }
 
 .cash-type input:focus-visible + span {
-    outline: 3px solid rgba(23,105,170,.2);
+    outline: 3px solid rgba(23, 105, 170, 0.2);
     outline-offset: 2px;
 }
 
@@ -691,7 +688,7 @@
     position: absolute;
     left: 13px;
     z-index: 1;
-    color: #1769AA;
+    color: #1769aa;
     font-size: 12px;
     font-weight: 850;
     pointer-events: none;
@@ -715,10 +712,10 @@
 
 .cash-alert {
     padding: 11px 13px;
-    border: 1px solid #F0C5C5;
+    border: 1px solid #f0c5c5;
     border-radius: 9px;
-    background: #FFF0F0;
-    color: #A94040;
+    background: #fff0f0;
+    color: #a94040;
     font-size: 12px;
     line-height: 1.5;
 }
@@ -740,7 +737,7 @@
     flex-wrap: wrap;
     gap: 11px;
     padding-top: 16px;
-    border-top: 1px solid #E4ECF2;
+    border-top: 1px solid #e4ecf2;
 }
 
 .cash-submit {
@@ -751,8 +748,8 @@
     padding: 10px 20px;
     border: 0;
     border-radius: 9px;
-    background: #1769AA;
-    color: #FFFFFF;
+    background: #1769aa;
+    color: #ffffff;
     font-size: 12px;
     font-weight: 800;
     cursor: pointer;
@@ -763,7 +760,7 @@
 }
 
 .cash-submit:disabled {
-    opacity: .55;
+    opacity: 0.55;
     cursor: not-allowed;
 }
 
@@ -773,7 +770,7 @@
     justify-content: center;
     min-height: 45px;
     padding: 10px 16px;
-    color: #64748B;
+    color: #64748b;
     font-size: 12px;
     font-weight: 750;
 }
@@ -781,9 +778,8 @@
 /* Tablet */
 
 @media (max-width: 750px) {
-
     .cash-summary {
-        grid-template-columns: repeat(2,minmax(0,1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .cash-summary__card--balance {
@@ -791,14 +787,12 @@
     }
 
     .cash-row {
-        grid-template-columns:
-            27px 83px minmax(0,1fr) 110px;
+        grid-template-columns: 27px 83px minmax(0, 1fr) 110px;
         gap: 7px;
     }
 
     .cash-row--manage {
-        grid-template-columns:
-            27px 83px minmax(0,1fr) 110px 65px;
+        grid-template-columns: 27px 83px minmax(0, 1fr) 110px 65px;
     }
 
     .cash-row__amount strong {
@@ -817,7 +811,7 @@
     }
 
     .cash-form__grid {
-        grid-template-columns: repeat(2,minmax(0,1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         grid-template-areas:
             "date amount"
             "type type"
@@ -845,7 +839,6 @@
 /* HP */
 
 @media (max-width: 600px) {
-
     .cash-toolbar {
         flex-direction: column;
         align-items: stretch;
@@ -860,7 +853,7 @@
 
     .cash-filter {
         display: grid;
-        grid-template-columns: minmax(0,1fr);
+        grid-template-columns: minmax(0, 1fr);
         gap: 7px;
         width: 100%;
         flex: none;
@@ -877,7 +870,6 @@
 }
 
 @media (max-width: 480px) {
-
     .cash-page,
     .cash-form-page {
         gap: 14px;
@@ -892,7 +884,7 @@
 
     .cash-hero h1,
     .cash-form-hero h1 {
-        font-size: clamp(25px,7.5vw,33px);
+        font-size: clamp(25px, 7.5vw, 33px);
     }
 
     .cash-hero p {
@@ -918,7 +910,7 @@
     }
 
     .cash-summary__card > strong {
-        font-size: clamp(15px,4vw,20px);
+        font-size: clamp(15px, 4vw, 20px);
     }
 
     .cash-board {
@@ -943,8 +935,8 @@
         grid-template-columns:
             18px
             61px
-            minmax(0,1fr)
-            minmax(82px,max-content);
+            minmax(0, 1fr)
+            minmax(82px, max-content);
         gap: 4px;
     }
 
@@ -952,8 +944,8 @@
         grid-template-columns:
             18px
             61px
-            minmax(0,1fr)
-            minmax(82px,max-content)
+            minmax(0, 1fr)
+            minmax(82px, max-content)
             53px;
     }
 
@@ -984,7 +976,7 @@
 
     .cash-row__amount strong {
         font-size: 10px;
-        letter-spacing: -.03em;
+        letter-spacing: -0.03em;
     }
 
     .cash-row__amount span {
@@ -1060,7 +1052,7 @@
 
     .cash-form__actions {
         display: grid;
-        grid-template-columns: minmax(0,1fr) 82px;
+        grid-template-columns: minmax(0, 1fr) 82px;
         gap: 8px;
     }
 
@@ -1080,16 +1072,13 @@
 }
 
 @media (max-width: 350px) {
-
     .cash-row {
-        grid-template-columns:
-            17px 55px minmax(0,1fr) 78px;
+        grid-template-columns: 17px 55px minmax(0, 1fr) 78px;
         gap: 3px;
     }
 
     .cash-row--manage {
-        grid-template-columns:
-            17px 55px minmax(0,1fr) 78px 51px;
+        grid-template-columns: 17px 55px minmax(0, 1fr) 78px 51px;
     }
 
     .cash-row__amount strong {
@@ -1097,7 +1086,7 @@
     }
 
     .cash-form__grid {
-        grid-template-columns: minmax(0,1fr);
+        grid-template-columns: minmax(0, 1fr);
         grid-template-areas:
             "date"
             "type"
@@ -1131,8 +1120,7 @@
 
 .cash-form__grid {
     display: grid;
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
         "date amount"
         "type type"
@@ -1183,10 +1171,12 @@
     min-height: 45px;
     min-width: 0;
     overflow: hidden;
-    border: 1.5px solid #CBD9E6;
+    border: 1.5px solid #cbd9e6;
     border-radius: 9px;
-    background: #FFFFFF;
-    transition: border-color .2s, box-shadow .2s;
+    background: #ffffff;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
 }
 
 /* Rp merupakan kolom tersendiri */
@@ -1205,10 +1195,10 @@
     margin: 0;
     padding: 0;
 
-    border-right: 1px solid #D8E6F0;
-    background: #EDF5FB;
+    border-right: 1px solid #d8e6f0;
+    background: #edf5fb;
 
-    color: #1769AA;
+    color: #1769aa;
     font-size: 13px;
     font-weight: 850;
     line-height: 1;
@@ -1235,7 +1225,7 @@
     box-shadow: none;
 
     background: transparent;
-    color: #173B5A;
+    color: #173b5a;
 
     font-size: 14px;
     font-weight: 750;
@@ -1246,8 +1236,8 @@
 /* Fokus input nominal */
 
 .cash-money:focus-within {
-    border-color: #1769AA;
-    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+    border-color: #1769aa;
+    box-shadow: 0 0 0 3px rgba(23, 105, 170, 0.1);
 }
 
 .site-main .cash-money input:focus {
@@ -1283,8 +1273,7 @@
 
 .cash-type {
     display: grid;
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 9px;
     width: 100%;
     max-width: 440px;
@@ -1316,38 +1305,38 @@
     min-height: 45px;
     padding: 9px 12px;
 
-    border: 1.5px solid #D7E3ED;
+    border: 1.5px solid #d7e3ed;
     border-radius: 9px;
-    background: #FFFFFF;
+    background: #ffffff;
 
-    color: #48657D;
+    color: #48657d;
     font-size: 12px;
     font-weight: 800;
     text-align: center;
 
     transition:
-        border-color .2s,
-        background-color .2s;
+        border-color 0.2s,
+        background-color 0.2s;
 }
 
 /* Pemasukan aktif */
 
 .cash-type input[value="pemasukan"]:checked + span {
-    border-color: #7BCB91;
-    background: #EAF8EF;
-    color: #217C43;
+    border-color: #7bcb91;
+    background: #eaf8ef;
+    color: #217c43;
 }
 
 /* Pengeluaran aktif */
 
 .cash-type input[value="pengeluaran"]:checked + span {
-    border-color: #F1C98B;
-    background: #FFF3E3;
-    color: #A65B08;
+    border-color: #f1c98b;
+    background: #fff3e3;
+    color: #a65b08;
 }
 
 .cash-type input:focus-visible + span {
-    outline: 3px solid rgba(23,105,170,.2);
+    outline: 3px solid rgba(23, 105, 170, 0.2);
     outline-offset: 2px;
 }
 
@@ -1409,8 +1398,7 @@
 
 @media (max-width: 750px) {
     .cash-form__grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         grid-template-areas:
             "date amount"
             "type type"
@@ -1446,8 +1434,7 @@
 
     .cash-form__actions {
         display: grid;
-        grid-template-columns:
-            minmax(0, 1fr) 82px;
+        grid-template-columns: minmax(0, 1fr) 82px;
         gap: 9px;
     }
 
@@ -1502,16 +1489,16 @@
     -moz-appearance: none;
 
     /* Ikon panah custom */
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%231769AA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 16px center;
     background-size: 16px 16px;
 
     /* Tampilan */
-    border: 1.5px solid #C9DBEA;
+    border: 1.5px solid #c9dbea;
     border-radius: 10px;
-    color: #1769AA;
+    color: #1769aa;
     font-size: 13px;
     font-weight: 750;
     cursor: pointer;
@@ -1519,6 +1506,29 @@
 
 .site-main .cash-filter select:focus {
     outline: none;
-    border-color: #1769AA;
-    box-shadow: 0 0 0 3px rgba(23,105,170,.1);
+    border-color: #1769aa;
+    box-shadow: 0 0 0 3px rgba(23, 105, 170, 0.1);
+}
+
+.cash-kok-tag {
+    display: inline-block;
+    margin-left: 6px;
+    margin-top: 3px;
+    padding: 3px 7px;
+    border-radius: 5px;
+    background: #fff3e3;
+    color: #a36b1d;
+    font-size: 9px;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.cash-kok-tag--paid {
+    background: #eaf8ef;
+    color: #218652;
+}
+
+.cash-kok-tag--warning {
+    background: #fff0f0;
+    color: #b34242;
 }

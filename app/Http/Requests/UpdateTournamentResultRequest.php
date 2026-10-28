@@ -6,7 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTournamentResultRequest extends FormRequest
 {
-    public function authorize(): bool { return $this->user()?->is_active && $this->user()->canManage(); }
+    public function authorize(): bool
+    {
+        return $this->user()?->is_active && $this->user()->canManage();
+    }
 
     public function rules(): array
     {
@@ -19,6 +22,10 @@ class UpdateTournamentResultRequest extends FormRequest
             'jus_b' => ['nullable', 'integer', 'between:0,999'],
             'shuttlecock_count' => ['required', 'integer', 'between:0,65535'],
             'confirm_reset' => ['nullable', 'boolean'],
+            'played_on' => [
+                'required',
+                'date_format:Y-m-d',
+            ],
         ];
     }
 }

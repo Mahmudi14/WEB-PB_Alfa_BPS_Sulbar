@@ -2232,3 +2232,80 @@
         width: 100%;
     }
 }
+
+/* IDENTITAS LIGA DAN CUP DI RIWAYAT */
+
+.match-page .match-tournament-info {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding-bottom: 7px;
+    border-bottom: 1px solid #e4ecf2;
+}
+
+.match-tournament-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 900;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.match-page .match-tournament-badge--liga {
+    background: #eaf4fc;
+    color: #1769aa;
+}
+
+.match-page .match-tournament-badge--cup {
+    background: #fff1e1;
+    color: #b66a18;
+}
+
+.match-tournament-name {
+    min-width: 0;
+    color: #254761;
+    font-size: 11px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.match-tournament-round {
+    margin-left: auto;
+    color: #7a90a3;
+    font-size: 10px;
+}
+
+.match-page .match-tournament-extra {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    padding: 7px;
+    border-radius: 7px;
+    background: #f7fafc;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.match-tournament-extra strong {
+    color: #173b5a;
+    font-size: 11px;
+}
+
+@media (max-width: 600px) {
+    .match-tournament-name {
+        font-size: 10px;
+    }
+
+    .match-tournament-round {
+        font-size: 9px;
+    }
+}

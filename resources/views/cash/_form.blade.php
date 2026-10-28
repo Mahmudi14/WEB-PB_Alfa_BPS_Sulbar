@@ -1,45 +1,41 @@
-
 @php
-    $editing = isset($transaction) && $transaction?->exists;
+$editing = isset($transaction) && $transaction?->exists;
+$isAuto = $editing
+&& $transaction->shuttlecock_player_id !== null;
 
-    $type = old(
-        'type',
-        $editing ? $transaction->type : 'pemasukan'
-    );
+$type = old(
+'type',
+$editing ? $transaction->type : 'pemasukan'
+);
 @endphp
 
-<form
-    class="cash-form"
-    method="POST"
-    action="{{ $editing
+<form class="cash-form" method="POST" action="{{ $editing
         ? route('cash.update', $transaction)
-        : route('cash.store') }}"
-    data-single-submit
->
+        : route('cash.store') }}" data-single-submit>
     @csrf
 
     @if($editing)
-        @method('PUT')
+    @method('PUT')
     @endif
 
     {{-- =====================================================
-         1. VALIDASI FORM
+    1. VALIDASI FORM
     ===================================================== --}}
 
     @if($errors->any())
-        <div class="cash-alert" role="alert">
-            <strong>Periksa kembali data transaksi.</strong>
+    <div class="cash-alert" role="alert">
+        <strong>Periksa kembali data transaksi.</strong>
 
-            <ul>
-                @foreach($errors->all() as $message)
-                    <li>{{ $message }}</li>
-                @endforeach
-            </ul>
-        </div>
+        <ul>
+            @foreach($errors->all() as $message)
+            <li>{{ $message }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
 
     {{-- =====================================================
-         2. DATA TRANSAKSI
+    2. DATA TRANSAKSI
     ===================================================== --}}
 
     <div class="cash-form__grid">
@@ -51,20 +47,14 @@
                 Tanggal Transaksi
             </label>
 
-            <input
-                id="transaction_date"
-                type="date"
-                name="transaction_date"
-                value="{{ old(
+            <input id="transaction_date" @readonly($isAuto) type="date" name="transaction_date" value="{{ old(
                     'transaction_date',
                     $editing
                         ? \Illuminate\Support\Carbon::parse(
                             $transaction->transaction_date
                         )->format('Y-m-d')
                         : now()->toDateString()
-                ) }}"
-                required
-            >
+                ) }}" required>
         </div>
 
         {{-- Nominal --}}
@@ -77,20 +67,10 @@
             <div class="cash-money">
                 <span aria-hidden="true">Rp</span>
 
-                <input
-                    id="amount"
-                    type="number"
-                    name="amount"
-                    value="{{ old(
+                <input id="amount" type="number" name="amount" value="{{ old(
                         'amount',
                         $editing ? $transaction->amount : ''
-                    ) }}"
-                    placeholder="0"
-                    min="1"
-                    step="1"
-                    inputmode="numeric"
-                    required
-                >
+                    ) }}" placeholder="0" min="{{ $isAuto ? 0 : 1 }}" step="1" inputmode="numeric" required>
             </div>
         </div>
 
@@ -102,24 +82,14 @@
             <div class="cash-type">
 
                 <label>
-                    <input
-                        type="radio"
-                        name="type"
-                        value="pemasukan"
-                        @checked($type === 'pemasukan')
-                        required
-                    >
+                    <input type="radio" name="type" value="pemasukan" @checked($type==='pemasukan' ) @disabled($isAuto)
+                        required>
 
                     <span>Pemasukan</span>
                 </label>
 
                 <label>
-                    <input
-                        type="radio"
-                        name="type"
-                        value="pengeluaran"
-                        @checked($type === 'pengeluaran')
-                    >
+                    <input type="radio" name="type" value="pengeluaran" @checked($type==='pengeluaran' )>
 
                     <span>Pengeluaran</span>
                 </label>
@@ -134,13 +104,8 @@
                 Keterangan
             </label>
 
-            <textarea
-                id="description"
-                name="description"
-                rows="2"
-                placeholder="Masukkan keterangan transaksi"
-                required
-            >{{ old(
+            <textarea id="description" name="description" rows="2" @readonly($isAuto)
+                placeholder="Masukkan keterangan transaksi" required>{{ old(
                 'description',
                 $editing ? $transaction->description : ''
             ) }}</textarea>
@@ -149,15 +114,15 @@
     </div>
 
     {{-- =====================================================
-         3. TOMBOL AKSI
+    3. TOMBOL AKSI
     ===================================================== --}}
 
     <div class="cash-form__actions">
 
         <button type="submit" class="cash-submit">
             {{ $editing
-                ? 'Simpan Perubahan'
-                : 'Simpan Transaksi' }}
+            ? 'Simpan Perubahan'
+            : 'Simpan Transaksi' }}
         </button>
 
         <a href="{{ route('cash.index') }}" class="cash-cancel">

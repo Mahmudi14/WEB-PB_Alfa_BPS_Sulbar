@@ -15,6 +15,9 @@ class CashTransaction extends Model
         'type',
         'amount',
         'description',
+        'shuttlecock_player_id',
+        'shuttlecock_count',
+        'shuttlecock_review_required',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -25,6 +28,9 @@ class CashTransaction extends Model
         return [
             'transaction_date' => 'date',
             'amount' => 'integer',
+            'shuttlecock_player_id' => 'integer',
+            'shuttlecock_count' => 'integer',
+            'shuttlecock_review_required' => 'boolean',
         ];
     }
 
