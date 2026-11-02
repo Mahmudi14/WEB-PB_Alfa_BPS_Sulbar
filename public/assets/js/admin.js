@@ -1114,3 +1114,747 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN TOURNAMENT RULES
+|--------------------------------------------------------------------------
+*/
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("[data-admin-tournament-rules]");
+
+    if (!form) return;
+
+    const leagueSettings = form.querySelector("[data-tr-league-settings]");
+
+    const drawOption = form.querySelector(
+        '[name="set_format"][value="two_draw"]',
+    );
+
+    const aggregateOption = form.querySelector(
+        '[name="set_format"][value="two_aggregate"]',
+    );
+
+    const notice = form.querySelector("[data-tr-cup-notice]");
+
+    function updateRules() {
+        const format = form.querySelector('[name="format"]:checked')?.value;
+
+        const isLiga = format === "liga";
+
+        if (leagueSettings) {
+            leagueSettings.hidden = !isLiga;
+
+            leagueSettings.querySelectorAll("input").forEach(function (input) {
+                input.disabled = !isLiga;
+            });
+        }
+
+        if (drawOption) {
+            drawOption.disabled = !isLiga;
+
+            if (!isLiga && drawOption.checked && aggregateOption) {
+                aggregateOption.checked = true;
+            }
+        }
+
+        if (notice) {
+            notice.hidden = isLiga;
+        }
+    }
+
+    form.querySelectorAll('input[name="format"]').forEach(function (input) {
+        input.addEventListener("change", updateRules);
+    });
+
+    updateRules();
+});
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN TOURNAMENT ENTRIES
+|--------------------------------------------------------------------------
+*/
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("[data-admin-tr-entries]");
+
+    if (!form) return;
+
+    const rows = Array.from(form.querySelectorAll("[data-tr-entry]"));
+
+    const addButton = form.querySelector("[data-tr-add-entry]");
+
+    const counter = form.querySelector("[data-tr-entry-count]");
+
+    function activeRows() {
+        return rows.filter((row) => !row.hidden);
+    }
+
+    function syncRow(row, enabled) {
+        row.hidden = !enabled;
+
+        row.querySelectorAll("[data-tr-entry-player]").forEach(
+            function (select) {
+                select.disabled = !enabled;
+
+                if (!enabled) {
+                    select.value = "";
+                }
+
+                select.dispatchEvent(new Event("change", { bubbles: true }));
+            },
+        );
+    }
+
+    function updateRows() {
+        const active = activeRows();
+
+        active.forEach(function (row, index) {
+            row.querySelector("[data-tr-entry-number]").textContent = String(
+                index + 1,
+            );
+        });
+
+        if (counter) {
+            counter.textContent = String(active.length);
+        }
+
+        if (addButton) {
+            addButton.disabled = active.length >= 32;
+        }
+
+        rows.forEach(function (row) {
+            const removeButton = row.querySelector("[data-tr-remove-entry]");
+
+            if (removeButton) {
+                removeButton.disabled = active.length <= 2;
+            }
+        });
+    }
+
+    addButton?.addEventListener("click", function () {
+        const row = rows.find((item) => item.hidden);
+
+        if (!row) return;
+
+        syncRow(row, true);
+        updateRows();
+
+        row.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+        });
+    });
+
+    rows.forEach(function (row) {
+        row.querySelector("[data-tr-remove-entry]")?.addEventListener(
+            "click",
+            function () {
+                if (activeRows().length <= 2) return;
+
+                syncRow(row, false);
+                updateRows();
+            },
+        );
+    });
+
+    form.addEventListener("submit", function (event) {
+        const active = activeRows();
+
+        if (active.length < 2 || active.length > 32) {
+            event.preventDefault();
+
+            window.AdminDialog?.error(
+                "Peserta harus berjumlah 2 sampai 32.",
+                "Jumlah Peserta Tidak Valid",
+            );
+
+            return;
+        }
+
+        const selected = [];
+
+        for (const row of active) {
+            const selects = row.querySelectorAll("[data-tr-entry-player]");
+
+            for (const select of selects) {
+                if (!select.value) {
+                    event.preventDefault();
+
+                    window.AdminDialog?.error(
+                        "Lengkapi seluruh pemain pada setiap peserta.",
+                        "Peserta Belum Lengkap",
+                    );
+
+                    return;
+                }
+
+                selected.push(select.value);
+            }
+        }
+
+        if (new Set(selected).size !== selected.length) {
+            event.preventDefault();
+
+            window.AdminDialog?.error(
+                "Satu pemain tidak boleh didaftarkan dua kali dalam turnamen.",
+                "Peserta Duplikat",
+            );
+        }
+    });
+
+    updateRows();
+});
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN TOURNAMENT SCHEDULE ORDER
+|--------------------------------------------------------------------------
+*/
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("[data-admin-tr-order-form]");
+
+    if (!form) return;
+
+    const selects = Array.from(form.querySelectorAll("[data-tr-order]"));
+
+    const shuffleButton = form.querySelector("[data-tr-shuffle]");
+
+    const startButton = document.querySelector("[data-tr-start]");
+
+    const staleMessage = document.querySelector("[data-tr-order-stale]");
+
+    function markStale() {
+        if (startButton) {
+            startButton.disabled = true;
+        }
+
+        if (staleMessage) {
+            staleMessage.hidden = false;
+        }
+    }
+
+    selects.forEach(function (select) {
+        select.addEventListener("change", markStale);
+    });
+
+    shuffleButton?.addEventListener("click", function () {
+        const values = selects.map((select) => select.value);
+
+        for (let i = values.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+
+            [values[i], values[j]] = [values[j], values[i]];
+        }
+
+        selects.forEach(function (select, index) {
+            select.value = values[index];
+
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+
+        markStale();
+    });
+
+    form.addEventListener("submit", function (event) {
+        const values = selects.map((select) => select.value);
+
+        if (
+            values.some((value) => value === "") ||
+            new Set(values).size !== values.length
+        ) {
+            event.preventDefault();
+
+            window.AdminDialog?.error(
+                "Urutan peserta tidak boleh kosong atau berulang.",
+                "Urutan Peserta Tidak Valid",
+            );
+        }
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN GALLERY UPLOAD
+|--------------------------------------------------------------------------
+*/
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("[data-admin-gallery-form]");
+
+    if (!form) return;
+
+    const fileInput = form.querySelector("[data-admin-gallery-file]");
+
+    const dropZone = form.querySelector("[data-admin-gallery-drop]");
+
+    const preview = form.querySelector("[data-admin-gallery-preview]");
+
+    const previewImage = form.querySelector(
+        "[data-admin-gallery-preview-image]",
+    );
+
+    const fileName = form.querySelector("[data-admin-gallery-file-name]");
+
+    if (!fileInput || !dropZone || !preview || !previewImage || !fileName) {
+        return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+
+    const acceptedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    let previewUrl = null;
+    let dragDepth = 0;
+
+    function clearPreview() {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+
+        previewImage.removeAttribute("src");
+
+        fileName.textContent = "";
+
+        preview.hidden = true;
+    }
+
+    function showError(message) {
+        if (window.AdminDialog?.error) {
+            window.AdminDialog.error(message, "Foto Tidak Valid");
+        } else {
+            window.alert(message);
+        }
+    }
+
+    function updatePreview() {
+        clearPreview();
+
+        const file = fileInput.files?.[0];
+
+        if (!file) {
+            return;
+        }
+
+        if (!acceptedTypes.includes(file.type)) {
+            fileInput.value = "";
+
+            showError("Gunakan foto dengan format JPG, PNG, atau WebP.");
+
+            return;
+        }
+
+        if (file.size === 0 || file.size > maxSize) {
+            fileInput.value = "";
+
+            showError("Ukuran foto harus lebih dari 0 byte dan maksimal 5 MB.");
+
+            return;
+        }
+
+        previewUrl = URL.createObjectURL(file);
+
+        previewImage.src = previewUrl;
+
+        const size = (file.size / (1024 * 1024)).toFixed(2);
+
+        fileName.textContent = file.name + " · " + size + " MB";
+
+        preview.hidden = false;
+    }
+
+    fileInput.addEventListener("change", updatePreview);
+
+    /*
+    |--------------------------------------------------------------------------
+    | DRAG AND DROP
+    |--------------------------------------------------------------------------
+    */
+
+    dropZone.addEventListener("dragenter", function (event) {
+        event.preventDefault();
+
+        dragDepth++;
+
+        dropZone.classList.add("is-dragging");
+    });
+
+    dropZone.addEventListener("dragover", function (event) {
+        event.preventDefault();
+
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = "copy";
+        }
+    });
+
+    dropZone.addEventListener("dragleave", function (event) {
+        event.preventDefault();
+
+        dragDepth = Math.max(0, dragDepth - 1);
+
+        if (dragDepth === 0) {
+            dropZone.classList.remove("is-dragging");
+        }
+    });
+
+    dropZone.addEventListener("drop", function (event) {
+        event.preventDefault();
+
+        dragDepth = 0;
+
+        dropZone.classList.remove("is-dragging");
+
+        const files = event.dataTransfer?.files;
+
+        if (!files || files.length === 0) {
+            return;
+        }
+
+        if (files.length > 1) {
+            showError("Unggah satu foto untuk setiap pengiriman.");
+
+            return;
+        }
+
+        try {
+            fileInput.files = files;
+
+            fileInput.dispatchEvent(
+                new Event("change", {
+                    bubbles: true,
+                }),
+            );
+        } catch (error) {
+            showError(
+                "Browser tidak mendukung unggah seret. Gunakan tombol Pilih Foto.",
+            );
+        }
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI SEBELUM SUBMIT
+    |--------------------------------------------------------------------------
+    */
+
+    form.addEventListener("submit", function (event) {
+        const file = fileInput.files?.[0];
+
+        if (!file) {
+            event.preventDefault();
+
+            showError("Pilih foto terlebih dahulu.");
+
+            return;
+        }
+
+        if (
+            !acceptedTypes.includes(file.type) ||
+            file.size === 0 ||
+            file.size > maxSize
+        ) {
+            event.preventDefault();
+
+            showError(
+                "Foto tidak valid. Pilih JPG, PNG, atau WebP dengan ukuran maksimal 5 MB.",
+            );
+        }
+    });
+
+    window.addEventListener("pagehide", function () {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN WEBSITE SETTINGS
+|--------------------------------------------------------------------------
+*/
+
+document.addEventListener("DOMContentLoaded", function () {
+    "use strict";
+
+    const form = document.querySelector("[data-admin-site-settings]");
+
+    if (!form) return;
+
+    const fileInput = form.querySelector("[data-admin-site-logo-input]");
+
+    const removeLogo = form.querySelector("[data-admin-site-remove-logo]");
+
+    const logoImages = Array.from(
+        form.querySelectorAll("[data-admin-site-logo-image]"),
+    );
+
+    const logoFallbacks = Array.from(
+        form.querySelectorAll("[data-admin-site-logo-fallback]"),
+    );
+
+    const logoStatus = form.querySelector("[data-admin-site-logo-status]");
+
+    const selectedFileName = form.querySelector("[data-admin-site-file-name]");
+
+    const aboutTitle = form.querySelector("[data-admin-site-about-title]");
+
+    const aboutText = form.querySelector("[data-admin-site-about-text]");
+
+    const previewTitle = form.querySelector("[data-admin-site-preview-title]");
+
+    const previewText = form.querySelector("[data-admin-site-preview-text]");
+
+    const characterCount = form.querySelector(
+        "[data-admin-site-character-count]",
+    );
+
+    const originalLogo = logoImages[0]?.dataset.originalSrc || "";
+
+    const maxFileSize = 3 * 1024 * 1024;
+
+    const acceptedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    let temporaryLogoUrl = null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | ERROR DIALOG
+    |--------------------------------------------------------------------------
+    */
+
+    function showError(message) {
+        if (window.AdminDialog?.error) {
+            window.AdminDialog.error(message, "Logo Tidak Valid");
+        } else {
+            window.alert(message);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | TAMPILKAN LOGO DI SELURUH PREVIEW
+    |--------------------------------------------------------------------------
+    */
+
+    function displayLogo(source) {
+        const hasImage = Boolean(source);
+
+        logoImages.forEach(function (image) {
+            if (hasImage) {
+                image.src = source;
+                image.hidden = false;
+            } else {
+                image.hidden = true;
+                image.removeAttribute("src");
+            }
+        });
+
+        logoFallbacks.forEach(function (fallback) {
+            fallback.hidden = hasImage;
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RENDER STATUS LOGO
+    |--------------------------------------------------------------------------
+    */
+
+    function refreshLogo() {
+        const file = fileInput?.files?.[0];
+
+        const useDefault = removeLogo?.checked === true;
+
+        if (useDefault) {
+            displayLogo("");
+
+            if (logoStatus) {
+                logoStatus.textContent = "Logo default akan digunakan";
+            }
+
+            return;
+        }
+
+        if (file && temporaryLogoUrl) {
+            displayLogo(temporaryLogoUrl);
+
+            if (logoStatus) {
+                logoStatus.textContent = "Pratinjau logo baru";
+            }
+
+            return;
+        }
+
+        displayLogo(originalLogo);
+
+        if (logoStatus) {
+            logoStatus.textContent = originalLogo
+                ? "Logo kustom sedang digunakan"
+                : "Menggunakan logo default";
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | MEMBERSIHKAN URL SEMENTARA
+    |--------------------------------------------------------------------------
+    */
+
+    function clearTemporaryLogo() {
+        if (temporaryLogoUrl) {
+            URL.revokeObjectURL(temporaryLogoUrl);
+            temporaryLogoUrl = null;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PILIH FILE LOGO
+    |--------------------------------------------------------------------------
+    */
+
+    fileInput?.addEventListener("change", function () {
+        clearTemporaryLogo();
+
+        const file = fileInput.files?.[0];
+
+        if (!file) {
+            if (selectedFileName) {
+                selectedFileName.hidden = true;
+                selectedFileName.textContent = "";
+            }
+
+            refreshLogo();
+            return;
+        }
+
+        if (!acceptedTypes.includes(file.type)) {
+            fileInput.value = "";
+
+            showError("Gunakan logo berformat JPG, PNG, atau WebP.");
+
+            refreshLogo();
+            return;
+        }
+
+        if (file.size === 0 || file.size > maxFileSize) {
+            fileInput.value = "";
+
+            showError("Ukuran logo harus lebih dari 0 byte dan maksimal 3 MB.");
+
+            refreshLogo();
+            return;
+        }
+
+        if (removeLogo) {
+            removeLogo.checked = false;
+        }
+
+        temporaryLogoUrl = URL.createObjectURL(file);
+
+        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+
+        if (selectedFileName) {
+            selectedFileName.hidden = false;
+
+            selectedFileName.textContent = file.name + " · " + fileSize + " MB";
+        }
+
+        refreshLogo();
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | KEMBALIKAN LOGO DEFAULT
+    |--------------------------------------------------------------------------
+    */
+
+    removeLogo?.addEventListener("change", function () {
+        if (removeLogo.checked && fileInput) {
+            fileInput.value = "";
+
+            clearTemporaryLogo();
+
+            if (selectedFileName) {
+                selectedFileName.hidden = true;
+                selectedFileName.textContent = "";
+            }
+        }
+
+        refreshLogo();
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | PREVIEW INFORMASI KLUB
+    |--------------------------------------------------------------------------
+    */
+
+    function updateTextPreview() {
+        if (previewTitle && aboutTitle) {
+            previewTitle.textContent =
+                aboutTitle.value.trim() || "Judul belum diisi";
+        }
+
+        if (previewText && aboutText) {
+            previewText.textContent =
+                aboutText.value.trim() || "Deskripsi belum diisi";
+        }
+
+        if (characterCount && aboutText) {
+            const count = Array.from(aboutText.value).length;
+
+            characterCount.textContent =
+                count.toLocaleString("id-ID") + " / 10000";
+        }
+    }
+
+    aboutTitle?.addEventListener("input", updateTextPreview);
+
+    aboutText?.addEventListener("input", updateTextPreview);
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI SEBELUM SIMPAN
+    |--------------------------------------------------------------------------
+    */
+
+    form.addEventListener("submit", function (event) {
+        const file = fileInput?.files?.[0];
+
+        if (!file) return;
+
+        const invalidFile =
+            !acceptedTypes.includes(file.type) ||
+            file.size === 0 ||
+            file.size > maxFileSize;
+
+        if (invalidFile) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            showError(
+                "Logo tidak valid. Gunakan JPG, PNG, atau WebP maksimal 3 MB.",
+            );
+        }
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | INITIALIZE
+    |--------------------------------------------------------------------------
+    */
+
+    refreshLogo();
+    updateTextPreview();
+
+    window.addEventListener("pagehide", function () {
+        clearTemporaryLogo();
+    });
+});

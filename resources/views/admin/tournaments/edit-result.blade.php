@@ -51,7 +51,7 @@ $next->result !== null
             </p>
         </div>
 
-        <a href="{{ route('admin.matches.index') }}" class="adm-btn adm-btn--secondary">
+        <a href="{{ route('admin.tournaments.show', $tournament) }}" class="adm-btn adm-btn--secondary">
             Kembali
         </a>
     </div>
@@ -219,7 +219,7 @@ $next->result !== null
 
             <div class="adm-match-form-actions">
 
-                <a href="{{ route('admin.matches.index') }}" class="adm-btn adm-btn--secondary">
+                <a href="{{ route('admin.tournaments.show', $tournament) }}" class="adm-btn adm-btn--secondary">
                     Batal
                 </a>
 

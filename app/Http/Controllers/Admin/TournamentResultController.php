@@ -37,7 +37,6 @@ class TournamentResultController extends Controller
         );
     }
 
-
     public function update(
         UpdateTournamentResultRequest $request,
         Tournament $tournament,
@@ -54,13 +53,14 @@ class TournamentResultController extends Controller
         );
 
         return redirect()
-            ->route('admin.matches.index')
+            ->route('admin.tournaments.show', [
+                'tournament' => $tournament,
+            ])
             ->with(
                 'success',
                 'Hasil pertandingan turnamen berhasil disimpan.'
             );
     }
-
 
     private function ensureFixture(
         Tournament $tournament,
