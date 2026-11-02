@@ -23,12 +23,14 @@ class PlayerController extends Controller
         return view('players.index', compact('players'));
     }
 
+
     // Form tambah
 
     public function create()
     {
         return view('players.create');
     }
+
 
     // Simpan pemain
 
@@ -61,7 +63,6 @@ class PlayerController extends Controller
                 $userId = null;
 
                 // Akun login dibuat jika email diisi
-
                 if (!empty($data['email'])) {
                     $user = User::create([
                         'name' => $data['name'],
@@ -76,7 +77,6 @@ class PlayerController extends Controller
                 }
 
                 // Profil pemain selalu dibuat
-
                 Player::create([
                     'name' => $data['name'],
                     'email' => $data['email'] ?? null,
@@ -99,6 +99,7 @@ class PlayerController extends Controller
             );
     }
 
+
     // Form edit
 
     public function edit(Request $request, Player $player)
@@ -109,6 +110,7 @@ class PlayerController extends Controller
 
         return view('players.edit', compact('player'));
     }
+
 
     // Update pemain
 
@@ -142,6 +144,27 @@ class PlayerController extends Controller
             ],
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | PERLINDUNGAN AKUN ADMIN
+        |--------------------------------------------------------------------------
+        |
+        | Email akun administrator tidak boleh dikosongkan.
+        | Hal ini mencegah akun admin menjadi nonaktif
+        | melalui formulir edit pemain lama.
+        |
+        */
+
+        if (
+            $player->user?->role === 'admin'
+            && empty($data['email'])
+        ) {
+            throw ValidationException::withMessages([
+                'email' =>
+                'Email akun administrator tidak boleh dikosongkan.',
+            ]);
+        }
+
         $createdAccount = false;
 
         try {
@@ -155,22 +178,42 @@ class PlayerController extends Controller
 
                 if ($user) {
 
-                    // Akun lama tetap menggunakan
-                    // password yang sudah dimiliki
+                    /*
+                     * Akun lama tetap menggunakan password
+                     * dan status aktivasi yang sudah dimiliki.
+                     */
 
                     $user->name = $data['name'];
 
                     if ($email !== null) {
+
+                        /*
+                         * PERBAIKAN:
+                         *
+                         * Memperbarui email tidak otomatis
+                         * mengaktifkan kembali akun nonaktif.
+                         *
+                         * Status is_active tetap seperti semula.
+                         */
+
                         $user->email = $email;
-                        $user->is_active = true;
                     } else {
+
+                        /*
+                         * Mengosongkan email tetap menonaktifkan
+                         * akses login seperti aturan sebelumnya.
+                         */
+
                         $user->is_active = false;
                     }
 
                     $user->save();
                 } elseif ($email !== null) {
 
-                    // Pemain lama baru diberi akun login
+                    /*
+                     * Jika pemain sebelumnya tidak mempunyai
+                     * akun, sistem tetap membuat akun baru.
+                     */
 
                     $user = User::create([
                         'name' => $data['name'],
@@ -183,6 +226,11 @@ class PlayerController extends Controller
 
                     $createdAccount = true;
                 }
+
+                /*
+                 * Perbarui profil pemain.
+                 * Tidak mengubah ranking dan riwayat pertandingan.
+                 */
 
                 $player->update([
                     'name' => $data['name'],
@@ -206,6 +254,7 @@ class PlayerController extends Controller
             );
     }
 
+
     // Nonaktifkan pemain
 
     public function destroy(Request $request, Player $player)
@@ -214,13 +263,39 @@ class PlayerController extends Controller
 
         $this->ensureCanModify($request, $player);
 
+        /*
+        |--------------------------------------------------------------------------
+        | PERLINDUNGAN AKUN ADMIN
+        |--------------------------------------------------------------------------
+        |
+        | Akun administrator tidak boleh dinonaktifkan
+        | melalui fitur penghapusan pemain lama.
+        |
+        */
+
         abort_if(
-            $player->user_id === $request->user()->id,
+            $player->user?->role === 'admin',
+            403,
+            'Akun administrator tidak dapat dinonaktifkan.'
+        );
+
+        /*
+         * Pengguna tidak boleh menonaktifkan dirinya sendiri.
+         */
+
+        abort_if(
+            (int) $player->user_id === (int) $request->user()->id,
             403,
             'Tidak dapat menonaktifkan akun sendiri.'
         );
 
         DB::transaction(function () use ($player) {
+
+            /*
+             * Pertahankan soft delete pemain.
+             * Riwayat pertandingan tidak ikut dihapus.
+             */
+
             $player->delete();
 
             if ($player->user) {
@@ -232,10 +307,14 @@ class PlayerController extends Controller
 
         return redirect()
             ->route('players.index')
-            ->with('success', 'Pemain berhasil dinonaktifkan.');
+            ->with(
+                'success',
+                'Pemain berhasil dinonaktifkan.'
+            );
     }
 
-    // Normalisasi
+
+    // Normalisasi input
 
     private function normalizeInput(Request $request): void
     {
@@ -244,10 +323,13 @@ class PlayerController extends Controller
         );
 
         $request->merge([
-            'name' => trim((string) $request->input('name', '')),
+            'name' => trim(
+                (string) $request->input('name', '')
+            ),
             'email' => $email === '' ? null : $email,
         ]);
     }
+
 
     // Password default dari konfigurasi
 
@@ -268,27 +350,30 @@ class PlayerController extends Controller
         return $password;
     }
 
-    // Hak akses edit
 
+    // Hak akses edit pemain
 
     private function ensureCanModify(
         Request $request,
         Player $player
     ): void {
-
         $user = $request->user();
 
         // Hanya Admin dan Pengelola
         abort_unless($user->canManage(), 403);
 
-        // Admin memiliki akses penuh
+        // Admin tetap memiliki akses edit penuh
         if ($user->isAdmin()) {
             return;
         }
 
-        // Pengelola boleh mengedit pemain biasa,
-        // dirinya sendiri, dan sesama Pengelola.
-        // Namun tidak boleh mengedit akun Admin.
+        /*
+         * Pengelola tetap boleh mengedit pemain biasa,
+         * dirinya sendiri, dan sesama Pengelola.
+         *
+         * Data akun Admin tetap dilindungi.
+         */
+
         abort_if(
             $player->user?->role === 'admin',
             403,
@@ -297,7 +382,7 @@ class PlayerController extends Controller
     }
 
 
-    // Email duplikat
+    // Penanganan email duplikat
 
     private function handleDuplicateEmail(
         QueryException $exception
