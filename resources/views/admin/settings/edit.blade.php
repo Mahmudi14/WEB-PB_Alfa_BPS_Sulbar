@@ -1,5 +1,4 @@
-
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Pengaturan Website - PB Alfa')
 
@@ -44,23 +43,18 @@
         </div>
 
         @if($errors->any())
-            <div class="adm-alert" role="alert">
-                <strong>Periksa kembali pengaturan.</strong>
-                <ul>
-                    @foreach($errors->all() as $message)
-                        <li>{{ $message }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div class="adm-alert" role="alert">
+            <strong>Periksa kembali pengaturan.</strong>
+            <ul>
+                @foreach($errors->all() as $message)
+                <li>{{ $message }}</li>
+                @endforeach
+            </ul>
+        </div>
         @endif
 
-        <form
-            method="POST"
-            action="{{ route('admin.settings.update') }}"
-            enctype="multipart/form-data"
-            data-single-submit
-            class="adm-settings-form"
-        >
+        <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data"
+            data-single-submit class="adm-settings-form">
             @csrf
             @method('PUT')
 
@@ -77,14 +71,10 @@
                     <div class="adm-logo-preview">
 
                         @if($settings->logo_path)
-                            <img
-                                src="{{ asset('storage/' . $settings->logo_path) }}"
-                                alt="Logo PB Alfa"
-                                loading="lazy"
-                                decoding="async"
-                            >
+                        <img src="{{ asset('storage/' . $settings->logo_path) }}" alt="Logo PB Alfa" loading="lazy"
+                            decoding="async">
                         @else
-                            <span>PB</span>
+                        <span>PB</span>
                         @endif
 
                     </div>
@@ -95,12 +85,7 @@
                             Upload / Ganti Logo
                         </label>
 
-                        <input
-                            id="logo"
-                            type="file"
-                            name="logo"
-                            accept="image/jpeg,image/png,image/webp"
-                        >
+                        <input id="logo" type="file" name="logo" accept="image/jpeg,image/png,image/webp">
 
                         <small>
                             JPG, PNG, atau WebP. Maksimal 2 MB.
@@ -127,17 +112,10 @@
                             Judul Bagian
                         </label>
 
-                        <input
-                            id="about_title"
-                            type="text"
-                            name="about_title"
-                            maxlength="120"
-                            value="{{ old(
+                        <input id="about_title" type="text" name="about_title" maxlength="120" value="{{ old(
                                 'about_title',
                                 $settings->about_title
-                            ) }}"
-                            required
-                        >
+                            ) }}" required>
                     </div>
 
                     <div class="adm-field">
@@ -145,13 +123,8 @@
                             Deskripsi Klub
                         </label>
 
-                        <textarea
-                            id="about_text"
-                            name="about_text"
-                            maxlength="2000"
-                            rows="5"
-                            required
-                        >{{ old('about_text', $settings->about_text) }}</textarea>
+                        <textarea id="about_text" name="about_text" maxlength="2000" rows="5"
+                            required>{{ old('about_text', $settings->about_text) }}</textarea>
                     </div>
 
                 </div>
@@ -162,10 +135,7 @@
 
             <div class="adm-settings-actions">
 
-                <button
-                    type="submit"
-                    class="adm-button adm-button--primary"
-                >
+                <button type="submit" class="adm-button adm-button--primary">
                     Simpan Pengaturan
                 </button>
 
@@ -177,24 +147,16 @@
 
         @if($settings->logo_path)
 
-            <form
-                method="POST"
-                action="{{ route('admin.settings.logo.delete') }}"
-                class="adm-remove-logo"
-                data-single-submit
-                data-confirm="Hapus logo klub?"
-            >
-                @csrf
-                @method('DELETE')
+        <form method="POST" action="{{ route('admin.settings.logo.delete') }}" class="adm-remove-logo"
+            data-single-submit data-confirm="Hapus logo klub?">
+            @csrf
+            @method('DELETE')
 
-                <button
-                    type="submit"
-                    class="adm-button adm-button--danger"
-                >
-                    Hapus Logo
-                </button>
+            <button type="submit" class="adm-button adm-button--danger">
+                Hapus Logo
+            </button>
 
-            </form>
+        </form>
 
         @endif
 

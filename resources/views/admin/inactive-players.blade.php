@@ -1,5 +1,4 @@
-
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Pemain Nonaktif - PB Alfa')
 
@@ -49,71 +48,62 @@
 
             @forelse($players as $player)
 
-                <article class="adm-inactive-row">
+            <article class="adm-inactive-row">
 
-                    <div class="adm-inactive-row__identity">
+                <div class="adm-inactive-row__identity">
 
-                        <span class="adm-user-avatar"
-                              aria-hidden="true">
-                            {{ mb_strtoupper(
-                                mb_substr($player->name, 0, 1)
-                            ) }}
+                    <span class="adm-user-avatar" aria-hidden="true">
+                        {{ mb_strtoupper(
+                        mb_substr($player->name, 0, 1)
+                        ) }}
+                    </span>
+
+                    <div class="adm-user-row__info">
+
+                        <strong>{{ $player->name }}</strong>
+
+                        <span>
+                            {{ $player->email ?? 'Tanpa email' }}
                         </span>
-
-                        <div class="adm-user-row__info">
-
-                            <strong>{{ $player->name }}</strong>
-
-                            <span>
-                                {{ $player->email ?? 'Tanpa email' }}
-                            </span>
-
-                        </div>
 
                     </div>
 
-                    {{-- Status --}}
+                </div>
 
-                    <div class="adm-inactive-row__status">
+                {{-- Status --}}
 
-                        <span class="adm-status adm-status--inactive">
-                            Nonaktif
-                        </span>
+                <div class="adm-inactive-row__status">
 
-                        <small>
-                            {{ $player->deleted_at->format('d/m/Y H:i') }}
-                        </small>
+                    <span class="adm-status adm-status--inactive">
+                        Nonaktif
+                    </span>
 
-                    </div>
+                    <small>
+                        {{ $player->deleted_at->format('d/m/Y H:i') }}
+                    </small>
 
-                    {{-- Aktifkan --}}
+                </div>
 
-                    <form
-                        method="POST"
-                        action="{{ route('admin.players.restore', $player->id) }}"
-                        data-single-submit
-                        data-confirm="Aktifkan kembali pemain {{ $player->name }}?"
-                        class="adm-restore-form"
-                    >
-                        @csrf
-                        @method('PATCH')
+                {{-- Aktifkan --}}
 
-                        <button
-                            type="submit"
-                            class="adm-button adm-button--success"
-                        >
-                            Aktifkan Kembali
-                        </button>
+                <form method="POST" action="{{ route('admin.players.restore', $player->id) }}" data-single-submit
+                    data-confirm="Aktifkan kembali pemain {{ $player->name }}?" class="adm-restore-form">
+                    @csrf
+                    @method('PATCH')
 
-                    </form>
+                    <button type="submit" class="adm-button adm-button--success">
+                        Aktifkan Kembali
+                    </button>
 
-                </article>
+                </form>
+
+            </article>
 
             @empty
 
-                <div class="adm-empty">
-                    Tidak ada pemain nonaktif.
-                </div>
+            <div class="adm-empty">
+                Tidak ada pemain nonaktif.
+            </div>
 
             @endforelse
 
@@ -122,35 +112,34 @@
         {{-- Pagination --}}
 
         @if($players->hasPages())
-            <nav class="adm-pagination"
-                 aria-label="Halaman pemain nonaktif">
+        <nav class="adm-pagination" aria-label="Halaman pemain nonaktif">
 
-                @if($players->onFirstPage())
-                    <span class="is-disabled">
-                        ← Sebelumnya
-                    </span>
-                @else
-                    <a href="{{ $players->previousPageUrl() }}">
-                        ← Sebelumnya
-                    </a>
-                @endif
+            @if($players->onFirstPage())
+            <span class="is-disabled">
+                ← Sebelumnya
+            </span>
+            @else
+            <a href="{{ $players->previousPageUrl() }}">
+                ← Sebelumnya
+            </a>
+            @endif
 
-                <span class="adm-pagination__info">
-                    {{ $players->currentPage() }}
-                    / {{ $players->lastPage() }}
-                </span>
+            <span class="adm-pagination__info">
+                {{ $players->currentPage() }}
+                / {{ $players->lastPage() }}
+            </span>
 
-                @if($players->hasMorePages())
-                    <a href="{{ $players->nextPageUrl() }}">
-                        Berikutnya →
-                    </a>
-                @else
-                    <span class="is-disabled">
-                        Berikutnya →
-                    </span>
-                @endif
+            @if($players->hasMorePages())
+            <a href="{{ $players->nextPageUrl() }}">
+                Berikutnya →
+            </a>
+            @else
+            <span class="is-disabled">
+                Berikutnya →
+            </span>
+            @endif
 
-            </nav>
+        </nav>
         @endif
 
     </section>

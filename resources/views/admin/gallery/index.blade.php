@@ -1,5 +1,4 @@
-
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Galeri - PB Alfa')
 
@@ -46,174 +45,134 @@
         </div>
 
         @if($errors->any())
-            <div class="adm-alert" role="alert">
-                <strong>Periksa kembali data foto.</strong>
-                <ul>
-                    @foreach($errors->all() as $message)
-                        <li>{{ $message }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div class="adm-alert" role="alert">
+            <strong>Periksa kembali data foto.</strong>
+            <ul>
+                @foreach($errors->all() as $message)
+                <li>{{ $message }}</li>
+                @endforeach
+            </ul>
+        </div>
         @endif
 
         {{-- Tambah foto --}}
 
-        @if($images->count() < 6)
+        @if($images->count() < 6) <form method="POST" action="{{ route('admin.gallery.store') }}"
+            enctype="multipart/form-data" data-single-submit class="adm-gallery-form">
+            @csrf
 
-            <form
-                method="POST"
-                action="{{ route('admin.gallery.store') }}"
-                enctype="multipart/form-data"
-                data-single-submit
-                class="adm-gallery-form"
-            >
-                @csrf
+            <div class="adm-settings-group__heading">
+                <h3>Tambah Foto</h3>
+            </div>
 
-                <div class="adm-settings-group__heading">
-                    <h3>Tambah Foto</h3>
+            <div class="adm-gallery-form__fields">
+
+                <div class="adm-field">
+                    <label for="image">
+                        Pilih Foto
+                    </label>
+
+                    <input id="image" type="file" name="image" accept="image/jpeg,image/png,image/webp" required>
                 </div>
 
-                <div class="adm-gallery-form__fields">
+                <div class="adm-field">
+                    <label for="caption">
+                        Keterangan
+                        <span class="adm-optional">Opsional</span>
+                    </label>
 
-                    <div class="adm-field">
-                        <label for="image">
-                            Pilih Foto
-                        </label>
-
-                        <input
-                            id="image"
-                            type="file"
-                            name="image"
-                            accept="image/jpeg,image/png,image/webp"
-                            required
-                        >
-                    </div>
-
-                    <div class="adm-field">
-                        <label for="caption">
-                            Keterangan
-                            <span class="adm-optional">Opsional</span>
-                        </label>
-
-                        <input
-                            id="caption"
-                            type="text"
-                            name="caption"
-                            maxlength="150"
-                            value="{{ old('caption') }}"
-                            placeholder="Contoh: Latihan bersama"
-                        >
-                    </div>
-
+                    <input id="caption" type="text" name="caption" maxlength="150" value="{{ old('caption') }}"
+                        placeholder="Contoh: Latihan bersama">
                 </div>
 
-                <div class="adm-gallery-form__footer">
-                    <small>
-                        JPG, PNG, atau WebP. Maksimal 2 MB.
-                    </small>
+            </div>
 
-                    <button
-                        type="submit"
-                        class="adm-button adm-button--primary"
-                    >
-                        Upload Foto
-                    </button>
-                </div>
+            <div class="adm-gallery-form__footer">
+                <small>
+                    JPG, PNG, atau WebP. Maksimal 2 MB.
+                </small>
+
+                <button type="submit" class="adm-button adm-button--primary">
+                    Upload Foto
+                </button>
+            </div>
 
             </form>
 
-        @else
+            @else
 
             <div class="adm-gallery-limit">
                 Galeri sudah berisi 6 foto. Hapus satu foto
                 untuk menambahkan foto baru.
             </div>
 
-        @endif
+            @endif
 
-        {{-- Foto tersimpan --}}
+            {{-- Foto tersimpan --}}
 
-        <div class="adm-gallery-heading">
-            <h3>Foto Tersimpan</h3>
+            <div class="adm-gallery-heading">
+                <h3>Foto Tersimpan</h3>
 
-            <span class="adm-gallery-heading__count">
-                {{ $images->count() }} Foto
-            </span>
-        </div>
+                <span class="adm-gallery-heading__count">
+                    {{ $images->count() }} Foto
+                </span>
+            </div>
 
-        @if($images->isEmpty())
+            @if($images->isEmpty())
 
             <div class="adm-empty">
                 Belum ada foto kegiatan.
             </div>
 
-        @else
+            @else
 
             <div class="adm-gallery-grid">
 
                 @foreach($images as $image)
 
-                    <article class="adm-gallery-card">
+                <article class="adm-gallery-card">
 
-                        <div class="adm-gallery-card__image">
-                            <img
-                                src="{{ asset('storage/' . $image->image_path) }}"
-                                alt="{{ $image->caption ?: 'Foto kegiatan PB Alfa' }}"
-                                loading="lazy"
-                                decoding="async"
-                            >
-                        </div>
+                    <div class="adm-gallery-card__image">
+                        <img src="{{ asset('storage/' . $image->image_path) }}"
+                            alt="{{ $image->caption ?: 'Foto kegiatan PB Alfa' }}" loading="lazy" decoding="async">
+                    </div>
 
-                        <div class="adm-gallery-card__body">
+                    <div class="adm-gallery-card__body">
 
-                            <p>
-                                {{ $image->caption ?: 'Tanpa keterangan' }}
-                            </p>
+                        <p>
+                            {{ $image->caption ?: 'Tanpa keterangan' }}
+                        </p>
 
-                            {{-- Hapus foto --}}
+                        {{-- Hapus foto --}}
 
-                            <form
-                                method="POST"
-                                action="{{ route('admin.gallery.destroy', $image) }}"
-                                data-single-submit
-                                data-confirm="Hapus foto ini?"
-                            >
-                                @csrf
-                                @method('DELETE')
+                        <form method="POST" action="{{ route('admin.gallery.destroy', $image) }}" data-single-submit
+                            data-confirm="Hapus foto ini?">
+                            @csrf
+                            @method('DELETE')
 
-                                <button
-                                    type="submit"
-                                    class="adm-button adm-button--danger"
-                                >
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        aria-hidden="true"
-                                    >
-                                        <path d="M3 6h18"/>
-                                        <path d="M8 6V4h8v2"/>
-                                        <path d="M5 6l1 15h12l1-15"/>
-                                        <path d="M10 10v7M14 10v7"/>
-                                    </svg>
+                            <button type="submit" class="adm-button adm-button--danger">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M3 6h18" />
+                                    <path d="M8 6V4h8v2" />
+                                    <path d="M5 6l1 15h12l1-15" />
+                                    <path d="M10 10v7M14 10v7" />
+                                </svg>
 
-                                    Hapus Foto
-                                </button>
+                                Hapus Foto
+                            </button>
 
-                            </form>
+                        </form>
 
-                        </div>
+                    </div>
 
-                    </article>
+                </article>
 
                 @endforeach
 
             </div>
 
-        @endif
+            @endif
 
     </section>
 

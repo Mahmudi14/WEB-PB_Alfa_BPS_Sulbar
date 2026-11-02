@@ -1,157 +1,270 @@
+@extends('layouts.admin')
 
-@extends('layouts.app')
-
-@section('title', 'Panel Admin - PB Alfa')
-
-@push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}?v=1">
-@endpush
+@section('title', 'Dashboard Admin - PB Alfa')
 
 @section('content')
 
-<div class="adm-page">
+<div class="admin-dashboard">
 
-    <header class="adm-hero">
-        <div class="adm-hero__content">
-            <span class="adm-eyebrow">
-                PB ALFA / ADMINISTRATION
-            </span>
+    {{-- Selamat datang --}}
 
-            <h1>PANEL <span>ADMINISTRATOR.</span></h1>
+    <section class="admin-welcome">
 
-            <p>
-                Selamat datang,
-                <strong>{{ auth()->user()->name }}</strong>.
-                Kelola PB Alfa dari satu tempat.
-            </p>
-        </div>
-
-        <span class="adm-hero__decoration" aria-hidden="true">
-            PB
+        <span class="admin-welcome__label">
+            PB ALFA / MANAGEMENT CENTER
         </span>
-    </header>
 
-    {{-- Menu --}}
+        <h2>
+            Selamat Datang,
+            {{ auth()->user()->name }}!
+        </h2>
 
-    <section class="adm-section">
+        <p>
+            Kelola data pemain, pertandingan, turnamen,
+            keuangan, dan pengaturan PB Alfa BPS
+            Sulawesi Barat dari satu panel administrator.
+        </p>
 
-        <div class="adm-section__heading">
+    </section>
+
+
+    {{-- Statistik utama --}}
+
+    <section aria-labelledby="admin-stats-title">
+
+        <div class="admin-block-heading">
             <div>
-                <span class="adm-eyebrow adm-eyebrow--green">
-                    MANAGEMENT CENTER
-                </span>
+                <h2 id="admin-stats-title">
+                    Ringkasan Klub
+                </h2>
 
-                <h2>Menu Pengelolaan</h2>
+                <p>
+                    Informasi terbaru berdasarkan
+                    data tersimpan.
+                </p>
             </div>
-
-            <span class="adm-count">7 Menu</span>
         </div>
 
-        <div class="adm-menu-grid">
+        <div class="admin-stats">
 
-            <a href="{{ route('players.index') }}"
-               class="adm-menu-card">
+            {{-- Pemain --}}
 
-                <span class="adm-menu-card__number">01</span>
+            <article class="admin-stat">
 
-                <div class="adm-menu-card__body">
-                    <h3>Data Pemain</h3>
-                    <p>Tambah, edit, dan kelola pemain.</p>
-                </div>
-
-                <span class="adm-menu-card__arrow" aria-hidden="true">
-                    ↗
+                <span class="admin-stat__icon">
+                    @include(
+                    'admin.partials.nav-icon',
+                    ['name' => 'users']
+                    )
                 </span>
+
+                <span class="admin-stat__label">
+                    Total Pemain Aktif
+                </span>
+
+                <strong class="admin-stat__value">
+                    {{ number_format($playerCount, 0, ',', '.') }}
+                </strong>
+
+                <span class="admin-stat__note">
+                    Pemain yang belum dinonaktifkan
+                </span>
+
+            </article>
+
+
+            {{-- Pertandingan --}}
+
+            <article class="admin-stat admin-stat--green">
+
+                <span class="admin-stat__icon">
+                    @include(
+                    'admin.partials.nav-icon',
+                    ['name' => 'match']
+                    )
+                </span>
+
+                <span class="admin-stat__label">
+                    Pertandingan Reguler
+                </span>
+
+                <strong class="admin-stat__value">
+                    {{ number_format(
+                    $regularMatchCount, 0, ',', '.'
+                    ) }}
+                </strong>
+
+                <span class="admin-stat__note">
+                    Termasuk pertandingan pending
+                </span>
+
+            </article>
+
+
+            {{-- Turnamen --}}
+
+            <article class="admin-stat admin-stat--orange">
+
+                <span class="admin-stat__icon">
+                    @include(
+                    'admin.partials.nav-icon',
+                    ['name' => 'trophy']
+                    )
+                </span>
+
+                <span class="admin-stat__label">
+                    Total Turnamen
+                </span>
+
+                <strong class="admin-stat__value">
+                    {{ number_format(
+                    $tournamentCount, 0, ',', '.'
+                    ) }}
+                </strong>
+
+                <span class="admin-stat__note">
+                    Seluruh status Liga dan Cup
+                </span>
+
+            </article>
+
+
+            {{-- Keuangan --}}
+
+            <article class="admin-stat">
+
+                <span class="admin-stat__icon">
+                    @include(
+                    'admin.partials.nav-icon',
+                    ['name' => 'wallet']
+                    )
+                </span>
+
+                <span class="admin-stat__label">
+                    Saldo Kas
+                </span>
+
+                <strong class="admin-stat__value
+                    admin-stat__value--cash
+                    {{ $cashBalance < 0 ? 'is-negative' : '' }}">
+
+                    Rp {{ number_format(
+                    $cashBalance, 0, ',', '.'
+                    ) }}
+
+                </strong>
+
+                <span class="admin-stat__note">
+                    Pemasukan dikurangi pengeluaran
+                </span>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    {{-- Akses cepat --}}
+
+    <section class="admin-panel" aria-labelledby="admin-shortcuts-title">
+
+        <div class="admin-block-heading">
+            <div>
+                <h2 id="admin-shortcuts-title">
+                    Akses Cepat
+                </h2>
+
+                <p>
+                    Pilih aktivitas pengelolaan sistem.
+                </p>
+            </div>
+        </div>
+
+        <div class="admin-shortcuts">
+
+            <a href="{{ route('admin.users') }}" class="admin-shortcut">
+
+                <span class="admin-shortcut__icon">
+                    @include(
+                    'admin.partials.nav-icon',
+                    ['name' => 'shield']
+                    )
+                </span>
+
+                <span class="admin-shortcut__text">
+                    <strong>Pengguna & Role</strong>
+                    <small>
+                        Kelola hak akses dan reset password.
+                    </small>
+                </span>
+
+                <span class="admin-shortcut__arrow" aria-hidden="true">›</span>
+
             </a>
 
-            <a href="{{ route('matches.index') }}"
-               class="adm-menu-card">
 
-                <span class="adm-menu-card__number">02</span>
+            <a href="{{ route('admin.players.inactive') }}" class="admin-shortcut">
 
-                <div class="adm-menu-card__body">
-                    <h3>Pertandingan</h3>
-                    <p>Catat dan kelola hasil pertandingan.</p>
-                </div>
-
-                <span class="adm-menu-card__arrow" aria-hidden="true">
-                    ↗
+                <span class="admin-shortcut__icon">
+                    @include(
+                    'admin.partials.nav-icon',
+                    ['name' => 'user-x']
+                    )
                 </span>
+
+                <span class="admin-shortcut__text">
+                    <strong>Pemain Nonaktif</strong>
+                    <small>
+                        Pulihkan pemain yang dinonaktifkan.
+                    </small>
+                </span>
+
+                <span class="admin-shortcut__arrow" aria-hidden="true">›</span>
+
             </a>
 
-            <a href="{{ route('cash.index') }}"
-               class="adm-menu-card">
 
-                <span class="adm-menu-card__number">03</span>
+            <a href="{{ route('admin.gallery.index') }}" class="admin-shortcut">
 
-                <div class="adm-menu-card__body">
-                    <h3>Keuangan</h3>
-                    <p>Kelola pemasukan dan pengeluaran kas.</p>
-                </div>
-
-                <span class="adm-menu-card__arrow" aria-hidden="true">
-                    ↗
+                <span class="admin-shortcut__icon">
+                    @include(
+                    'admin.partials.nav-icon',
+                    ['name' => 'image']
+                    )
                 </span>
+
+                <span class="admin-shortcut__text">
+                    <strong>Galeri Klub</strong>
+                    <small>
+                        {{ $galleryCount }} foto tersimpan.
+                        Kelola dokumentasi kegiatan.
+                    </small>
+                </span>
+
+                <span class="admin-shortcut__arrow" aria-hidden="true">›</span>
+
             </a>
 
-            <a href="{{ route('admin.users') }}"
-               class="adm-menu-card">
 
-                <span class="adm-menu-card__number">04</span>
+            <a href="{{ route('admin.settings.edit') }}" class="admin-shortcut">
 
-                <div class="adm-menu-card__body">
-                    <h3>Pengguna dan Role</h3>
-                    <p>Atur hak akses Pemain dan Pengelola.</p>
-                </div>
-
-                <span class="adm-menu-card__arrow" aria-hidden="true">
-                    ↗
+                <span class="admin-shortcut__icon">
+                    @include(
+                    'admin.partials.nav-icon',
+                    ['name' => 'settings']
+                    )
                 </span>
-            </a>
 
-            <a href="{{ route('admin.players.inactive') }}"
-               class="adm-menu-card">
-
-                <span class="adm-menu-card__number">05</span>
-
-                <div class="adm-menu-card__body">
-                    <h3>Pemain Nonaktif</h3>
-                    <p>Aktifkan kembali pemain yang dihapus.</p>
-                </div>
-
-                <span class="adm-menu-card__arrow" aria-hidden="true">
-                    ↗
+                <span class="admin-shortcut__text">
+                    <strong>Pengaturan Website</strong>
+                    <small>
+                        Atur logo dan informasi klub.
+                    </small>
                 </span>
-            </a>
 
-            <a href="{{ route('admin.settings.edit') }}"
-               class="adm-menu-card">
+                <span class="admin-shortcut__arrow" aria-hidden="true">›</span>
 
-                <span class="adm-menu-card__number">06</span>
-
-                <div class="adm-menu-card__body">
-                    <h3>Pengaturan Website</h3>
-                    <p>Perbarui logo dan informasi klub.</p>
-                </div>
-
-                <span class="adm-menu-card__arrow" aria-hidden="true">
-                    ↗
-                </span>
-            </a>
-
-            <a href="{{ route('admin.gallery.index') }}"
-               class="adm-menu-card">
-
-                <span class="adm-menu-card__number">07</span>
-
-                <div class="adm-menu-card__body">
-                    <h3>Galeri</h3>
-                    <p>Unggah dan kelola foto kegiatan.</p>
-                </div>
-
-                <span class="adm-menu-card__arrow" aria-hidden="true">
-                    ↗
-                </span>
             </a>
 
         </div>

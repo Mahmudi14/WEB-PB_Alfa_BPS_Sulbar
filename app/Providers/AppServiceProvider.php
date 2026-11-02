@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer(
-            ['layouts.app', 'pages.home'],
+            ['layouts.app', 'layouts.admin', 'pages.home'],
             function ($view) {
 
                 $data = Cache::remember(
