@@ -7,15 +7,15 @@
 
     <meta name="theme-color" content="#102D49">
 
-    <title>@yield('title', 'Admin - PB Alfa')</title>
+    <title>@yield('title', 'Panel Admin - PB Alfa')</title>
 
     @php
     $logo = ($siteSettings ?? null)?->logo_path;
     @endphp
 
     <link rel="icon" href="{{ $logo
-              ? asset('storage/' . $logo)
-              : asset('icons/icon-512.png') }}">
+            ? asset('storage/' . $logo)
+            : asset('icons/icon-512.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -26,83 +26,25 @@
 
     <link rel="stylesheet" href="{{ asset('assets/css/site.css') }}?v=8">
 
-    <link rel="stylesheet" href="{{ asset('assets/css/admin-layout.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-v4.css') }}?v=1">
 
     @stack('styles')
 </head>
 
-<body class="admin-body">
+<body class="a4-body">
 
-    @php
-    $pageTitle = match (true) {
-    request()->routeIs('admin.users*') =>
-    'Pengguna & Role',
-
-    request()->routeIs('admin.players.*') =>
-    'Pemain Nonaktif',
-
-    request()->routeIs('admin.settings.*') =>
-    'Pengaturan Website',
-
-    request()->routeIs('admin.gallery.*') =>
-    'Galeri Klub',
-
-    default => 'Dashboard',
-    };
-    @endphp
-
-    <div class="admin-app">
+    <div class="a4-app">
 
         @include('admin.partials.sidebar')
 
-        <button type="button" class="admin-backdrop" data-admin-backdrop tabindex="-1" aria-label="Tutup sidebar">
+        <button type="button" class="a4-backdrop" data-a4-backdrop aria-label="Tutup navigasi" tabindex="-1">
         </button>
 
-        <div class="admin-main">
+        <div class="a4-main">
 
-            <header class="admin-topbar">
+            @include('admin.partials.topbar')
 
-                <div class="admin-topbar__left">
-
-                    <button type="button" class="admin-menu-toggle" data-admin-toggle
-                        aria-label="Buka menu administrator" aria-controls="admin-sidebar" aria-expanded="false">
-
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" aria-hidden="true">
-                            <path d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-
-                    <div>
-                        <span class="admin-topbar__eyebrow">
-                            PB ALFA / ADMINISTRATOR
-                        </span>
-
-                        <h1 class="admin-topbar__title">
-                            {{ $pageTitle }}
-                        </h1>
-                    </div>
-
-                </div>
-
-                <div class="admin-topbar__user">
-
-                    <div class="admin-topbar__identity">
-                        <strong>{{ auth()->user()->name }}</strong>
-                        <span>Administrator</span>
-                    </div>
-
-                    <span class="admin-topbar__avatar" aria-hidden="true">
-                        {{ mb_strtoupper(
-                        mb_substr(auth()->user()->name, 0, 1)
-                        ) }}
-                    </span>
-
-                </div>
-
-            </header>
-
-            <main class="site-main admin-content">
+            <main class="site-main a4-content">
 
                 @if(session('success'))
                 <div class="alert-success" role="status">
@@ -126,11 +68,9 @@
 
     @include('admin.partials.dialog')
 
-    <script src="{{ asset('assets/js/site.js') }}?v=8" defer>
-    </script>
+    <script src="{{ asset('assets/js/site.js') }}?v=8" defer></script>
 
-    <script src="{{ asset('assets/js/admin-sidebar.js') }}?v=1" defer>
-    </script>
+    <script src="{{ asset('assets/js/admin-v4.js') }}?v=1" defer></script>
 
     @stack('scripts')
 

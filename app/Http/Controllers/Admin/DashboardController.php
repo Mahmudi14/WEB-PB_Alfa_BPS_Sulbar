@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BadmintonMatch;
 use App\Models\CashTransaction;
-use App\Models\GalleryImage;
 use App\Models\Player;
 use App\Models\Tournament;
+use App\Services\CompletedMatchQuery;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -16,15 +16,15 @@ class DashboardController extends Controller
     {
         $playerCount = Player::count();
 
-        // Hanya pertandingan reguler yang belum dihapus.
         $regularMatchCount = BadmintonMatch::count();
+
+        $tournamentMatchCount = CompletedMatchQuery::tournament()
+            ->count();
+
+        $matchCount = $regularMatchCount + $tournamentMatchCount;
 
         $tournamentCount = Tournament::count();
 
-        $galleryCount = GalleryImage::count();
-
-        // Mengikuti rumus saldo pada CashController.
-        // Soft-deleted transactions otomatis dikecualikan.
         $income = (int) CashTransaction::query()
             ->where('type', 'pemasukan')
             ->sum('amount');
@@ -35,11 +35,12 @@ class DashboardController extends Controller
 
         $cashBalance = $income - $expense;
 
-        return view('admin.index', compact(
+        return view('admin.dashboard.index', compact(
             'playerCount',
+            'matchCount',
             'regularMatchCount',
+            'tournamentMatchCount',
             'tournamentCount',
-            'galleryCount',
             'cashBalance'
         ));
     }
