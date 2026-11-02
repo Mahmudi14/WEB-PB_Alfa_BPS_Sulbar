@@ -1,28 +1,26 @@
-<dialog id="pb-dialog" class="pb-dialog" aria-labelledby="pb-dialog-title" aria-describedby="pb-dialog-message">
+<dialog id="adm-dialog" class="adm-dialog" aria-labelledby="adm-dialog-title" aria-describedby="adm-dialog-message">
 
-    <div class="pb-dialog__content">
+    <div class="adm-dialog__body">
 
-        <div class="pb-dialog__icon" aria-hidden="true">
-            <span id="pb-dialog-symbol">!</span>
+        <div class="adm-dialog__symbol" id="adm-dialog-symbol" aria-hidden="true">
+            ?
         </div>
 
-        <div class="pb-dialog__heading">
-            <h2 id="pb-dialog-title">
-                Konfirmasi
-            </h2>
+        <h2 id="adm-dialog-title">
+            Konfirmasi
+        </h2>
 
-            <p id="pb-dialog-message"></p>
-        </div>
+        <p id="adm-dialog-message"></p>
 
-        <ul id="pb-dialog-errors" hidden></ul>
+        <ul id="adm-dialog-errors" class="adm-dialog__errors" hidden></ul>
 
-        <div class="pb-dialog__actions">
+        <div class="adm-dialog__actions">
 
-            <button type="button" id="pb-dialog-cancel" class="pb-dialog__cancel">
+            <button type="button" id="adm-dialog-cancel" class="adm-btn adm-btn--secondary">
                 Batal
             </button>
 
-            <button type="button" id="pb-dialog-ok" class="pb-dialog__ok">
+            <button type="button" id="adm-dialog-ok" class="adm-btn adm-btn--primary">
                 Mengerti
             </button>
 
@@ -32,20 +30,17 @@
 
 </dialog>
 
-@if($errors->any() || session('error'))
 
-<div id="pb-dialog-server-errors" hidden>
+@if($errors->any())
 
-    @if(session('error'))
-    <p data-pb-error>
-        {{ session('error') }}
-    </p>
-    @endif
+<div id="adm-server-errors" hidden>
 
     @foreach($errors->all() as $message)
-    <p data-pb-error>
+
+    <p data-admin-error>
         {{ $message }}
     </p>
+
     @endforeach
 
 </div>

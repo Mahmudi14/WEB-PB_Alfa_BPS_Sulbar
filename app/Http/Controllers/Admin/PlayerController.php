@@ -17,22 +17,82 @@ class PlayerController extends Controller
 {
     public function index(PlayerRankingService $rankingService)
     {
-        $players = $rankingService->all();
+        $ranking = $rankingService->all()->keyBy('id');
 
-        return view('admin.modules.players', compact('players'));
+        $players = Player::withTrashed()
+            ->with('user')
+            ->orderBy('name')
+            ->orderBy('id')
+            ->get();
+
+        foreach ($players as $player) {
+            $stats = $ranking->get($player->id);
+
+            $player->rank_position = $stats?->rank_position;
+            $player->wins = (int) ($stats?->wins ?? 0);
+            $player->draws = (int) ($stats?->draws ?? 0);
+            $player->losses = (int) ($stats?->losses ?? 0);
+            $player->total_score = $stats?->total_score;
+        }
+
+        $activeCount = $players
+            ->filter(fn($player) => !$player->trashed())
+            ->count();
+
+        $inactiveCount = $players->count() - $activeCount;
+
+        return response()
+            ->view('admin.players.index', compact(
+                'players',
+                'activeCount',
+                'inactiveCount'
+            ))
+            ->header(
+                'Cache-Control',
+                'private, no-store, max-age=0'
+            );
     }
+
+
+    public function show(
+        int $player,
+        PlayerRankingService $rankingService
+    ) {
+        $player = Player::withTrashed()
+            ->with('user')
+            ->findOrFail($player);
+
+        $stats = $rankingService->all()
+            ->firstWhere('id', $player->id);
+
+        return response()
+            ->view('admin.players.show', compact(
+                'player',
+                'stats'
+            ))
+            ->header(
+                'Cache-Control',
+                'private, no-store, max-age=0'
+            );
+    }
+
 
     public function create()
     {
-        return view('players.create');
+        return view('admin.players.create');
     }
+
 
     public function store(Request $request)
     {
         $this->normalizeInput($request);
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'email' => [
                 'nullable',
                 'email',
@@ -40,7 +100,10 @@ class PlayerController extends Controller
                 Rule::unique('users', 'email'),
                 Rule::unique('players', 'email'),
             ],
-            'gender' => ['required', Rule::in(['L', 'P'])],
+            'gender' => [
+                'required',
+                Rule::in(['L', 'P']),
+            ],
             'initial_score' => [
                 'required',
                 'integer',
@@ -82,30 +145,32 @@ class PlayerController extends Controller
             ->with(
                 'success',
                 !empty($data['email'])
-                    ? 'Pemain dan akun login berhasil dibuat. Password menggunakan password default.'
+                    ? 'Pemain dan akun login berhasil dibuat dengan password default.'
                     : 'Pemain berhasil ditambahkan.'
             );
     }
 
-    public function edit(Request $request, Player $player)
+
+    public function edit(Player $player)
     {
         $player->load('user');
 
-        $this->ensureCanModify($request, $player);
-
-        return view('players.edit', compact('player'));
+        return view('admin.players.edit', compact('player'));
     }
+
 
     public function update(Request $request, Player $player)
     {
         $player->load('user');
 
-        $this->ensureCanModify($request, $player);
-
         $this->normalizeInput($request);
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'email' => [
                 'nullable',
                 'email',
@@ -115,13 +180,25 @@ class PlayerController extends Controller
                 Rule::unique('users', 'email')
                     ->ignore($player->user_id),
             ],
-            'gender' => ['required', Rule::in(['L', 'P'])],
+            'gender' => [
+                'required',
+                Rule::in(['L', 'P']),
+            ],
             'initial_score' => [
                 'required',
                 'integer',
                 'between:-999999,999999',
             ],
         ]);
+
+        if (
+            $player->user?->role === 'admin'
+            && empty($data['email'])
+        ) {
+            throw ValidationException::withMessages([
+                'email' => 'Email akun administrator tidak boleh dikosongkan.',
+            ]);
+        }
 
         $createdAccount = false;
 
@@ -139,7 +216,6 @@ class PlayerController extends Controller
 
                     if ($email !== null) {
                         $user->email = $email;
-                        $user->is_active = true;
                     } else {
                         $user->is_active = false;
                     }
@@ -171,41 +247,15 @@ class PlayerController extends Controller
         }
 
         return redirect()
-            ->route('admin.players.index')
+            ->route('admin.players.show', $player->id)
             ->with(
                 'success',
                 $createdAccount
-                    ? 'Data pemain dan akun login berhasil diperbarui. Password menggunakan password default.'
+                    ? 'Data pemain dan akun login baru berhasil disimpan.'
                     : 'Data pemain berhasil diperbarui.'
             );
     }
 
-    public function destroy(Request $request, Player $player)
-    {
-        $player->load('user');
-
-        $this->ensureCanModify($request, $player);
-
-        abort_if(
-            (int) $player->user_id === (int) $request->user()->id,
-            403,
-            'Tidak dapat menonaktifkan akun sendiri.'
-        );
-
-        DB::transaction(function () use ($player) {
-            $player->delete();
-
-            if ($player->user) {
-                $player->user->update([
-                    'is_active' => false,
-                ]);
-            }
-        }, 3);
-
-        return redirect()
-            ->route('admin.players.index')
-            ->with('success', 'Pemain berhasil dinonaktifkan.');
-    }
 
     private function normalizeInput(Request $request): void
     {
@@ -214,40 +264,37 @@ class PlayerController extends Controller
         );
 
         $request->merge([
-            'name' => trim((string) $request->input('name', '')),
+            'name' => trim(
+                (string) $request->input('name', '')
+            ),
             'email' => $email === '' ? null : $email,
         ]);
     }
+
 
     private function defaultPassword(): string
     {
         $password = config('pb_alfa.player_initial_password');
 
-        if (!is_string($password) || trim($password) === '') {
-            abort(500, 'Password default belum dikonfigurasi.');
-        }
+        abort_unless(
+            is_string($password) && trim($password) !== '',
+            500,
+            'Password default belum dikonfigurasi.'
+        );
 
         return $password;
     }
 
-    private function ensureCanModify(
-        Request $request,
-        Player $player
-    ): void {
-        abort_unless(
-            $request->user()
-                && $request->user()->is_active
-                && $request->user()->isAdmin(),
-            403
-        );
-    }
 
     private function handleDuplicateEmail(
         QueryException $exception
     ): void {
+        $code = (string) $exception->getCode();
+        $vendor = (int) ($exception->errorInfo[1] ?? 0);
+
         if (
-            (string) $exception->getCode() === '23000'
-            && (int) ($exception->errorInfo[1] ?? 0) === 1062
+            $code === '23505'
+            || ($code === '23000' && $vendor === 1062)
         ) {
             throw ValidationException::withMessages([
                 'email' => 'Email sudah digunakan.',

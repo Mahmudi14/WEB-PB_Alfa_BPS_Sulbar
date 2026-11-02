@@ -24,17 +24,19 @@ class TournamentResultController extends Controller
             403
         );
 
-        $fixture->load(
+        $fixture->load([
             'entryA.players',
             'entryB.players',
-            'sets'
-        );
+            'sets',
+            'nextFixture',
+        ]);
 
-        return view('tournaments.edit-result', compact(
-            'tournament',
-            'fixture'
-        ));
+        return view(
+            'admin.tournaments.edit-result',
+            compact('tournament', 'fixture')
+        );
     }
+
 
     public function update(
         UpdateTournamentResultRequest $request,
@@ -52,16 +54,13 @@ class TournamentResultController extends Controller
         );
 
         return redirect()
-            ->route('admin.tournaments.show', [
-                'tournament' => $tournament,
-                'bagian' => 'pertandingan',
-                'ronde' => $fixture->round_number,
-            ])
+            ->route('admin.matches.index')
             ->with(
                 'success',
-                'Skor dan jumlah kok berhasil disimpan.'
+                'Hasil pertandingan turnamen berhasil disimpan.'
             );
     }
+
 
     private function ensureFixture(
         Tournament $tournament,

@@ -1,130 +1,164 @@
 @php
-$menus = [
+
+$adminMenus = [
 [
 'title' => 'Dashboard',
 'route' => 'admin.index',
-'active' => 'admin.index',
+'active' => ['admin.index'],
 'icon' => 'dashboard',
 ],
 [
 'title' => 'Data Pemain',
 'route' => 'admin.players.index',
-'active' => 'admin.players.*',
+'active' => ['admin.players.*'],
 'icon' => 'users',
 ],
 [
 'title' => 'Pertandingan',
 'route' => 'admin.matches.index',
-'active' => 'admin.matches.*',
+'active' => ['admin.matches.*'],
 'icon' => 'match',
 ],
 [
 'title' => 'Turnamen',
 'route' => 'admin.tournaments.index',
-'active' => 'admin.tournaments.*',
+'active' => ['admin.tournaments.*'],
 'icon' => 'trophy',
 ],
 [
 'title' => 'Keuangan',
 'route' => 'admin.cash.index',
-'active' => 'admin.cash.*',
+'active' => ['admin.cash.*'],
 'icon' => 'wallet',
 ],
 [
 'title' => 'Galeri Klub',
 'route' => 'admin.gallery.index',
-'active' => 'admin.gallery.*',
+'active' => ['admin.gallery.*'],
 'icon' => 'image',
 ],
 [
 'title' => 'Pengaturan Website',
 'route' => 'admin.settings.edit',
-'active' => 'admin.settings.*',
+'active' => ['admin.settings.*'],
 'icon' => 'settings',
 ],
 ];
+
 @endphp
 
-<aside id="a4-sidebar" class="a4-sidebar" aria-label="Navigasi admin">
-    <a href="{{ route('admin.index') }}" class="a4-brand">
+<aside id="admin-sidebar" class="adm-sidebar" aria-label="Navigasi administrator">
 
-        <span class="a4-brand__logo">
+    <a href="{{ route('admin.index') }}" class="adm-brand">
+
+        <span class="adm-brand__logo">
+
             @if(($siteSettings ?? null)?->logo_path)
-            <img src="{{ asset('storage/' . $siteSettings->logo_path) }}" alt="Logo PB Alfa">
+
+            <img src="{{ asset('storage/' . $siteSettings->logo_path) }}" alt="Logo PB Alfa" width="44" height="44">
+
             @else
             PB
             @endif
+
         </span>
 
-        <span class="a4-brand__info">
+        <span class="adm-brand__identity">
             <strong>PB ALFA</strong>
             <small>BPS SULAWESI BARAT</small>
         </span>
 
     </a>
 
-    <div class="a4-nav-scroll">
 
-        <p class="a4-nav-label">MENU ADMINISTRATOR</p>
+    {{-- NAVIGASI --}}
 
-        <nav class="a4-nav" aria-label="Menu utama">
+    <div class="adm-sidebar__scroll">
 
-            @foreach($menus as $menu)
+        <div class="adm-sidebar__section-label">
+            MENU ADMINISTRATOR
+        </div>
+
+        <nav class="adm-nav" aria-label="Menu utama admin">
+
+            @foreach($adminMenus as $menu)
+
             @php
+            $available =
+            \Illuminate\Support\Facades\Route::has(
+            $menu['route']
+            );
+
             $active = request()->routeIs(
-            $menu['active']
+            ...$menu['active']
             );
             @endphp
 
-            <a href="{{ route($menu['route']) }}" class="a4-nav__link {{ $active ? 'is-active' : '' }}" @if($active)
+            @if($available)
+
+            <a href="{{ route($menu['route']) }}" class="adm-nav__link {{ $active ? 'is-active' : '' }}" @if($active)
                 aria-current="page" @endif>
+
                 @include(
                 'admin.partials.nav-icon',
                 ['name' => $menu['icon']]
                 )
 
-                <span>{{ $menu['title'] }}</span>
+                <span class="adm-nav__text">
+                    {{ $menu['title'] }}
+                </span>
+
             </a>
+
+            @else
+
+            <span class="adm-nav__link adm-nav__link--disabled" aria-disabled="true" title="Modul sedang dikembangkan">
+
+                @include(
+                'admin.partials.nav-icon',
+                ['name' => $menu['icon']]
+                )
+
+                <span class="adm-nav__text">
+                    {{ $menu['title'] }}
+                </span>
+
+                <small class="adm-nav__soon">
+                    Segera
+                </small>
+
+            </span>
+
+            @endif
+
             @endforeach
 
         </nav>
 
     </div>
 
-    <div class="a4-sidebar__footer">
 
-        <a href="{{ route('home') }}" class="a4-footer-link" target="_blank" rel="noopener noreferrer">
+    {{-- FOOTER SIDEBAR --}}
+
+    <div class="adm-sidebar__footer">
+
+        <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer" class="adm-sidebar__website">
+
             @include(
             'admin.partials.nav-icon',
             ['name' => 'globe']
             )
+
             <span>Lihat Website</span>
+
+            <svg class="adm-sidebar__external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M13 5h6v6" />
+                <path d="M19 5l-9 9" />
+                <path d="M19 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5" />
+            </svg>
+
         </a>
-
-        <div class="a4-account">
-            <span class="a4-account__avatar">
-                {{ mb_strtoupper(
-                mb_substr(auth()->user()->name, 0, 1)
-                ) }}
-            </span>
-
-            <span class="a4-account__info">
-                <strong>{{ auth()->user()->name }}</strong>
-                <small>Administrator</small>
-            </span>
-        </div>
-
-        <form method="POST" action="{{ route('logout') }}" data-single-submit>
-            @csrf
-
-            <button type="submit" class="a4-logout">
-                @include(
-                'admin.partials.nav-icon',
-                ['name' => 'logout']
-                )
-                <span>Keluar dari Akun</span>
-            </button>
-        </form>
 
     </div>
 
