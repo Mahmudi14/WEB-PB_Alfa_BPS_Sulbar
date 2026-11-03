@@ -483,29 +483,6 @@ default => 'Tanpa Akun',
 
             </section>
 
-
-            {{-- INFORMASI STATUS --}}
-
-            <div class="adm-pe-status-info">
-
-                <div>
-
-                    <strong>Pengaturan Status Pemain</strong>
-
-                    <p>
-                        Aktivasi dan penonaktifan pemain
-                        dikelola melalui halaman Detail.
-                    </p>
-
-                </div>
-
-                <a href="{{ route('admin.players.show', $player->id) }}" class="adm-pe-status-info__link">
-                    Lihat Detail
-                    <span aria-hidden="true">&rarr;</span>
-                </a>
-
-            </div>
-
         </div>
 
     </div>

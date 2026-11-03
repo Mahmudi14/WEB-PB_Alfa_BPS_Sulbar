@@ -170,29 +170,6 @@
 
             <div class="adm-field">
 
-                <label for="ca-source">
-                    Sumber
-                </label>
-
-                <div class="adm-select-shell">
-                    <select id="ca-source" name="sumber" class="adm-select adm-premium-select"
-                        data-admin-premium-select>
-                        <option value="">Semua Sumber</option>
-
-                        <option value="manual" @selected($sumber==='manual' )>
-                            Manual
-                        </option>
-
-                        <option value="otomatis" @selected($sumber==='otomatis' )>
-                            Kok Otomatis
-                        </option>
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="adm-field">
-
                 <label for="ca-per-page">
                     Tampilkan
                 </label>
@@ -236,9 +213,7 @@
                         <th>No</th>
                         <th>Tanggal</th>
                         <th>Keterangan</th>
-                        <th>Sumber</th>
                         <th>Jenis</th>
-                        <th>Kok</th>
                         <th>Nominal</th>
                         <th>Status</th>
                         <th>Aksi</th>
@@ -275,30 +250,11 @@
                         </td>
 
                         <td>
-                            <span class="adm-ca-source {{ $isAuto
-                                    ? 'adm-ca-source--auto'
-                                    : 'adm-ca-source--manual' }}">
-                                {{ $isAuto
-                                ? 'Kok Otomatis'
-                                : 'Manual' }}
-                            </span>
-                        </td>
-
-                        <td>
                             <span class="adm-ca-type {{ $transaction->type === 'pemasukan'
                                     ? 'adm-ca-type--income'
                                     : 'adm-ca-type--expense' }}">
                                 {{ ucfirst($transaction->type) }}
                             </span>
-                        </td>
-
-                        <td class="adm-ca-nowrap">
-                            {{ $isAuto
-                            ? number_format(
-                            $transaction->shuttlecock_count ?? 0,
-                            0, ',', '.'
-                            )
-                            : '—' }}
                         </td>
 
                         <td class="adm-ca-nowrap">

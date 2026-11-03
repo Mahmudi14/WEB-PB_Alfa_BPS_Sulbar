@@ -8032,3 +8032,770 @@ a.adm-dash-shortcut:hover {
         gap: 3px;
     }
 }
+
+/* =========================================
+   EDIT PEMAIN - PENGATURAN AKUN
+   ========================================= */
+
+/* Hilangkan garis dan jarak atas section pertama */
+.adm-player-editor
+    .adm-pe-aside
+    .adm-pe-card__body
+    > .adm-pe-section:first-child {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Pertahankan pemisah untuk section berikutnya */
+.adm-player-editor
+    .adm-pe-aside
+    .adm-pe-card__body
+    > .adm-pe-section:not(:first-child) {
+    border-top: 1px solid #edf1f5;
+    margin-top: 21px;
+    padding-top: 21px;
+}
+
+/* ==========================================
+   MATCH INDEX - MINI SCOREBOARD
+   ========================================== */
+
+/* Ruang khusus kolom skor */
+
+.adm-match-table th:nth-child(6),
+.adm-match-table td:nth-child(6) {
+    min-width: 185px;
+}
+
+.adm-match-score-cell {
+    vertical-align: middle;
+}
+
+/* Scoreboard */
+
+.adm-match-mini-score {
+    width: 170px;
+    padding: 8px;
+
+    border: 1px solid #e0e9f1;
+    border-radius: 10px;
+
+    background: #f8fafc;
+}
+
+/* Header SET / TIM A / TIM B */
+
+.adm-match-mini-score__header {
+    display: grid;
+    grid-template-columns: 42px 1fr 1fr;
+    align-items: center;
+    gap: 6px;
+
+    padding: 2px 3px 8px;
+}
+
+.adm-match-mini-score__header span {
+    color: #8a9dab;
+
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+
+    text-align: center;
+}
+
+/* Setiap baris skor */
+
+.adm-match-mini-score__row {
+    display: grid;
+    grid-template-columns: 42px 1fr 1fr;
+    align-items: center;
+    gap: 6px;
+
+    margin-top: 5px;
+}
+
+/* Nomor set */
+
+.adm-match-mini-score__set {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 30px;
+
+    border-radius: 6px;
+
+    background: #edf2f6;
+    color: #72889a;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* Nilai skor */
+
+.adm-match-mini-score__value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 30px;
+
+    border: 1px solid #e1e7ee;
+    border-radius: 6px;
+
+    background: #fff;
+    color: #718699;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    font-variant-numeric: tabular-nums;
+}
+
+/* Skor pemenang masing-masing set */
+
+.adm-match-mini-score__value.is-winner {
+    background: #e8f6ed;
+    border-color: #cce8d5;
+
+    color: #267849;
+    font-weight: 900;
+}
+
+/* Pertandingan belum memiliki skor */
+
+.adm-match-no-score {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 8px 11px;
+
+    border: 1px dashed #e8d6b3;
+    border-radius: 8px;
+
+    background: #fff8ed;
+    color: #a47736;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+/* Responsif */
+
+@media (max-width: 700px) {
+    .adm-match-mini-score {
+        width: 160px;
+    }
+
+    .adm-match-mini-score__header,
+    .adm-match-mini-score__row {
+        grid-template-columns: 38px 1fr 1fr;
+        gap: 5px;
+    }
+}
+
+/* ==========================================
+   MATCH INDEX - COMPACT HORIZONTAL SCORE
+   ========================================== */
+
+/* Kolom skor mengikuti panjang teks */
+
+.adm-match-table th:nth-child(6),
+.adm-match-table td:nth-child(6) {
+    min-width: 0;
+    white-space: nowrap;
+}
+
+/* Posisi skor */
+
+.adm-match-score-cell {
+    vertical-align: middle;
+}
+
+/* Skor horizontal minimalis */
+
+.adm-match-score-inline {
+    display: inline-block;
+
+    color: #24455f;
+    font-size: 12px;
+    font-weight: 700;
+
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+/* Pertandingan belum memiliki skor */
+
+.adm-match-score-pending {
+    display: inline-block;
+
+    color: #a97932;
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+/* ==========================================
+   ADMIN TOURNAMENT - ROUND NAVIGATION
+   ========================================== */
+
+/* Posisi saat berpindah lewat URL anchor */
+
+.adm-tr-detail-schedule {
+    scroll-margin-top: 105px;
+}
+
+/* Navigasi ronde */
+
+.adm-tr-detail-round-nav {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: 16px;
+
+    padding: 14px 18px;
+    margin-bottom: 19px;
+
+    border: 1px solid #dfe9f2;
+    border-radius: 12px;
+
+    background: #f7fafd;
+}
+
+/* Tombol navigasi kiri dan kanan */
+
+.adm-tr-detail-round-nav__arrow {
+    display: grid;
+    place-items: center;
+
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid #dce6ef;
+    border-radius: 10px;
+
+    background: #fff;
+    color: #285b80;
+
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1;
+
+    text-decoration: none;
+    user-select: none;
+
+    transition:
+        background 0.16s ease,
+        border-color 0.16s ease,
+        color 0.16s ease;
+}
+
+a.adm-tr-detail-round-nav__arrow:hover {
+    background: #eaf3fb;
+    border-color: #a9cce5;
+    color: #1769aa;
+}
+
+a.adm-tr-detail-round-nav__arrow:focus-visible {
+    outline: 3px solid rgba(23, 105, 170, 0.23);
+    outline-offset: 2px;
+}
+
+/* Tombol disabled pada ronde pertama/terakhir */
+
+.adm-tr-detail-round-nav__arrow.is-disabled {
+    background: #f0f3f6;
+    border-color: #e5eaf0;
+    color: #bdc8d1;
+
+    cursor: default;
+}
+
+/* Label ronde */
+
+.adm-tr-detail-round-nav__current {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    min-width: 0;
+    text-align: center;
+}
+
+.adm-tr-detail-round-nav__current strong {
+    color: #1d425f;
+
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.adm-tr-detail-round-nav__current small {
+    color: #8198aa;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Khusus detail: satu ronde memenuhi lebar panel */
+
+.adm-tr-detail-schedule .adm-tr-rounds--single {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+}
+
+.adm-tr-detail-schedule .adm-tr-rounds--single .adm-tr-round {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Responsive */
+
+@media (max-width: 540px) {
+    .adm-tr-detail-round-nav {
+        grid-template-columns: 39px minmax(0, 1fr) 39px;
+        gap: 8px;
+
+        padding: 11px;
+    }
+
+    .adm-tr-detail-round-nav__arrow {
+        width: 39px;
+        height: 39px;
+
+        font-size: 27px;
+    }
+
+    .adm-tr-detail-round-nav__current strong {
+        font-size: 13px;
+    }
+
+    .adm-tr-detail-round-nav__current small {
+        font-size: 10px;
+    }
+}
+
+/* ==========================================
+   TOURNAMENT DETAIL - PROFESSIONAL SCOREBOARD
+   ========================================== */
+
+/* Posisi setelah navigasi ronde */
+
+.adm-tr-detail-schedule {
+    scroll-margin-top: 105px;
+}
+
+/* NAVIGASI RONDE */
+
+.adm-tr-detail-round-nav {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    align-items: center;
+    gap: 14px;
+
+    padding: 13px 17px;
+    margin-bottom: 18px;
+
+    border: 1px solid #e2eaf1;
+    border-radius: 12px;
+
+    background: #f7fafd;
+}
+
+.adm-tr-detail-round-nav__arrow {
+    display: grid;
+    place-items: center;
+
+    width: 42px;
+    height: 42px;
+
+    border: 1px solid #dce6ef;
+    border-radius: 9px;
+
+    background: #fff;
+    color: #285b80;
+
+    font-size: 29px;
+    line-height: 1;
+    text-decoration: none;
+
+    transition:
+        background 0.16s ease,
+        color 0.16s ease,
+        border-color 0.16s ease;
+}
+
+a.adm-tr-detail-round-nav__arrow:hover {
+    background: #eaf3fb;
+    border-color: #b1d0e6;
+    color: #1769aa;
+}
+
+a.adm-tr-detail-round-nav__arrow:focus-visible {
+    outline: 3px solid rgba(23, 105, 170, 0.25);
+    outline-offset: 2px;
+}
+
+.adm-tr-detail-round-nav__arrow.is-disabled {
+    background: #f1f4f7;
+    border-color: #e7ecf1;
+    color: #bbc7d1;
+    cursor: default;
+}
+
+.adm-tr-detail-round-nav__current {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+
+    min-width: 0;
+    text-align: center;
+}
+
+.adm-tr-detail-round-nav__current strong {
+    color: #244861;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.adm-tr-detail-round-nav__current small {
+    color: #8399aa;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* SCOREBOARD CONTAINER */
+
+.adm-tr-scoreboard {
+    border: 1px solid #e1eaf2;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.adm-tr-scoreboard__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 14px 18px;
+
+    background: #f5f8fb;
+    border-bottom: 1px solid #e5edf3;
+}
+
+.adm-tr-scoreboard__heading strong {
+    color: #244861;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.adm-tr-scoreboard__heading > span {
+    color: #8499aa;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* DAFTAR PERTANDINGAN */
+
+.adm-tr-scoreboard__list {
+    display: flex;
+    flex-direction: column;
+}
+
+.adm-tr-scoreboard__item {
+    display: grid;
+    grid-template-columns:
+        38px
+        minmax(0, 1fr)
+        110px;
+
+    align-items: center;
+    gap: 15px;
+
+    min-width: 0;
+    padding: 17px 19px;
+
+    background: #fff;
+}
+
+.adm-tr-scoreboard__item + .adm-tr-scoreboard__item {
+    border-top: 1px solid #edf1f5;
+}
+
+.adm-tr-scoreboard__item:hover {
+    background: #fbfdff;
+}
+
+/* NOMOR PALING KIRI */
+
+.adm-tr-scoreboard__number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 8px;
+    background: #f0f4f8;
+
+    color: #8498aa;
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+/* DUA BARIS TIM DAN SKOR */
+
+.adm-tr-scoreboard__board {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.adm-tr-scoreboard__team-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 15px;
+
+    min-width: 0;
+}
+
+.adm-tr-scoreboard__team {
+    min-width: 0;
+
+    color: #344f63;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.45;
+
+    overflow-wrap: anywhere;
+}
+
+.adm-tr-scoreboard__team.is-winner {
+    color: #1f7748;
+    font-weight: 800;
+}
+
+/* SKOR SET DI SISI KANAN */
+
+.adm-tr-scoreboard__scores {
+    display: grid;
+    grid-template-columns: repeat(2, 26px);
+    gap: 8px;
+    align-items: center;
+    justify-content: end;
+}
+
+.adm-tr-scoreboard--three .adm-tr-scoreboard__scores {
+    grid-template-columns: repeat(3, 26px);
+}
+
+.adm-tr-scoreboard__score {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+
+    color: #7e91a1;
+    font-size: 13px;
+    font-weight: 600;
+
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.adm-tr-scoreboard__score.is-set-winner {
+    color: #27804d;
+    font-weight: 900;
+}
+
+/* INFORMASI JUS */
+
+.adm-tr-scoreboard__note {
+    align-self: flex-end;
+
+    color: #8598a8;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* KOLOM AKSI */
+
+.adm-tr-scoreboard__action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    min-width: 0;
+}
+
+.adm-tr-scoreboard__edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-height: 34px;
+    padding: 8px 10px;
+
+    border: 1px solid #d8e8f5;
+    border-radius: 8px;
+
+    background: #f0f7fd;
+    color: #226b9e;
+
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition:
+        background 0.16s ease,
+        border-color 0.16s ease;
+}
+
+.adm-tr-scoreboard__edit svg {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+}
+
+.adm-tr-scoreboard__edit:hover {
+    background: #e3f1fc;
+    border-color: #a9cfe9;
+}
+
+.adm-tr-scoreboard__edit:focus-visible {
+    outline: 3px solid rgba(23, 105, 170, 0.25);
+    outline-offset: 2px;
+}
+
+.adm-tr-scoreboard__bye {
+    color: #9b814f;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* RESPONSIVE TABLET */
+
+@media (max-width: 850px) {
+    .adm-tr-scoreboard__item {
+        grid-template-columns:
+            34px
+            minmax(0, 1fr)
+            90px;
+
+        gap: 10px;
+        padding: 14px;
+    }
+
+    .adm-tr-scoreboard__edit {
+        padding: 8px;
+        font-size: 10px;
+    }
+
+    .adm-tr-scoreboard__team-row {
+        gap: 9px;
+    }
+}
+
+/* RESPONSIVE HP */
+
+@media (max-width: 600px) {
+    .adm-tr-detail-round-nav {
+        grid-template-columns:
+            38px
+            minmax(0, 1fr)
+            38px;
+
+        gap: 8px;
+        padding: 11px;
+    }
+
+    .adm-tr-detail-round-nav__arrow {
+        width: 38px;
+        height: 38px;
+        font-size: 27px;
+    }
+
+    .adm-tr-detail-round-nav__current strong {
+        font-size: 13px;
+    }
+
+    .adm-tr-detail-round-nav__current small {
+        font-size: 10px;
+    }
+
+    .adm-tr-scoreboard__heading {
+        padding: 12px;
+    }
+
+    .adm-tr-scoreboard__item {
+        grid-template-columns: 30px minmax(0, 1fr);
+        gap: 10px;
+
+        padding: 13px 11px;
+    }
+
+    .adm-tr-scoreboard__number {
+        width: 29px;
+        height: 29px;
+        font-size: 10px;
+    }
+
+    .adm-tr-scoreboard__board {
+        gap: 9px;
+    }
+
+    .adm-tr-scoreboard__team {
+        font-size: 11px;
+    }
+
+    .adm-tr-scoreboard__team-row {
+        gap: 8px;
+    }
+
+    .adm-tr-scoreboard__scores {
+        grid-template-columns: repeat(2, 20px);
+        gap: 4px;
+    }
+
+    .adm-tr-scoreboard--three .adm-tr-scoreboard__scores {
+        grid-template-columns: repeat(3, 20px);
+    }
+
+    .adm-tr-scoreboard__score {
+        font-size: 12px;
+    }
+
+    .adm-tr-scoreboard__action {
+        grid-column: 2;
+        justify-content: flex-end;
+    }
+
+    .adm-tr-scoreboard__edit {
+        min-height: 30px;
+        padding: 6px 9px;
+    }
+}
