@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\TournamentResultController;
 use App\Http\Controllers\Admin\CashController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\SiteSettingController;
+use App\Http\Controllers\Admin\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,24 @@ Route::get('/', [
     DashboardController::class,
     'index'
 ])->name('index');
+
+/*
+|--------------------------------------------------------------------------
+| PROFIL ADMINISTRATOR
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/profil', [
+    ProfileController::class,
+    'index'
+])->name('profile.index');
+
+Route::patch('/profil/nama', [
+    ProfileController::class,
+    'updateName'
+])
+    ->middleware('throttle:10,1')
+    ->name('profile.name.update');
 
 
 /*

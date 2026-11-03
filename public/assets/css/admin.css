@@ -8799,3 +8799,336 @@ a.adm-tr-detail-round-nav__arrow:focus-visible {
         padding: 6px 9px;
     }
 }
+
+/* ==========================================
+   ADMIN GALLERY - COMPACT PHOTO CARDS
+   ========================================== */
+
+/* Desktop: tiga foto per baris */
+.adm-ga-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+/* Gambar lebih pendek dan proporsional */
+.adm-ga-photo__media {
+    aspect-ratio: 16 / 10;
+}
+
+/* Konten card lebih ringkas */
+.adm-ga-photo__content {
+    padding: 11px;
+}
+
+.adm-ga-photo__content h4 {
+    font-size: 12px;
+    line-height: 1.45;
+    margin-bottom: 5px;
+}
+
+.adm-ga-photo__editor {
+    margin-top: 11px;
+}
+
+.adm-ga-photo__editor summary {
+    min-height: 36px;
+}
+
+/* Laptop */
+@media (max-width: 1250px) {
+    .adm-ga-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Saat upload dan galeri tersusun vertikal */
+@media (max-width: 1050px) {
+    .adm-ga-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* Tablet */
+@media (max-width: 800px) {
+    .adm-ga-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* HP */
+@media (max-width: 600px) {
+    .adm-ga-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .adm-ga-photo__content {
+        padding: 10px;
+    }
+}
+
+/* HP kecil: tetap dua kolom */
+@media (max-width: 440px) {
+    .adm-ga-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .adm-ga-photo__media {
+        aspect-ratio: 4 / 3;
+    }
+
+    .adm-ga-photo__content {
+        padding: 9px;
+    }
+
+    .adm-ga-photo__editor summary {
+        font-size: 10px;
+    }
+}
+
+/* ==========================================
+   ADMIN PROFILE PAGE
+   ========================================== */
+
+.adm-ap-page {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+.adm-ap-card {
+    max-width: 780px;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Identitas administrator */
+
+.adm-ap-identity {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+
+    padding: 25px;
+
+    background: #f7fafc;
+    border-bottom: 1px solid #e5edf4;
+}
+
+.adm-ap-avatar {
+    display: grid;
+    place-items: center;
+
+    width: 66px;
+    height: 66px;
+    flex: 0 0 66px;
+
+    border-radius: 17px;
+    background: #173f60;
+
+    color: #fff;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.adm-ap-identity__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.adm-ap-eyebrow {
+    color: #5383a4;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.adm-ap-identity__info h3 {
+    margin: 7px 0 5px;
+    color: #183e5c;
+    font-size: 19px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.adm-ap-identity__info p {
+    margin: 0;
+    color: #8195a5;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.adm-ap-role {
+    flex-shrink: 0;
+    padding: 8px 12px;
+
+    border-radius: 8px;
+    background: #e7f1fa;
+    color: #256b99;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* Form */
+
+.adm-ap-content {
+    padding: 26px;
+}
+
+.adm-ap-section-heading {
+    margin-bottom: 24px;
+}
+
+.adm-ap-section-heading h3 {
+    margin: 0 0 7px;
+    color: #183e5c;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.adm-ap-section-heading p {
+    margin: 0;
+    max-width: 550px;
+    color: #8498a8;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.adm-ap-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+
+    max-width: 560px;
+}
+
+.adm-ap-required,
+.adm-ap-error {
+    color: #b84450;
+}
+
+.adm-ap-error {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.adm-ap-readonly {
+    display: flex;
+    align-items: center;
+
+    min-height: 43px;
+    padding: 10px 12px;
+
+    border: 1px solid #e3eaf0;
+    border-radius: 9px;
+
+    background: #f5f8fa;
+    color: #72889a;
+
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.adm-ap-hint {
+    color: #91a2af;
+    font-size: 11px;
+}
+
+.adm-ap-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin-top: 27px;
+    padding-top: 20px;
+    border-top: 1px solid #edf1f5;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+    .adm-ap-identity {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 18px;
+    }
+
+    .adm-ap-avatar {
+        width: 52px;
+        height: 52px;
+        flex-basis: 52px;
+        font-size: 21px;
+    }
+
+    .adm-ap-role {
+        margin-left: 64px;
+    }
+
+    .adm-ap-content {
+        padding: 19px;
+    }
+
+    .adm-ap-identity__info h3 {
+        font-size: 16px;
+    }
+}
+
+/* ==========================================
+   ADMIN PROFILE - FULL WIDTH LAYOUT
+   ========================================== */
+
+/* Halaman memenuhi area konten */
+.adm-ap-page {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+/* Card profil memenuhi seluruh lebar */
+.adm-ap-page .adm-ap-card {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+/* Header identitas mengikuti lebar card */
+.adm-ap-page .adm-ap-identity {
+    width: 100%;
+}
+
+/* Form menggunakan dua kolom di desktop */
+.adm-ap-page .adm-ap-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    width: 100%;
+    max-width: none;
+    gap: 24px;
+}
+
+/* Input mengikuti lebar kolom */
+.adm-ap-page .adm-ap-fields .adm-field {
+    width: 100%;
+    min-width: 0;
+}
+
+.adm-ap-page .adm-ap-fields .adm-input,
+.adm-ap-page .adm-ap-readonly {
+    width: 100%;
+}
+
+/* Tombol simpan tetap di kanan bawah */
+.adm-ap-page .adm-ap-actions {
+    width: 100%;
+    justify-content: flex-end;
+}
+
+/* Tablet dan HP */
+@media (max-width: 700px) {
+    .adm-ap-page .adm-ap-fields {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}

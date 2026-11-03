@@ -106,7 +106,7 @@ default => 'Dashboard',
 
                 <div class="adm-profile__links">
 
-                    <a href="{{ route('profile.index') }}" class="adm-profile__item">
+                    <a href="{{ route('admin.profile.index') }}" class="adm-profile__item">
 
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

@@ -131,10 +131,15 @@
                 </a>
                 @endif
 
-                <a href="{{ route('profile.index') }}"
-                    class="nova-nav-link {{ request()->routeIs('profile.*') ? 'is-active' : '' }}"
-                    @if(request()->routeIs('profile.*')) aria-current="page" @endif
-                    >
+                <a href="{{ auth()->user()->isAdmin()
+        ? route('admin.profile.index')
+        : route('profile.index') }}" class="nova-nav-link {{
+        request()->routeIs('profile.*', 'admin.profile.*')
+            ? 'is-active'
+            : ''
+   }}" @if(request()->routeIs('profile.*', 'admin.profile.*'))
+                    aria-current="page"
+                    @endif>
                     Profil Saya
                 </a>
 
